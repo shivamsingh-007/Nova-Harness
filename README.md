@@ -1,8 +1,9 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/shivamsingh-007/Nova-Harness/main/banner.svg">
-    <img src="https://raw.githubusercontent.com/shivamsingh-007/Nova-Harness/main/banner.svg" width="100%" alt="Nova Harness">
-  </picture>
+  <img src="https://raw.githubusercontent.com/shivamsingh-007/Nova-Harness/master/logo.svg" width="80" alt="Nova Harness">
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/shivamsingh-007/Nova-Harness/master/banner.svg" width="100%" alt="Nova Harness">
 </p>
 
 <p align="center">
