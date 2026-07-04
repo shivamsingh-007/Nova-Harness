@@ -107,22 +107,9 @@ Coverage at 99% is against the contract code — not end-to-end system tests.
 └─────────────────────────────────────────────┘
 ```
 
-```
-$ pytest --cov=models --cov-report=term
-============================= test session starts =============================
-platform win32 -- Python 3.11.0, pytest-8.4.2, pluggy-1.6.0
-rootdir: C:\Users\shiva\OneDrive\Documents\yo harness
-plugins: anyio-4.12.1, asyncio-0.26.0, cov-5.0.0
-asyncio: mode=Mode.STRICT
-collected 1092 items
-
------------------------------------------------------------
-TOTAL                 3362     17    99%
------------------------------------------------------------
-
-1092 passed in 5.41s
-============================= 1092 passed in 2.44s ============================
-```
+<p align="center">
+  <img src="https://raw.githubusercontent.com/shivamsingh-007/Nova-Harness/master/terminal.svg" width="100%" alt="pytest output — 1092 tests passing, 99% coverage">
+</p>
 
 <br>
 

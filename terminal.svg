@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="800" height="480">
+  <defs>
+    <linearGradient id="termBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1b26"/>
+      <stop offset="100%" stop-color="#0f0f17"/>
+    </linearGradient>
+  </defs>
+
+  <!-- window frame -->
+  <rect x="10" y="10" width="780" height="460" rx="8" fill="url(#termBg)" stroke="#2a2a3a" stroke-width="1"/>
+  
+  <!-- title bar -->
+  <rect x="10" y="10" width="780" height="32" rx="8" fill="#2a2b3a"/>
+  <rect x="10" y="26" width="780" height="16" fill="#2a2b3a"/>
+  
+  <!-- traffic lights -->
+  <circle cx="32" cy="26" r="6" fill="#ff5f56"/>
+  <circle cx="52" cy="26" r="6" fill="#ffbd2e"/>
+  <circle cx="72" cy="26" r="6" fill="#27c93f"/>
+  
+  <!-- title -->
+  <text x="400" y="30" text-anchor="middle" font-family="'Segoe UI',Arial,sans-serif" font-size="12" fill="#808090">pytest --cov=models --cov-report=term</text>
+
+  <!-- terminal output -->
+  <text font-family="'Cascadia Code','Fira Code','JetBrains Mono','Consolas',monospace" font-size="12">
+    <tspan x="20" y="65" fill="#565670">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</tspan>
+    
+    <tspan x="20" y="85" fill="#7aa2f7">platform</tspan><tspan fill="#c0c0d0"> win32 -- Python 3.11.0, pytest-8.4.2, pluggy-1.6.0</tspan>
+    <tspan x="20" y="102" fill="#7aa2f7">rootdir</tspan><tspan fill="#c0c0d0">: C:\yo-harness</tspan>
+    <tspan x="20" y="119" fill="#7aa2f7">plugins</tspan><tspan fill="#c0c0d0">: anyio-4.12.1, asyncio-0.26.0, cov-5.0.0</tspan>
+    
+    <tspan x="20" y="145" fill="#565670">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</tspan>
+
+    <tspan x="20" y="168" fill="#c0c0d0">collecting ... collected 1092 items</tspan>
+    
+    <tspan x="20" y="192" fill="#22c55e">tests/test_task_contract.py .....................</tspan><tspan x="480" fill="#c0c0d0">[  4%]</tspan>
+    <tspan x="20" fill="#22c55e">tests/test_context_delivery.py .................</tspan><tspan x="480" fill="#c0c0d0">[  7%]</tspan>
+    <tspan x="20" fill="#22c55e">tests/test_context_selection_policy.py ........</tspan><tspan x="480" fill="#c0c0d0">[ 10%]</tspan>
+    <tspan x="20" fill="#22c55e">tests/test_tool_interface.py ..................</tspan><tspan x="480" fill="#c0c0d0">[ 14%]</tspan>
+    <tspan x="20" fill="#22c55e">tests/test_execution_environment.py ...........</tspan><tspan x="480" fill="#c0c0d0">[ 17%]</tspan>
+    <tspan x="20" fill="#22c55e">tests/test_durable_state.py ..................</tspan><tspan x="480" fill="#c0c0d0">[ 21%]</tspan>
+    <tspan x="20" fill="#22c55e">tests/test_verification_schema.py ............</tspan><tspan x="480" fill="#c0c0d0">[ 24%]</tspan>
+    <tspan x="20" fill="#22c55e">tests/test_prompt_assembly.py ................</tspan><tspan x="480" fill="#c0c0d0">[ 28%]</tspan>
+    <tspan x="20" fill="#22c55e">...................................................</tspan><tspan x="480" fill="#c0c0d0">[ 52%]</tspan>
+    <tspan x="20" fill="#22c55e">...................................................</tspan><tspan x="480" fill="#c0c0d0">[ 79%]</tspan>
+    <tspan x="20" fill="#22c55e">...................................................</tspan><tspan x="480" fill="#c0c0d0">[100%]</tspan>
+
+    <tspan x="20" y="360" fill="#565670">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</tspan>
+    <tspan x="20" y="380" fill="#c0c0d0">TOTAL</tspan><tspan x="280" fill="#c0c0d0">3362</tspan><tspan x="370" fill="#c0c0d0">17</tspan><tspan x="480" fill="#22c55e">99%</tspan>
+    <tspan x="20" y="397" fill="#565670">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</tspan>
+    
+    <tspan x="20" y="425" fill="#c0c0d0">======================= </tspan><tspan fill="#22c55e">1092 passed</tspan><tspan fill="#c0c0d0"> in 5.41s =======================</tspan>
+    
+    <tspan x="20" y="450" fill="#565670">$  </tspan><tspan fill="#c0c0d0">░</tspan>
+  </text>
+</svg>
