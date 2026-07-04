@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P14: Observability and Trace Schema</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #a855f7; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #a855f7 50%, #7c3aed 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p { font-size: 1.05rem; color: #9494a8; max-width: 640px; }
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-s { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+.icon-g { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.tree { padding-left: 1.2rem; border-left: 1px solid #1e1e2a; margin: 0.75rem 0; }
+
+.tree-item {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.3rem 0; font-size: 0.9rem;
+}
+
+.tree-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: #34d399; }
+.dot-yellow { background: #fbbf24; }
+.dot-red { background: #ef4444; }
+.dot-purple { background: #a78bfa; }
+.dot-blue { background: #38bdf8; }
+.dot-orange { background: #f97316; }
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #a855f7; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+
+.model-tree { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 2; }
+.model-tree .cls { color: #a855f7; font-weight: 600; }
+.model-tree .cls2 { color: #818cf8; font-weight: 600; }
+.model-tree .fld { color: #94a3b8; }
+.model-tree .typ { color: #818cf8; }
+.model-tree .def { color: #6b6b80; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 14 &mdash; Observability and Trace Schema</div>
+    <h1>Step-Level Execution Evidence Contract</h1>
+    <p>
+      The audit-friendly trace schema that captures what happened during a run:
+      steps, tools, policies, verifications, retries, and timestamps — without
+      secrets, chain-of-thought, or raw payloads.
+    </p>
+  </div>
+
+  <!-- FILES -->
+  <div class="section-label">Files Created</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/observability_trace.py                   <span class="dim">(7 BaseModels, 3 Enums)</span><br>
+    <span class="hl">CREATED</span>  tests/test_observability_trace_schema.py          <span class="dim">(68 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/observability_trace_examples.json          <span class="dim">(4 examples)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 538/538 tests pass across all primitives
+  </div>
+
+  <!-- HIERARCHY -->
+  <div class="section-label">Trace Hierarchy</div>
+
+  <div class="diagram">
+    <span class="hl">RunTrace</span><br>
+    <span style="padding-left:1.5rem;">&#9492;&#9472; <span class="hl2">StepTrace</span> (step_index: 0, 1, 2 ...)</span><br>
+    <span style="padding-left:3rem;">&#9500;&#9472; <span class="hl2">ToolTrace</span> &mdash; <span class="dim">tool_name, argument_summary, latency</span></span><br>
+    <span style="padding-left:3rem;">&#9500;&#9472; <span class="hl2">PolicyTrace</span> &mdash; <span class="dim">policy_name, outcome, risk_level, reason</span></span><br>
+    <span style="padding-left:3rem;">&#9500;&#9472; <span class="hl2">VerificationTrace</span> &mdash; <span class="dim">check_name, status, summary</span></span><br>
+    <span style="padding-left:3rem;">&#9492;&#9472; <span class="hl2">RetryTrace</span> &mdash; <span class="dim">attempt, max_attempts, reason, backoff</span></span><br>
+    <span style="padding-left:1.5rem;">&#9492;&#9472; <span class="hl2">TraceSummary</span> &mdash; <span class="dim">aggregate counts, total latency</span>
+  </div>
+
+  <!-- ENUMS -->
+  <div class="section-label">Enums &mdash; 3</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title" style="color:#a855f7;">StepType (7)</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> prompt_assembly</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> context_selection</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> tool_execution</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> verification</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> policy_check</div>
+        <div class="tree-item"><span class="tree-dot dot-orange"></span> retry</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> approval</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#818cf8;">TraceEventStatus (4)</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> success</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> failure</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> skipped</div>
+        <div class="tree-item"><span class="tree-dot dot-orange"></span> blocked</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#34d399;">PolicyOutcomeType (4)</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> allowed</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> required_approval</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> blocked</div>
+        <div class="tree-item"><span class="tree-dot dot-orange"></span> escalated</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALIDATION -->
+  <div class="section-label">Validation Rules</div>
+  <div class="diagram">
+    <span class="hl">Non-empty ids</span>              <span class="dim">run_id, task_id, step_id, tool_name, policy_name, check_name, reason</span><br>
+    <span class="hl">Non-negative latency</span>       <span class="dim">tool latency, step latency, total latency</span><br>
+    <span class="hl">Non-negative step_index</span>    <span class="dim">monotonic, sequential from 0</span><br>
+    <span class="hl">Non-negative counts</span>        <span class="dim">attempts, max_attempts, all summary integers</span><br>
+    <span class="hl">At least one step</span>          <span class="dim">RunTrace requires at least 1 StepTrace</span><br>
+    <span class="hl">finished_at for terminal status</span> <span class="dim">SUCCESS, FAILURE, BLOCKED require finished_at + latency</span><br>
+    <span class="hl">Summary steps match</span>         <span class="dim">summary.total_steps == len(steps)</span><br>
+    <span class="hl">attempt &lt;= max_attempts</span>      <span class="dim">retry bounds check</span><br>
+    <span class="hl">No secrets or chain-of-thought</span> <span class="dim">argument_summary only, not raw args</span>
+  </div>
+
+  <!-- EXAMPLES -->
+  <div class="section-label">Examples &mdash; 4 Traces</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-s">&#9632;</div>
+        <div>
+          <div class="card-title">Successful coding run</div>
+          <div class="card-subtitle">5 steps: prompt, context, policy, tool, verify</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> prompt_assembly</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> context_selection</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> policy_check &mdash; ALLOWED</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> tool_execution</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> verification &mdash; PASS</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-s">&#9632;</div>
+        <div>
+          <div class="card-title">Tool failure + retry</div>
+          <div class="card-subtitle">HTTP 503, retried once, succeeded</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> tool_execution &mdash; FAILURE</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> retry &mdash; attempt 1/3</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> tool_execution &mdash; SUCCESS</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-s">&#9632;</div>
+        <div>
+          <div class="card-title">Policy-blocked run</div>
+          <div class="card-subtitle">Credential access blocked, 1 step, terminated</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-orange"></span> policy_check &mdash; BLOCKED</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-s">&#9632;</div>
+        <div>
+          <div class="card-title">Verification failure</div>
+          <div class="card-subtitle">Tool wrote file, verification found malformed output</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> tool_execution &mdash; SUCCESS</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> verification &mdash; FAILURE</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOT IMPLEMENTED -->
+  <div class="section-label">Not Implemented Yet</div>
+  <div class="diagram">
+    <span class="dim">&#10007; Trace visualization / dashboard</span><br>
+    <span class="dim">&#10007; Tracing backend / export</span><br>
+    <span class="dim">&#10007; Distributed trace correlation</span><br>
+    <span class="dim">&#10007; Real-time event streaming</span><br>
+    <span class="dim">&#10007; Span-level sampling / rate limiting</span><br>
+    <span class="dim">&#10007; Alerting rules on trace patterns</span>
+  </div>
+
+  <!-- PRIMITIVES -->
+  <div class="section-label">Primitives So Far</div>
+  <div class="diagram">
+    <span class="hl2">P1  INSTRUCTION LAYERING</span>       <span class="dim">Global + Project + Task layers</span><br>
+    <span class="hl" style="color:#34d399;">P2  TASK CONTRACT SCHEMA</span>       <span class="dim">Nested Pydantic + 2-layer validation</span><br>
+    <span class="hl" style="color:#38bdf8;">P3  CONTEXT DELIVERY SCHEMA</span>     <span class="dim">Structured bundle + reason-annotated items</span><br>
+    <span class="hl" style="color:#fbbf24;">P4  CONTEXT SELECTION POLICY</span>   <span class="dim">Heuristic pipeline + exclusions + caps</span><br>
+    <span class="hl" style="color:#f87171;">P5  TOOL INTERFACE SCHEMA</span>      <span class="dim">Definition, Invocation, Result</span><br>
+    <span class="hl" style="color:#a78bfa;">P6  EXECUTION ENVIRONMENT</span>     <span class="dim">Provider-agnostic runtime contract</span><br>
+    <span class="hl" style="color:#fbbf24;">P7  DURABLE STATE SCHEMA</span>      <span class="dim">Run-centric execution persistence</span><br>
+    <span class="hl" style="color:#34d399;">P8  VERIFICATION SCHEMA</span>       <span class="dim">Multi-check quality gate contract</span><br>
+    <span class="hl" style="color:#38bdf8;">P9  PROMPT ASSEMBLY SCHEMA</span>    <span class="dim">Layered prompt assembly</span><br>
+    <span class="hl2">P10 RUN ORCHESTRATION STATE MACHINE</span> <span class="dim">Deterministic control-flow contract</span><br>
+    <span class="hl" style="color:#fbbf24;">P11 RETRY AND RECOVERY POLICY</span> <span class="dim">Failure-classified retry contract</span><br>
+    <span class="hl" style="color:#ef4444;">P12 APPROVAL AND SAFETY POLICY</span> <span class="dim">Risk-classified governance contract</span><br>
+    <span class="hl" style="color:#34d399;">P13 EVALUATION AND BENCHMARK SCHEMA</span> <span class="dim">Task-grader-run benchmark contract</span><br>
+    <span class="hl" style="color:#a855f7;">P14 OBSERVABILITY AND TRACE SCHEMA</span> <span class="dim">Step-level execution evidence contract — <span style="color:#a855f7;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P14 &bull; Observability and Trace Schema &bull; 538/538 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

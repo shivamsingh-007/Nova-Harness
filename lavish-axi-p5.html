@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P5: Tool Interface Schema</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #f87171; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #f87171 50%, #dc2626 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p { font-size: 1.05rem; color: #9494a8; max-width: 640px; }
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-def { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+.icon-inv { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.icon-res { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-enum { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.icon-test { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+.tag {
+  display: inline-block; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 500;
+}
+
+.tag-def { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.15); }
+.tag-pass { background: rgba(52, 211, 153, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.2); }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.tree { padding-left: 1.2rem; border-left: 1px solid #1e1e2a; margin: 0.75rem 0; }
+
+.tree-item {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.3rem 0; font-size: 0.9rem;
+}
+
+.tree-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: #34d399; }
+.dot-yellow { background: #fbbf24; }
+.dot-red { background: #ef4444; }
+.dot-blue { background: #38bdf8; }
+.dot-purple { background: #a78bfa; }
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #f87171; }
+.diagram .hl2 { color: #fbbf24; }
+.diagram .hl3 { color: #34d399; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+}
+
+.model-tree { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 2; }
+.model-tree .cls { color: #f87171; font-weight: 600; }
+.model-tree .cls2 { color: #fbbf24; font-weight: 600; }
+.model-tree .cls3 { color: #34d399; font-weight: 600; }
+.model-tree .fld { color: #94a3b8; }
+.model-tree .typ { color: #818cf8; }
+.model-tree .def { color: #6b6b80; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 5 &mdash; Tool Interface Schema</div>
+    <h1>Definition, Invocation, Result</h1>
+    <p>
+      Three-model contract for how tools are declared, called, and returned.
+      Separates static metadata from dynamic calls and execution results.
+      MCP-compatible design for future transport adaptation.
+    </p>
+  </div>
+
+  <!-- FILES -->
+  <div class="section-label">Files Created</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/tool_interface.py          <span class="dim">(3 BaseModels, 3 Enums)</span><br>
+    <span class="hl">CREATED</span>  tests/test_tool_interface.py       <span class="dim">(24 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/tool_interface_examples.json <span class="dim">(3 examples: read, edit, run)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 87/87 tests pass across all 5 primitives
+  </div>
+
+  <!-- THREE MODELS -->
+  <div class="section-label">Three-Model Architecture</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-def">&#9632;</div>
+        <div>
+          <div class="card-title">ToolDefinition</div>
+          <div class="card-subtitle">Static tool metadata</div>
+        </div>
+      </div>
+      <div class="model-tree">
+        <span class="cls">ToolDefinition</span><br>
+        <span style="padding-left:1rem;display:block;">
+          <span class="fld">&#9500;&#9472; name</span>: <span class="typ">str</span><br>
+          <span class="fld">&#9500;&#9472; description</span>: <span class="typ">str</span><br>
+          <span class="fld">&#9500;&#9472; input_schema</span>: <span class="typ">Dict</span><br>
+          <span class="fld">&#9500;&#9472; output_schema</span>: <span class="typ">Optional[Dict]</span><br>
+          <span class="fld">&#9500;&#9472; requires_approval</span>: <span class="typ">bool</span><br>
+          <span class="fld">&#9500;&#9472; execution_mode</span>: <span class="typ">ExecutionMode</span><br>
+          <span class="fld">&#9500;&#9472; tags</span>: <span class="typ">List[str]</span><br>
+          <span class="fld">&#9492;&#9472; enabled</span>: <span class="typ">bool</span><br>
+        </span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-inv">&#9632;</div>
+        <div>
+          <div class="card-title">ToolInvocation</div>
+          <div class="card-subtitle">One model-requested call</div>
+        </div>
+      </div>
+      <div class="model-tree">
+        <span class="cls2">ToolInvocation</span><br>
+        <span style="padding-left:1rem;display:block;">
+          <span class="fld">&#9500;&#9472; invocation_id</span>: <span class="typ">str</span><br>
+          <span class="fld">&#9500;&#9472; tool_name</span>: <span class="typ">str</span><br>
+          <span class="fld">&#9500;&#9472; arguments</span>: <span class="typ">Dict</span><br>
+          <span class="fld">&#9500;&#9472; requested_by_task_id</span>: <span class="typ">str</span><br>
+          <span class="fld">&#9500;&#9472; requested_by_agent</span>: <span class="typ">str</span><br>
+          <span class="fld">&#9492;&#9472; approval_state</span>: <span class="typ">ApprovalState</span><br>
+        </span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-res">&#9632;</div>
+        <div>
+          <div class="card-title">ToolResult</div>
+          <div class="card-subtitle">Execution outcome</div>
+        </div>
+      </div>
+      <div class="model-tree">
+        <span class="cls3">ToolResult</span><br>
+        <span style="padding-left:1rem;display:block;">
+          <span class="fld">&#9500;&#9472; invocation_id</span>: <span class="typ">str</span><br>
+          <span class="fld">&#9500;&#9472; tool_name</span>: <span class="typ">str</span><br>
+          <span class="fld">&#9500;&#9472; status</span>: <span class="typ">ToolStatus</span><br>
+          <span class="fld">&#9500;&#9472; output</span>: <span class="typ">Optional[Dict]</span><br>
+          <span class="fld">&#9500;&#9472; error</span>: <span class="typ">Optional[str]</span><br>
+          <span class="fld">&#9500;&#9472; artifacts</span>: <span class="typ">List[str]</span><br>
+          <span class="fld">&#9500;&#9472; started_at</span>: <span class="typ">Optional[str]</span><br>
+          <span class="fld">&#9492;&#9472; finished_at</span>: <span class="typ">Optional[str]</span><br>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENUMS -->
+  <div class="section-label">Enums &mdash; 3</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-enum">&#9881;</div>
+        <div><div class="card-title">ExecutionMode</div></div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> read_only</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> mutating</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> execution</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-enum">&#9881;</div>
+        <div><div class="card-title">ApprovalState</div></div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> not_required</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> pending</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> approved</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> rejected</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-enum">&#9881;</div>
+        <div><div class="card-title">ToolStatus</div></div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> success</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> error</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> blocked</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALIDATORS -->
+  <div class="section-label">Validation Rules</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-def">&#9881;</div>
+        <div>
+          <div class="card-title">ToolDefinition</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> name, description must not be empty</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> input_schema must not be empty</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-inv">&#9881;</div>
+        <div>
+          <div class="card-title">ToolInvocation</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> invocation_id, tool_name, task_id, agent must not be empty</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Cannot start as already APPROVED &rarr; must go through PENDING</div>
+      </div>
+    </div>
+    <div class="card" style="grid-column: 1 / -1;">
+      <div class="card-header">
+        <div class="card-icon icon-res">&#9881;</div>
+        <div>
+          <div class="card-title">ToolResult &mdash; Status Consistency</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> SUCCESS must have output or artifacts (can't be empty success)</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> ERROR must include an error message</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> BLOCKED must include an error message</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXAMPLES -->
+  <div class="section-label">Examples &mdash; 3</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-test">&#9881;</div>
+        <div>
+          <div class="card-title">read_file</div>
+          <div class="card-subtitle">read_only, no approval</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Invoked &rarr; success with output</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> Tags: read, filesystem</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-test">&#9881;</div>
+        <div>
+          <div class="card-title">edit_file</div>
+          <div class="card-subtitle">mutating, requires approval</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> PENDING approval state</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Result: success + artifact</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> Tags: write, filesystem</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-test">&#9881;</div>
+        <div>
+          <div class="card-title">run_tests</div>
+          <div class="card-subtitle">execution, error result</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Result: error with traceback</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> Tags: test, verify</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL CATEGORIES -->
+  <div class="section-label">Conceptual Tool Categories</div>
+  <div class="diagram">
+    <span class="hl">Read tools</span>          <span class="dim">read_file, search_code, git_diff &mdash; read_only</span><br>
+    <span class="hl2">Write tools</span>        <span class="dim">edit_file, apply_patch &mdash; mutating, often requires_approval</span><br>
+    <span class="hl3">Execution tools</span>     <span class="dim">run_tests, run_lint, run_typecheck &mdash; execution</span><br>
+    <span class="dim">Meta tools</span>           <span class="dim">list_tools, get_task_context &mdash; introspection</span>
+  </div>
+
+  <!-- PRIMITIVES -->
+  <div class="section-label">Primitives So Far</div>
+  <div class="diagram">
+    <span class="hl" style="color:#818cf8;">P1  INSTRUCTION LAYERING</span>       <span class="dim">Global + Project + Task layers</span><br>
+    <span class="hl" style="color:#34d399;">P2  TASK CONTRACT SCHEMA</span>       <span class="dim">Nested Pydantic + 2-layer validation</span><br>
+    <span class="hl" style="color:#38bdf8;">P3  CONTEXT DELIVERY SCHEMA</span>     <span class="dim">Structured bundle + reason-annotated items</span><br>
+    <span class="hl" style="color:#fbbf24;">P4  CONTEXT SELECTION POLICY</span>   <span class="dim">Heuristic pipeline + exclusions + caps</span><br>
+    <span class="hl" style="color:#f87171;">P5  TOOL INTERFACE SCHEMA</span>      <span class="dim">Definition, Invocation, Result — <span style="color:#f87171;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P5 &bull; Tool Interface Schema &bull; 87/87 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

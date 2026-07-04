@@ -1,0 +1,121 @@
+{
+  "session_examples": [
+    {
+      "label": "active_session_in_progress",
+      "value": {
+        "session_id": "sess-20260704-001",
+        "run_id": "run-a1b2c3",
+        "status": "active",
+        "current_step_id": "step-3",
+        "current_plan_summary": "Implement user authentication flow",
+        "completed_step_ids": ["step-1", "step-2"],
+        "active_context_refs": ["ctx-file-auth-py", "ctx-spec-auth"],
+        "tool_result_refs": ["tr-read-spec", "tr-read-impl"]
+      }
+    },
+    {
+      "label": "paused_session",
+      "value": {
+        "session_id": "sess-20260704-002",
+        "run_id": "run-d4e5f6",
+        "status": "paused",
+        "current_step_id": "step-4",
+        "completed_step_ids": ["step-1", "step-2", "step-3"],
+        "active_context_refs": [],
+        "tool_result_refs": []
+      }
+    }
+  ],
+  "checkpoint_examples": [
+    {
+      "label": "step_boundary_checkpoint",
+      "value": {
+        "checkpoint_id": "cp-20260704-001",
+        "session_id": "sess-20260704-001",
+        "run_id": "run-a1b2c3",
+        "checkpoint_type": "step_boundary",
+        "created_at": "2026-07-04T12:00:00Z",
+        "state_snapshot": {
+          "snapshot_id": "snap-20260704-001",
+          "storage_uri": "s3://harness-checkpoints/snap-20260704-001.json",
+          "checksum": "sha256-abc123def456"
+        },
+        "checkpointed_steps": [
+          {
+            "step_id": "step-2",
+            "step_name": "parse_user_input",
+            "replay_safety": "replay_safe",
+            "status": "completed",
+            "side_effect_markers": []
+          }
+        ],
+        "notes": "Auto-checkpoint after step-2 completed"
+      }
+    },
+    {
+      "label": "pre_sideeffect_checkpoint",
+      "value": {
+        "checkpoint_id": "cp-20260704-002",
+        "session_id": "sess-20260704-001",
+        "run_id": "run-a1b2c3",
+        "checkpoint_type": "pre_sideeffect",
+        "created_at": "2026-07-04T12:03:00Z",
+        "state_snapshot": {
+          "snapshot_id": "snap-20260704-002",
+          "storage_uri": "s3://harness-checkpoints/snap-20260704-002.json"
+        },
+        "checkpointed_steps": [
+          {
+            "step_id": "step-3",
+            "step_name": "send_welcome_email",
+            "replay_safety": "requires_idempotency_key",
+            "status": "pending",
+            "side_effect_markers": [
+              {
+                "marker_id": "m-email-001",
+                "step_id": "step-3",
+                "operation_name": "send_email",
+                "idempotency_key": "idem-welcome-001",
+                "side_effect_committed": false
+              }
+            ]
+          }
+        ],
+        "notes": "Checkpoint before external email send"
+      }
+    }
+  ],
+  "recovery_examples": [
+    {
+      "label": "resume_from_checkpoint",
+      "value": {
+        "decision_id": "rd-001",
+        "request_id": "rr-001",
+        "disposition": "resume_from_checkpoint",
+        "target_step_id": "step-3",
+        "requires_revalidation": false,
+        "rationale": "Infra issue resolved, resuming from last checkpoint"
+      }
+    },
+    {
+      "label": "abort_resume",
+      "value": {
+        "decision_id": "rd-002",
+        "request_id": "rr-002",
+        "disposition": "abort_resume",
+        "rationale": "Session expired beyond TTL, cannot resume safely"
+      }
+    },
+    {
+      "label": "restart_step_with_revalidation",
+      "value": {
+        "decision_id": "rd-003",
+        "request_id": "rr-003",
+        "disposition": "restart_step",
+        "target_step_id": "step-5",
+        "requires_revalidation": true,
+        "rationale": "Side-effect step needs human review before replay"
+      }
+    }
+  ]
+}

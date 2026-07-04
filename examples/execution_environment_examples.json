@@ -1,0 +1,82 @@
+{
+  "examples": [
+    {
+      "name": "Safe local Docker sandbox — default restricted",
+      "environment": {
+        "environment_id": "env-local-safe",
+        "provider": "docker",
+        "filesystem": {
+          "workspace_root": "/workspace",
+          "writable_paths": ["/workspace/src", "/workspace/tests"],
+          "read_only_paths": ["/workspace/.venv", "/workspace/node_modules"],
+          "blocked_paths": ["/workspace/secrets", "/workspace/.git"]
+        },
+        "network": {
+          "mode": "disabled",
+          "allowed_hosts": []
+        },
+        "resources": {
+          "max_cpu_cores": 2.0,
+          "max_memory_mb": 2048,
+          "max_disk_mb": 4096,
+          "max_runtime_seconds": 600,
+          "max_process_count": 20
+        },
+        "secrets": {
+          "access_mode": "none",
+          "allowed_secret_names": []
+        },
+        "lifecycle": {
+          "mode": "ephemeral",
+          "ttl_seconds": 1800,
+          "preserve_on_failure": true
+        },
+        "audit": {
+          "log_tool_calls": true,
+          "log_resource_usage": true,
+          "capture_stdout_stderr": true,
+          "capture_fs_diff": true
+        }
+      }
+    },
+    {
+      "name": "Restricted E2B sandbox — allowlist network with explicit secrets",
+      "environment": {
+        "environment_id": "env-e2b-restricted",
+        "provider": "e2b",
+        "filesystem": {
+          "workspace_root": "/home/user",
+          "writable_paths": ["/home/user/project/src", "/home/user/project/tests"],
+          "read_only_paths": ["/home/user/project/data", "/home/user/project/config.yml"],
+          "blocked_paths": ["/home/user/.ssh", "/home/user/.aws"]
+        },
+        "network": {
+          "mode": "allowlist",
+          "allowed_hosts": ["pypi.org", "files.pythonhosted.org", "api.github.com"]
+        },
+        "resources": {
+          "max_cpu_cores": 4.0,
+          "max_memory_mb": 4096,
+          "max_disk_mb": 8192,
+          "max_runtime_seconds": 900,
+          "max_process_count": 40
+        },
+        "secrets": {
+          "access_mode": "explicit",
+          "allowed_secret_names": ["GH_TOKEN", "PYPI_TOKEN"]
+        },
+        "lifecycle": {
+          "mode": "ephemeral",
+          "ttl_seconds": 3600,
+          "preserve_on_failure": true
+        },
+        "audit": {
+          "log_tool_calls": true,
+          "log_resource_usage": true,
+          "capture_stdout_stderr": true,
+          "capture_fs_diff": true
+        }
+      }
+    }
+  ]
+}

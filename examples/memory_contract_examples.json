@@ -1,0 +1,140 @@
+{
+  "memory_examples": [
+    {
+      "label": "session_memory_task_continuity",
+      "value": {
+        "memory_id": "mem-sess-042",
+        "memory_type": "session",
+        "purpose": "task_continuity",
+        "scope": {
+          "scope_type": "session",
+          "scope_id": "sess-20260704-001"
+        },
+        "sensitivity": "low",
+        "lifecycle_status": "active",
+        "content_ref": "memory-store://sessions/sess-20260704-001/step-3-result.json",
+        "retention_policy": {
+          "retention_class": "ephemeral",
+          "ttl_seconds": 3600,
+          "allow_user_delete": true,
+          "allow_admin_delete": true
+        }
+      }
+    },
+    {
+      "label": "long_term_user_preference_memory",
+      "value": {
+        "memory_id": "mem-user-pref-001",
+        "memory_type": "long_term",
+        "purpose": "user_preference",
+        "scope": {
+          "scope_type": "user",
+          "scope_id": "user-shiva"
+        },
+        "sensitivity": "low",
+        "lifecycle_status": "active",
+        "content_ref": "memory-store://users/user-shiva/preferences.json",
+        "provenance_ref": "audit://ev-pref-save-042",
+        "retention_policy": {
+          "retention_class": "standard",
+          "ttl_seconds": 2592000,
+          "allow_user_delete": true,
+          "allow_admin_delete": true
+        }
+      }
+    },
+    {
+      "label": "suppressed_memory_denied_at_retrieval",
+      "value": {
+        "memory_id": "mem-suppressed-001",
+        "memory_type": "session",
+        "purpose": "safety_signal",
+        "scope": {
+          "scope_type": "session",
+          "scope_id": "sess-001"
+        },
+        "sensitivity": "high",
+        "lifecycle_status": "suppressed",
+        "content_ref": "memory-store://suppressed/safety-signal-001.json",
+        "retention_policy": {
+          "retention_class": "short_lived",
+          "ttl_seconds": 86400,
+          "allow_user_delete": false,
+          "allow_admin_delete": true
+        }
+      }
+    },
+    {
+      "label": "quarantined_memory_record",
+      "value": {
+        "memory_id": "mem-quarantine-001",
+        "memory_type": "long_term",
+        "purpose": "safety_signal",
+        "scope": {
+          "scope_type": "system",
+          "scope_id": "system-global"
+        },
+        "sensitivity": "restricted",
+        "lifecycle_status": "quarantined",
+        "content_ref": "memory-store://quarantine/suspicious-content-001.json",
+        "provenance_ref": "audit://ev-guardrail-block-099",
+        "retention_policy": {
+          "retention_class": "legal_hold",
+          "allow_user_delete": false,
+          "allow_admin_delete": false
+        }
+      }
+    },
+    {
+      "label": "project_scoped_memory_standard_retention",
+      "value": {
+        "memory_id": "mem-proj-harness-context",
+        "memory_type": "long_term",
+        "purpose": "project_context",
+        "scope": {
+          "scope_type": "project",
+          "scope_id": "proj-harness"
+        },
+        "sensitivity": "moderate",
+        "lifecycle_status": "active",
+        "content_ref": "memory-store://projects/proj-harness/design-decision-015.json",
+        "provenance_ref": "audit://ev-adr-save-015",
+        "retention_policy": {
+          "retention_class": "standard",
+          "ttl_seconds": 7776000,
+          "allow_user_delete": true,
+          "allow_admin_delete": true
+        }
+      }
+    }
+  ],
+  "access_decision_examples": [
+    {
+      "label": "session_scope_allowed",
+      "value": {
+        "decision_id": "mad-sess-042",
+        "memory_id": "mem-sess-042",
+        "allowed": true,
+        "reason": "Execution session scope matches memory scope",
+        "execution_context": {
+          "session_id": "sess-20260704-001",
+          "run_id": "run-a1b2c3",
+          "actor_role": "agent-codex"
+        }
+      }
+    },
+    {
+      "label": "suppressed_memory_denied",
+      "value": {
+        "decision_id": "mad-suppressed-001",
+        "memory_id": "mem-suppressed-001",
+        "allowed": false,
+        "reason": "Memory lifecycle_status is SUPPRESSED, not retrievable for normal operations",
+        "execution_context": {
+          "session_id": "sess-001",
+          "run_id": "run-001"
+        }
+      }
+    }
+  ]
+}

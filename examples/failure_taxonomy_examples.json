@@ -1,0 +1,172 @@
+{
+  "examples": [
+    {
+      "name": "Retryable provider timeout",
+      "description": "A model provider request timed out. The error is classified as PROVIDER, retryable, and safe to show to the user. The recovery disposition tells downstream logic to retry.",
+      "envelope": {
+        "error_id": "err-prov-042",
+        "code": "PROVIDER_TIMEOUT",
+        "message": "Provider request timed out after 30 seconds",
+        "category": "provider",
+        "severity": "error",
+        "retryable": true,
+        "user_safe": true,
+        "recovery_disposition": "retryable",
+        "context": {
+          "run_id": "run-042",
+          "trace_id": "trace-abc-123",
+          "step_id": "step-3",
+          "operation": "generate",
+          "component": "openrouter"
+        },
+        "details": [
+          "timeout_seconds=30",
+          "model=google/gemini-2.0-flash-001",
+          "attempt=2 of 3"
+        ],
+        "cause_chain": []
+      },
+      "public_view": {
+        "error_id": "err-prov-042",
+        "code": "PROVIDER_TIMEOUT",
+        "message": "The AI provider took too long to respond. Please try again.",
+        "category": "provider",
+        "retryable": true
+      },
+      "classification": {
+        "error_id": "err-prov-042",
+        "primary_category": "provider",
+        "severity": "error",
+        "recovery_disposition": "retryable",
+        "should_trigger_alert": false
+      }
+    },
+    {
+      "name": "Non-retryable verification failure",
+      "description": "The tool output failed verification checks. The error is classified as VERIFICATION, non-retryable, and user-safe. The cause chain shows that both the test and lint checks failed.",
+      "envelope": {
+        "error_id": "err-ver-099",
+        "code": "VERIFICATION_FAILED",
+        "message": "Output failed 2 of 3 verification checks",
+        "category": "verification",
+        "severity": "error",
+        "retryable": false,
+        "user_safe": true,
+        "recovery_disposition": "non_retryable",
+        "context": {
+          "run_id": "run-099",
+          "trace_id": "trace-def-456",
+          "step_id": "step-5",
+          "operation": "verify_tool_output",
+          "component": "verifier"
+        },
+        "details": [
+          "criterion:test=pytest failed",
+          "criterion:lint=pylint failed",
+          "criterion:typecheck=pyright passed"
+        ],
+        "cause_chain": [
+          {
+            "code": "TEST_FAILURE",
+            "message": "No test functions found in output",
+            "category": "verification"
+          },
+          {
+            "code": "LINT_FAILURE",
+            "message": "Lint score below threshold",
+            "category": "verification"
+          }
+        ]
+      },
+      "public_view": {
+        "error_id": "err-ver-099",
+        "code": "VERIFICATION_FAILED",
+        "message": "The generated output did not pass all quality checks.",
+        "category": "verification",
+        "retryable": false
+      },
+      "classification": {
+        "error_id": "err-ver-099",
+        "primary_category": "verification",
+        "severity": "error",
+        "recovery_disposition": "non_retryable",
+        "should_trigger_alert": false
+      }
+    },
+    {
+      "name": "Blocked safety policy failure",
+      "description": "A tool invocation was blocked by the safety policy. The error is classified as SAFETY_POLICY, non-retryable, and NOT user-safe (internal details not exposed). Recovery disposition is BLOCK_AND_AUDIT.",
+      "envelope": {
+        "error_id": "err-saf-007",
+        "code": "SAFETY_POLICY_BLOCKED",
+        "message": "Tool call blocked by safety policy: rule DELETE_FILE for path /etc/passwd",
+        "category": "safety_policy",
+        "severity": "critical",
+        "retryable": false,
+        "user_safe": false,
+        "recovery_disposition": "block_and_audit",
+        "context": {
+          "run_id": "run-007",
+          "trace_id": "trace-ghi-789",
+          "step_id": "step-2",
+          "operation": "execute_tool",
+          "component": "safety_checker"
+        },
+        "details": [
+          "policy_rule=DELETE_FILE",
+          "target_path=/etc/passwd",
+          "risk_level=critical"
+        ],
+        "cause_chain": []
+      },
+      "public_view": {
+        "error_id": "err-saf-007",
+        "code": "SAFETY_POLICY_BLOCKED",
+        "message": "The requested operation was blocked by a security policy.",
+        "category": "safety_policy",
+        "retryable": false
+      },
+      "classification": {
+        "error_id": "err-saf-007",
+        "primary_category": "safety_policy",
+        "severity": "critical",
+        "recovery_disposition": "block_and_audit",
+        "should_trigger_alert": true
+      }
+    },
+    {
+      "name": "Sanitized public error view",
+      "description": "A raw internal error envelope and its sanitized public counterpart side by side. Internal details like component, trace_id, and cause chain are stripped from the public view. The message is rewritten to be user-safe.",
+      "internal_envelope": {
+        "error_id": "err-int-999",
+        "code": "PERSISTENCE_WRITE_FAILED",
+        "message": "Failed to write run state to /var/harness/runs/run-999.json: disk full",
+        "category": "persistence",
+        "severity": "error",
+        "retryable": true,
+        "user_safe": false,
+        "recovery_disposition": "retryable",
+        "context": {
+          "run_id": "run-999",
+          "trace_id": "trace-jkl-012",
+          "step_id": "step-final",
+          "operation": "persist_run_state",
+          "component": "state_writer"
+        },
+        "details": [
+          "target_path=/var/harness/runs/run-999.json",
+          "error=no space left on device",
+          "fs_usage=100%"
+        ],
+        "cause_chain": []
+      },
+      "public_view": {
+        "error_id": "err-int-999",
+        "code": "PERSISTENCE_WRITE_FAILED",
+        "message": "The system encountered a storage issue. Your run data may not have been saved. Please try again.",
+        "category": "persistence",
+        "retryable": true
+      }
+    }
+  ]
+}

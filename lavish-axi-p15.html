@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P15: State Machine Driver</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #fbbf24; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #fbbf24 50%, #f59e0b 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p { font-size: 1.05rem; color: #9494a8; max-width: 640px; }
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-y { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.icon-g { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #fbbf24; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+
+.state-flow {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+  line-height: 2.2; white-space: pre;
+}
+
+.dim2 { color: #6b6b80; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 15 &mdash; State Machine Driver</div>
+    <h1>Wiring the FSM into Executable Flow</h1>
+    <p>
+      The <code>StateDriver</code> wraps P10's <code>OrchestrationStateMachine</code> with
+      a runtime facade: trigger events, evaluate guards, record history, and
+      query available transitions — the first piece of the harness runtime.
+    </p>
+  </div>
+
+  <div class="section-label">Files</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  harness/__init__.py                       <span class="dim">(empty package init)</span><br>
+    <span class="hl">CREATED</span>  harness/state_driver.py                    <span class="dim">(StateDriver, TransitionRecord)</span><br>
+    <span class="hl">CREATED</span>  tests/test_state_driver.py                   <span class="dim">(23 tests, all PASS)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 561/561 tests pass across all primitives
+  </div>
+
+  <div class="section-label">Interface</div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-y">&#9881;</div>
+      <div>
+        <div class="card-title">StateDriver</div>
+        <div class="card-subtitle">Runtime wrapper over OrchestrationStateMachine</div>
+      </div>
+    </div>
+    <div class="diagram">
+      <span class="hl">.machine</span>             OrchestrationStateMachine   <span class="dim">(from P10)</span><br>
+      <span class="hl">.current_state_id</span>      RunState                    <span class="dim">default: CREATED</span><br>
+      <span class="hl">.history</span>               List[TransitionRecord]      <span class="dim">every attempt logged</span><br>
+      <span class="hl">.is_terminal</span>            bool                        <span class="dim">terminal? no more events</span><br>
+      <span class="hl">.available_events()</span>    List[RunEvent]              <span class="dim">valid events from current state</span><br>
+      <span class="hl">.trigger(event, guards)</span> RunState                    <span class="dim">transition or raise</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-y">&#128214;</div>
+      <div>
+        <div class="card-title">TransitionRecord</div>
+        <div class="card-subtitle">Each trigger attempt logged in history</div>
+      </div>
+    </div>
+    <div class="diagram">
+      <span class="hl">from_state</span>      RunState            <span class="dim">state before event</span><br>
+      <span class="hl">event</span>            RunEvent            <span class="dim">triggered event</span><br>
+      <span class="hl">to_state</span>          RunState            <span class="dim">state after (or same if guard blocked)</span><br>
+      <span class="hl">timestamp</span>         str (ISO)           <span class="dim">when trigger was called</span><br>
+      <span class="hl">guard_results</span>     Dict[str, bool]     <span class="dim">guard name → result</span><br>
+      <span class="hl">decision</span>          str                 <span class="dim">"allowed" or "blocked by guard: X"</span>
+    </div>
+  </div>
+
+  <div class="section-label">Driver Behavior</div>
+
+  <div class="diagram">
+    <span class="hl">trigger(event, guard_results?)</span><br>
+    <span class="dim">&nbsp;&nbsp;1. Terminal check</span>        <span class="dim">&#8594; raise if terminal</span><br>
+    <span class="dim">&nbsp;&nbsp;2. Find matching transition</span>  <span class="dim">&#8594; raise if no match (shows available)</span><br>
+    <span class="dim">&nbsp;&nbsp;3. Evaluate guards</span>         <span class="dim">&#8594; reject if any guard fails (stays put, logged)</span><br>
+    <span class="dim">&nbsp;&nbsp;4. Record + transition</span>     <span class="dim">&#8594; append to history, update state</span>
+  </div>
+
+  <div class="section-label">Full Traversal Example</div>
+
+  <div class="state-flow"><span class="hl">CREATED</span> <span class="dim2">─ START_RUN ─&#8594;</span> <span class="hl">ASSEMBLING_PROMPT</span> <span class="dim2">─ PROMPT_READY ─&#8594;</span> <span class="hl">MODEL_PENDING</span>
+<span class="dim2">─ MODEL_RESPONSE_RECEIVED ─&#8594;</span> <span class="hl">MODEL_COMPLETED</span> <span class="dim2">─ NO_TOOL_NEEDED ─&#8594;</span> <span class="hl">VERIFYING</span>
+<span class="dim2">─ VERIFICATION_PASSED ─&#8594;</span> <span class="hl" style="color:#34d399;">SUCCEEDED</span> <span class="dim2">(terminal)</span>
+
+<span class="dim2">Alternative: TOOL_CALL_REQUESTED &#8594; APPROVAL_REQUIRED &#8594; APPROVAL_REJECTED &#8594;</span> <span class="hl" style="color:#ef4444;">FAILED</span>
+
+<span class="dim2">Alternative: TOOL_FAILED_RETRYABLE &#8594; RETRY_PENDING &#8594; RETRY_ALLOWED{retry_budget:ok} &#8594; ASSEMBLING_PROMPT</span></div>
+
+  <div class="section-label">Test Coverage</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">23 tests</div>
+          <div class="card-subtitle">All passing</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">Covers</div>
+          <div class="card-subtitle">init, trigger, guards, history, terminal, avail events, full paths, custom machines</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Not Implemented Yet</div>
+  <div class="diagram">
+    <span class="dim">&#10007; Pipeline executor (wire all primitives into one orchestration flow)</span><br>
+    <span class="dim">&#10007; Automatic guard resolution (wire P11 retry policy, P12 approval policy)</span><br>
+    <span class="dim">&#10007; Trace capture from driver history (connect to P14)</span><br>
+    <span class="dim">&#10007; Real model invocation / tool loop integration</span>
+  </div>
+
+  <div class="section-label">Primitives So Far</div>
+  <div class="diagram">
+    <span class="hl2">P1&nbsp;&nbsp;INSTRUCTION LAYERING</span>        <span class="dim">Global + Project + Task layers</span><br>
+    <span style="color:#34d399;">P2&nbsp;&nbsp;TASK CONTRACT SCHEMA</span>        <span class="dim">Nested Pydantic + 2-layer validation</span><br>
+    <span style="color:#38bdf8;">P3&nbsp;&nbsp;CONTEXT DELIVERY SCHEMA</span>      <span class="dim">Structured bundle + reason-annotated items</span><br>
+    <span style="color:#fbbf24;">P4&nbsp;&nbsp;CONTEXT SELECTION POLICY</span>    <span class="dim">Heuristic pipeline + exclusions + caps</span><br>
+    <span style="color:#f87171;">P5&nbsp;&nbsp;TOOL INTERFACE SCHEMA</span>       <span class="dim">Definition, Invocation, Result</span><br>
+    <span style="color:#a78bfa;">P6&nbsp;&nbsp;EXECUTION ENVIRONMENT</span>      <span class="dim">Provider-agnostic runtime contract</span><br>
+    <span style="color:#fbbf24;">P7&nbsp;&nbsp;DURABLE STATE SCHEMA</span>       <span class="dim">Run-centric execution persistence</span><br>
+    <span style="color:#34d399;">P8&nbsp;&nbsp;VERIFICATION SCHEMA</span>        <span class="dim">Multi-check quality gate contract</span><br>
+    <span style="color:#38bdf8;">P9&nbsp;&nbsp;PROMPT ASSEMBLY SCHEMA</span>     <span class="dim">Layered prompt assembly</span><br>
+    <span class="hl2">P10 RUN ORCHESTRATION STATE MACHINE</span>  <span class="dim">Deterministic control-flow contract</span><br>
+    <span style="color:#fbbf24;">P11 RETRY AND RECOVERY POLICY</span>  <span class="dim">Failure-classified retry contract</span><br>
+    <span style="color:#ef4444;">P12 APPROVAL AND SAFETY POLICY</span>  <span class="dim">Risk-classified governance contract</span><br>
+    <span style="color:#34d399;">P13 EVALUATION AND BENCHMARK SCHEMA</span>  <span class="dim">Task-grader-run benchmark contract</span><br>
+    <span style="color:#a855f7;">P14 OBSERVABILITY AND TRACE SCHEMA</span>  <span class="dim">Step-level execution evidence contract</span><br>
+    <span class="hl" style="color:#fbbf24;">P15 STATE MACHINE DRIVER</span>       <span class="dim">Trigger, guard, history runtime — <span style="color:#fbbf24;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P15 &bull; State Machine Driver &bull; 561/561 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

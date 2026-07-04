@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P22: Tool Permission &amp; Capability Matrix</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #a855f7; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #a855f7 50%, #7c3aed 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p { font-size: 1.05rem; color: #9494a8; max-width: 640px; }
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-g { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-y { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.icon-b { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.icon-r { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.icon-p { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+.icon-c { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #a855f7; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+
+.flow { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; line-height: 2.2; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 22 &mdash; Capability Matrix</div>
+    <h1>Tool Permission &amp; Capability Matrix</h1>
+    <p>
+      Defines which agents can use which tools, what capabilities they can
+      exercise, under what scope and conditions, whether approval is required,
+      and how a runtime authorization decision is recorded.
+    </p>
+  </div>
+
+  <div class="section-label">Files</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/capability_matrix.py              <span class="dim">(4 enums + 7 models)</span><br>
+    <span class="hl">CREATED</span>  tests/test_capability_matrix.py         <span class="dim">(41 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/capability_matrix_examples.json <span class="dim">(4 examples)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 869/869 tests pass across all primitives
+  </div>
+
+  <div class="section-label">Enums</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9881;</div>
+        <div>
+          <div class="card-title">CapabilityVerb</div>
+          <div class="card-subtitle">7 verbs</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        read &bull; write &bull; delete<br>
+        execute &bull; approve &bull; send &bull; escalate
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9881;</div>
+        <div>
+          <div class="card-title">ToolRiskLevel</div>
+          <div class="card-subtitle">4 levels</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        low &bull; medium &bull; high &bull; critical
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9881;</div>
+        <div>
+          <div class="card-title">PermissionEffect</div>
+          <div class="card-subtitle">3 effects</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        allow &bull; deny &bull; require_approval
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-b">&#9881;</div>
+      <div>
+        <div class="card-title">ExecutionEnvironment</div>
+        <div class="card-subtitle">3 environments</div>
+      </div>
+    </div>
+    <div class="diagram" style="border:none; padding:0.5rem 0;">
+      development &bull; staging &bull; production
+    </div>
+  </div>
+
+  <div class="section-label">Models</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">ScopeConstraint</div>
+          <div class="card-subtitle">resource-level restriction</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        scope_type  <span class="dim">str (non-empty)</span><br>
+        scope_value <span class="dim">str (non-empty)</span><br>
+        description <span class="dim">str | None</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9632;</div>
+        <div>
+          <div class="card-title">ToolDescriptor</div>
+          <div class="card-subtitle">tool metadata + risk</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        tool_id   <span class="dim">str</span><br>
+        tool_name <span class="dim">str</span><br>
+        description <span class="dim">str</span><br>
+        risk_level <span class="dim">ToolRiskLevel</span><br>
+        supported_verbs <span class="dim">List[CapabilityVerb] (not empty)</span><br>
+        destructive <span class="dim">bool (forces HIGH/CRITICAL risk)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">CapabilityGrant</div>
+          <div class="card-subtitle">per-agent entitlement</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        grant_id    <span class="dim">str</span><br>
+        agent_identity <span class="dim">str</span><br>
+        tool_id     <span class="dim">str</span><br>
+        allowed_verbs <span class="dim">List[CapabilityVerb] (DELETE/SEND require approval)</span><br>
+        scope_constraints <span class="dim">List[ScopeConstraint]</span><br>
+        environments <span class="dim">List[ExecutionEnvironment] (not empty)</span><br>
+        approval_required <span class="dim">bool</span><br>
+        enabled     <span class="dim">bool = True</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9632;</div>
+        <div>
+          <div class="card-title">ToolPermissionRule</div>
+          <div class="card-subtitle">explicit allow/deny/approval</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        rule_id   <span class="dim">str</span><br>
+        tool_id   <span class="dim">str</span><br>
+        effect    <span class="dim">PermissionEffect</span><br>
+        applies_to_agent_identity <span class="dim">str</span><br>
+        verbs     <span class="dim">List[CapabilityVerb]</span><br>
+        environments <span class="dim">List[ExecutionEnvironment] (not empty)</span><br>
+        rationale <span class="dim">str | None</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9632;</div>
+        <div>
+          <div class="card-title">CapabilityMatrix</div>
+          <div class="card-subtitle">top-level — tools + grants + rules</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        matrix_id       <span class="dim">str</span><br>
+        tool_descriptors <span class="dim">List[ToolDescriptor]</span><br>
+        grants           <span class="dim">List[CapabilityGrant]</span><br>
+        rules            <span class="dim">List[ToolPermissionRule]</span><br>
+        default_effect   <span class="dim">PermissionEffect = DENY</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">ToolAccessRequest / AuthorizationDecision</div>
+          <div class="card-subtitle">runtime check</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        <span class="hl">ToolAccessRequest</span><br>
+        request_id, run_id, step_id, agent_identity, tool_id<br>
+        requested_verb, environment, requested_scope<br>
+        <span class="hl">AuthorizationDecision</span><br>
+        decision_id, request_id, allowed, effect<br>
+        matched_rule_ids, rationale, approval_required
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Enforcement Flow</div>
+
+  <div class="flow">
+<span class="dim">ToolAccessRequest arrives at runtime</span>
+<span class="dim">  &#9500;&#8594; Check grants for agent_identity + tool_id + verb + environment</span>
+<span class="dim">  &#9500;&#8594; Check explicit rules for overrides</span>
+<span class="dim">  &#9500;&#8594; Evaluate scope constraints</span>
+<span class="dim">  &#9492;&#8594; Return AuthorizationDecision</span>
+<span class="dim">       &#9500;&#8594; ALLOW &#8594; execute tool</span>
+<span class="dim">       &#9500;&#8594; DENY &#8594; block (default if no match)</span>
+<span class="dim">       &#9492;&#8594; REQUIRE_APPROVAL &#8594; route to P21</span>
+  </div>
+
+  <div class="section-label">Validation Rules</div>
+
+  <div class="diagram">
+    <span class="hl">NON-EMPTY</span>  matrix_id, tool_id, tool_name, grant_id, rule_id, request_id, decision_id, agent_identity<br>
+    <span class="hl">VERBS</span>      supported_verbs not empty on tools &bull; allowed_verbs not empty on grants<br>
+    <span class="hl">DESTRUCTIVE</span> destructive=True forces risk_level HIGH or CRITICAL &bull; DELETE/SEND require approval_required=True<br>
+    <span class="hl">ENVIRONMENTS</span> environments must not be empty on grants and rules<br>
+    <span class="hl">DECISIONS</span>   non-DENY decisions must have matched_rule_ids &bull; REQUIRE_APPROVAL needs approval_required=True
+  </div>
+
+  <div class="section-label">Test Coverage</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">41 tests</div>
+          <div class="card-subtitle">All passing</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">All 7 models</div>
+          <div class="card-subtitle">enums + validators</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#10003;</div>
+        <div>
+          <div class="card-title">Least privilege</div>
+          <div class="card-subtitle">default-deny, destructive safety, verb scoping</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Not Implemented Yet</div>
+  <div class="diagram">
+    <span class="dim">&#10007; Dynamic JIT token service</span><br>
+    <span class="dim">&#10007; Gateway integration</span><br>
+    <span class="dim">&#10007; OPA/Rego policy engine</span><br>
+    <span class="dim">&#10007; Delegated user-to-agent identity propagation</span><br>
+    <span class="dim">&#10007; Permission admin UI</span><br>
+    <span class="dim">&#10007; Automated entitlement recommender</span>
+  </div>
+
+  <div class="section-label">Primitives So Far</div>
+  <div class="diagram">
+    <span class="hl2">P1&nbsp;&nbsp;INSTRUCTION LAYERING</span>            <span class="dim">Global + Project + Task layers</span><br>
+    <span style="color:#34d399;">P2&nbsp;&nbsp;TASK CONTRACT SCHEMA</span>            <span class="dim">Nested Pydantic + 2-layer validation</span><br>
+    <span style="color:#38bdf8;">P3&nbsp;&nbsp;CONTEXT DELIVERY SCHEMA</span>          <span class="dim">Structured bundle + reason-annotated items</span><br>
+    <span style="color:#fbbf24;">P4&nbsp;&nbsp;CONTEXT SELECTION POLICY</span>        <span class="dim">Heuristic pipeline + exclusions + caps</span><br>
+    <span style="color:#f87171;">P5&nbsp;&nbsp;TOOL INTERFACE SCHEMA</span>           <span class="dim">Definition, Invocation, Result</span><br>
+    <span style="color:#a78bfa;">P6&nbsp;&nbsp;EXECUTION ENVIRONMENT</span>          <span class="dim">Provider-agnostic runtime contract</span><br>
+    <span style="color:#fbbf24;">P7&nbsp;&nbsp;DURABLE STATE SCHEMA</span>           <span class="dim">Run-centric execution persistence</span><br>
+    <span style="color:#34d399;">P8&nbsp;&nbsp;VERIFICATION SCHEMA</span>            <span class="dim">Multi-check quality gate contract</span><br>
+    <span style="color:#38bdf8;">P9&nbsp;&nbsp;PROMPT ASSEMBLY SCHEMA</span>         <span class="dim">Layered prompt assembly</span><br>
+    <span class="hl2">P10 RUN ORCHESTRATION STATE MACHINE</span>     <span class="dim">Deterministic control-flow contract</span><br>
+    <span style="color:#fbbf24;">P11 RETRY AND RECOVERY POLICY</span>     <span class="dim">Failure-classified retry contract</span><br>
+    <span style="color:#ef4444;">P12 APPROVAL AND SAFETY POLICY</span>     <span class="dim">Risk-classified governance contract</span><br>
+    <span style="color:#34d399;">P13 EVALUATION AND BENCHMARK SCHEMA</span>     <span class="dim">Task-grader-run benchmark contract</span><br>
+    <span style="color:#a855f7;">P14 OBSERVABILITY AND TRACE SCHEMA</span>     <span class="dim">Step-level execution evidence contract</span><br>
+    <span style="color:#fbbf24;">P15 STATE MACHINE DRIVER</span>          <span class="dim">Trigger, guard, history runtime</span><br>
+    <span style="color:#34d399;">P16 PIPELINE EXECUTOR</span>            <span class="dim">Single-run orchestration pipeline</span><br>
+    <span style="color:#fbbf24;">P17 PRODUCTION CONFIG &amp; SECRETS</span>    <span class="dim">Typed config + secret references + startup validation + redaction</span><br>
+    <span style="color:#a855f7;">P18 BUDGET &amp; RATE LIMIT POLICY</span>    <span class="dim">Hierarchical token/cost/runtime/tool-call/rate-limit contract</span><br>
+    <span style="color:#ef4444;">P19 FAILURE TAXONOMY &amp; ERROR ENVELOPE</span>  <span class="dim">Typed failure taxonomy + rich envelope + public-safe view + classification</span><br>
+    <span style="color:#38bdf8;">P20 INPUT &amp; OUTPUT GUARDRAILS</span>    <span class="dim">Input/output screening + risk classification + sanitization + decisions</span><br>
+    <span style="color:#34d399;">P21 APPROVAL &amp; ESCALATION</span>      <span class="dim">Risk-tiered approval + reviewer roles + evidence + timeout + escalation + outcome</span><br>
+    <span class="hl" style="color:#a855f7;">P22 CAPABILITY MATRIX</span>          <span class="dim">Default-deny capability matrix + per-agent grants + environment-aware permissions + runtime authorization — <span style="color:#a855f7;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P22 &bull; Capability Matrix &bull; 869/869 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

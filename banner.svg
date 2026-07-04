@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0a2e"/>
+      <stop offset="35%" stop-color="#1a1a4e"/>
+      <stop offset="60%" stop-color="#1e3a5f"/>
+      <stop offset="85%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#60a5fa"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#a855f7" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#a855f7" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="starGlow">
+      <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="moonGlow">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="titleGlow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- background -->
+  <rect width="1200" height="400" fill="url(#sky)"/>
+
+  <!-- stars in background -->
+  <circle cx="100" cy="60" r="1.5" fill="#ffffff" opacity="0.7"/>
+  <circle cx="250" cy="90" r="1" fill="#ffffff" opacity="0.5"/>
+  <circle cx="350" cy="40" r="1.2" fill="#ffffff" opacity="0.6"/>
+  <circle cx="500" cy="70" r="1" fill="#ffffff" opacity="0.4"/>
+  <circle cx="650" cy="30" r="1.5" fill="#ffffff" opacity="0.7"/>
+  <circle cx="750" cy="100" r="1" fill="#ffffff" opacity="0.5"/>
+  <circle cx="850" cy="50" r="1.2" fill="#ffffff" opacity="0.6"/>
+  <circle cx="950" cy="80" r="1" fill="#ffffff" opacity="0.4"/>
+  <circle cx="1050" cy="35" r="1.5" fill="#ffffff" opacity="0.7"/>
+  <circle cx="50" cy="150" r="1" fill="#ffffff" opacity="0.3"/>
+  <circle cx="200" cy="200" r="1.2" fill="#ffffff" opacity="0.4"/>
+  <circle cx="1150" cy="150" r="1" fill="#ffffff" opacity="0.5"/>
+  <circle cx="1100" cy="250" r="0.8" fill="#ffffff" opacity="0.3"/>
+  <circle cx="150" cy="300" r="1" fill="#ffffff" opacity="0.3"/>
+  <circle cx="400" cy="120" r="0.8" fill="#ffffff" opacity="0.4"/>
+  <circle cx="600" cy="150" r="1.2" fill="#ffffff" opacity="0.5"/>
+  <circle cx="900" cy="130" r="0.8" fill="#ffffff" opacity="0.4"/>
+
+  <!-- glowing stars -->
+  <circle cx="150" cy="80" r="12" fill="url(#starGlow)"/>
+  <circle cx="150" cy="80" r="4" fill="#fbbf24"/>
+  <circle cx="150" cy="80" r="2" fill="#ffffff"/>
+
+  <circle cx="920" cy="100" r="10" fill="url(#starGlow)"/>
+  <circle cx="920" cy="100" r="3.5" fill="#fbbf24"/>
+  <circle cx="920" cy="100" r="1.5" fill="#ffffff"/>
+
+  <!-- main big star (yellow, 5-pointed) -->
+  <polygon points="600,60 610,90 645,90 617,108 626,140 600,122 574,140 583,108 555,90 590,90"
+            fill="#fbbf24" opacity="0.9"/>
+  <polygon points="600,60 610,90 645,90 617,108 626,140 600,122 574,140 583,108 555,90 590,90"
+            fill="#ffffff" opacity="0.4" transform="scale(0.6) translate(400,30)"/>
+
+  <!-- moon (white crescent) -->
+  <circle cx="980" cy="280" r="45" fill="url(#moonGlow)"/>
+  <circle cx="980" cy="280" r="40" fill="#f0f0f5"/>
+  <circle cx="965" cy="270" r="35" fill="#0a0a2e" opacity="0.85"/>
+  <!-- subtle moon texture -->
+  <circle cx="985" cy="290" r="6" fill="#e8e8ef" opacity="0.5"/>
+  <circle cx="970" cy="295" r="3" fill="#e8e8ef" opacity="0.3"/>
+  <circle cx="992" cy="272" r="4" fill="#e8e8ef" opacity="0.4"/>
+
+  <!-- title glow band -->
+  <rect x="150" y="175" width="900" height="6" rx="3" fill="url(#glow)"/>
+
+  <!-- title -->
+  <text x="600" y="220" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+        font-size="76" font-weight="800" letter-spacing="4" fill="#f0f0ff"
+        filter="url(#titleGlow)">
+    NOVA HARNESS
+  </text>
+
+  <!-- subtitle -->
+  <text x="600" y="260" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+        font-size="18" font-weight="300" letter-spacing="8" fill="#60a5fa">
+    TYPED CONTRACT PRIMITIVES FOR AI AGENT EXECUTION
+  </text>
+
+  <!-- red accent line -->
+  <line x1="350" y1="275" x2="850" y2="275" stroke="#ef4444" stroke-width="1.5" opacity="0.5"/>
+
+  <!-- bottom stats bar -->
+  <rect x="0" y="340" width="1200" height="60" fill="#0a0a1a" opacity="0.6"/>
+
+  <!-- stats -->
+  <text x="200" y="375" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif"
+        font-size="14" font-weight="600" fill="#22c55e">1092 TESTS PASSING</text>
+  <text x="450" y="375" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif"
+        font-size="14" font-weight="600" fill="#3b82f6">99% COVERAGE</text>
+  <text x="700" y="375" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif"
+        font-size="14" font-weight="600" fill="#8b5cf6">27 PRIMITIVES</text>
+  <text x="950" y="375" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif"
+        font-size="14" font-weight="600" fill="#fbbf24">PYTHON 3.11+</text>
+
+  <!-- subtle red dot accents on bottom -->
+  <circle cx="200" cy="360" r="2" fill="#ef4444" opacity="0.6"/>
+  <circle cx="450" cy="360" r="2" fill="#ef4444" opacity="0.6"/>
+  <circle cx="700" cy="360" r="2" fill="#ef4444" opacity="0.6"/>
+  <circle cx="950" cy="360" r="2" fill="#ef4444" opacity="0.6"/>
+</svg>

@@ -1,0 +1,174 @@
+{
+  "examples": [
+    {
+      "name": "Development config with env secret reference",
+      "description": "A harness config for local development. The provider key is sourced from an environment variable. Tracing stores prompt bodies for debugging. Egress is wide open for local testing.",
+      "config": {
+        "environment": "development",
+        "app_name": "harness-dev",
+        "provider": {
+          "provider_name": "openrouter",
+          "model_name": "google/gemini-2.0-flash-001",
+          "api_key_secret": {
+            "secret_name": "openrouter_api_key",
+            "source": "env",
+            "reference": "OPENROUTER_API_KEY",
+            "required": true,
+            "allow_in_env_only": true,
+            "description": "OpenRouter API key from local environment"
+          },
+          "timeout_seconds": 60,
+          "max_retries": 2,
+          "enabled": true
+        },
+        "runtime_budget": {
+          "max_steps_per_run": 12,
+          "max_tool_calls_per_run": 8,
+          "max_runtime_seconds": 120,
+          "max_cost_usd_per_run": 1.0
+        },
+        "tracing": {
+          "enabled": true,
+          "redact_sensitive_fields": true,
+          "store_prompt_bodies": true,
+          "store_tool_arguments": true
+        },
+        "security": {
+          "allowed_egress_hosts": [],
+          "secrets_redaction_enabled": true,
+          "enforce_secret_scoping": true,
+          "require_approval_for_secret_access": true
+        }
+      }
+    },
+    {
+      "name": "Production config with vault secret reference",
+      "description": "A hardened production config. The provider key is referenced from a vault path. Prompt bodies and tool arguments are not stored. Egress is restricted to the provider API host only.",
+      "config": {
+        "environment": "production",
+        "app_name": "harness-prod",
+        "provider": {
+          "provider_name": "openrouter",
+          "model_name": "google/gemini-2.0-flash-001",
+          "api_key_secret": {
+            "secret_name": "openrouter_api_key",
+            "source": "vault",
+            "reference": "secret/prod/openrouter/api-key",
+            "required": true,
+            "allow_in_env_only": false,
+            "description": "OpenRouter API key from production vault"
+          },
+          "timeout_seconds": 30,
+          "max_retries": 3,
+          "enabled": true
+        },
+        "runtime_budget": {
+          "max_steps_per_run": 25,
+          "max_tool_calls_per_run": 15,
+          "max_runtime_seconds": 300,
+          "max_cost_usd_per_run": 5.0
+        },
+        "tracing": {
+          "enabled": true,
+          "redact_sensitive_fields": true,
+          "store_prompt_bodies": false,
+          "store_tool_arguments": false
+        },
+        "security": {
+          "allowed_egress_hosts": ["api.openai.com", "api.anthropic.com"],
+          "secrets_redaction_enabled": true,
+          "enforce_secret_scoping": true,
+          "require_approval_for_secret_access": true
+        }
+      }
+    },
+    {
+      "name": "Resolved runtime config with redacted secret metadata",
+      "description": "After startup resolution, the runtime config records which secrets were resolved, their source, and a redacted preview — never the raw value.",
+      "runtime_config": {
+        "app_config": {
+          "environment": "development",
+          "app_name": "harness-dev",
+          "provider": {
+            "provider_name": "openrouter",
+            "model_name": "google/gemini-2.0-flash-001",
+            "api_key_secret": {
+              "secret_name": "openrouter_api_key",
+              "source": "env",
+              "reference": "OPENROUTER_API_KEY",
+              "required": true,
+              "allow_in_env_only": true,
+              "description": null
+            },
+            "timeout_seconds": 60,
+            "max_retries": 2,
+            "enabled": true
+          },
+          "runtime_budget": {
+            "max_steps_per_run": 12,
+            "max_tool_calls_per_run": 8,
+            "max_runtime_seconds": 120,
+            "max_cost_usd_per_run": 1.0
+          },
+          "tracing": {
+            "enabled": true,
+            "redact_sensitive_fields": true,
+            "store_prompt_bodies": true,
+            "store_tool_arguments": true
+          },
+          "security": {
+            "allowed_egress_hosts": [],
+            "secrets_redaction_enabled": true,
+            "enforce_secret_scoping": true,
+            "require_approval_for_secret_access": true
+          }
+        },
+        "resolved_secrets": [
+          {
+            "secret_name": "openrouter_api_key",
+            "resolved_from": "env",
+            "value_present": true,
+            "redacted_preview": "sk-or-v1-********..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "Invalid production config missing required secret",
+      "description": "A production config that fails startup validation because it has no api_key_secret for the provider. The validation error indicates the missing required field.",
+      "config": {
+        "environment": "production",
+        "app_name": "harness-prod",
+        "provider": {
+          "provider_name": "openrouter",
+          "model_name": "google/gemini-2.0-flash-001",
+          "api_key_secret": null,
+          "timeout_seconds": 30,
+          "max_retries": 3,
+          "enabled": true
+        },
+        "runtime_budget": {
+          "max_steps_per_run": 25,
+          "max_tool_calls_per_run": 15,
+          "max_runtime_seconds": 300,
+          "max_cost_usd_per_run": 5.0
+        },
+        "tracing": {
+          "enabled": true,
+          "redact_sensitive_fields": true,
+          "store_prompt_bodies": false,
+          "store_tool_arguments": false
+        },
+        "security": {
+          "allowed_egress_hosts": ["api.openai.com"],
+          "secrets_redaction_enabled": true,
+          "enforce_secret_scoping": true,
+          "require_approval_for_secret_access": true
+        }
+      },
+      "expected_errors": [
+        "production provider must have an api_key_secret"
+      ]
+    }
+  ]
+}

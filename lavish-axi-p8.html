@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P8: Verification Schema</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #34d399; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #34d399 50%, #10b981 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p { font-size: 1.05rem; color: #9494a8; max-width: 640px; }
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-check { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-rec { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.icon-test { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-ex { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.tree { padding-left: 1.2rem; border-left: 1px solid #1e1e2a; margin: 0.75rem 0; }
+
+.tree-item {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.3rem 0; font-size: 0.9rem;
+}
+
+.tree-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: #34d399; }
+.dot-yellow { background: #fbbf24; }
+.dot-red { background: #ef4444; }
+.dot-purple { background: #a78bfa; }
+.dot-blue { background: #38bdf8; }
+.dot-orange { background: #f97316; }
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #34d399; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+
+.model-tree { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 2; }
+.model-tree .cls { color: #34d399; font-weight: 600; }
+.model-tree .cls2 { color: #818cf8; font-weight: 600; }
+.model-tree .fld { color: #94a3b8; }
+.model-tree .typ { color: #818cf8; }
+.model-tree .def { color: #6b6b80; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 8 &mdash; Verification Schema</div>
+    <h1>Multi-Check Verification Contract</h1>
+    <p>
+      A structured contract for "done": what must be checked, how results are recorded,
+      and how pass/fail is derived. Tests, lint, typecheck, security, acceptance, and
+      artifact checks — with evidence, blocking semantics, and a final verdict.
+    </p>
+  </div>
+
+  <!-- FILES -->
+  <div class="section-label">Files Created</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/verification.py                     <span class="dim">(5 BaseModels, 4 Enums)</span><br>
+    <span class="hl">CREATED</span>  tests/test_verification_schema.py           <span class="dim">(41 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/verification_examples.json           <span class="dim">(3 examples)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 203/203 tests pass across all 8 primitives
+  </div>
+
+  <!-- ARCHITECTURE -->
+  <div class="section-label">Verification — 5 Records + 4 Enums</div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-check">&#9632;</div>
+      <div>
+        <div class="card-title">VerificationPlan &rarr; VerificationResult</div>
+        <div class="card-subtitle">Plan is created before execution; Result captures the outcome</div>
+      </div>
+    </div>
+    <div class="model-tree">
+      <span class="cls">VerificationPlan</span><br>
+      <span style="padding-left:1rem;display:block;">
+        <span class="fld">&#9500;&#9472; plan_id</span>: <span class="typ">str</span> &#9679; <span class="fld">task_id</span>: <span class="typ">str</span> &#9679; <span class="fld">checks</span>: <span class="typ">List[VerificationCheck]</span> <span class="def">(&ge;1)</span>
+      </span>
+      <br>
+      <span class="cls2">VerificationResult</span><br>
+      <span style="padding-left:1rem;display:block;">
+        <span class="fld">&#9500;&#9472; plan_id</span>: <span class="typ">str</span> &#9679; <span class="fld">run_id</span>: <span class="typ">str</span><br>
+        <span class="fld">&#9500;&#9472; checks</span>: <span class="typ">List[VerificationCheck]</span><br>
+        <span class="fld">&#9500;&#9472; verdict</span>: <span class="typ">VerificationVerdict</span> <span class="def">(PASS/FAIL/PARTIAL/BLOCKED)</span><br>
+        <span class="fld">&#9492;&#9472; started_at</span>: <span class="typ">Optional[str]</span> &#9679; <span class="fld">finished_at</span>: <span class="typ">Optional[str]</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- RECORDS -->
+  <div class="section-label">Five Records — Key Validators</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">VerificationCheck</div>
+          <div class="card-subtitle">check_id, name, type, blocking, command/rule, status, evidence, failure_reason</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Must have either <span style="font-family:monospace;font-size:0.85rem;">command</span> or <span style="font-family:monospace;font-size:0.85rem;">acceptance_rule</span></div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> status=FAILED requires failure_reason</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Default: blocking=True</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">VerificationEvidence</div>
+          <div class="card-subtitle">evidence_id, type (log/report/file/metric), path, summary, metric details</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> METRIC type requires metric_name + metric_value</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Log, report, file: need path or summary</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">VerificationVerdict</div>
+          <div class="card-subtitle">status, blocking_failures, non_blocking_failures, summary</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Blocking failures + PASS verdict &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Supports PASS / FAIL / PARTIAL / BLOCKED</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">VerificationPlan + Result</div>
+          <div class="card-subtitle">Plan: &ge;1 check required. Result: finished_at for PASS/FAIL</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Empty plan (no checks) &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> PASS/FAIL without finished_at &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> PARTIAL/BLOCKED: finished_at optional</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENUMS -->
+  <div class="section-label">Enums &mdash; 4</div>
+
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-title" style="color:#34d399;">CheckType</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> test</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> lint</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> typecheck</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> security</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> acceptance</div>
+        <div class="tree-item"><span class="tree-dot dot-orange"></span> artifact</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#818cf8;">CheckStatus</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> pending</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> running</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> passed</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> failed</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> skipped</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#38bdf8;">EvidenceType</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> log</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> report</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> file</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> metric</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#f97316;">VerdictStatus</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> pass</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> fail</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> partial</div>
+        <div class="tree-item"><span class="tree-dot dot-orange"></span> blocked</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEFAULT CHECK ORDER -->
+  <div class="section-label">Recommended Check Order (v1)</div>
+  <div class="diagram">
+    <span class="hl">1.</span> <span class="dim">Targeted test</span> &mdash; <span class="dim">smallest relevant proof first</span><br>
+    <span class="hl">2.</span> <span class="dim">Lint</span> &mdash; <span class="dim">code style and basic correctness</span><br>
+    <span class="hl">3.</span> <span class="dim">Typecheck</span> &mdash; <span class="dim">type safety</span><br>
+    <span class="hl">4.</span> <span class="dim">Acceptance check</span> &mdash; <span class="dim">matches spec requirements</span><br>
+    <span class="hl">5.</span> <span class="dim">Security (when relevant)</span> &mdash; <span class="dim">vulnerability scan</span><br>
+    <span class="hl">6.</span> <span class="dim">Artifact presence</span> &mdash; <span class="dim">output file exists</span>
+  </div>
+
+  <!-- EXAMPLES -->
+  <div class="section-label">Examples &mdash; 3</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-ex">&#9632;</div>
+        <div>
+          <div class="card-title">Code change &mdash; All passed</div>
+          <div class="card-subtitle">3 checks: test + lint + typecheck</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Verdict: PASS</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> 12 tests passed, no lint/type errors</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> Blocking: test + typecheck</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> Non-blocking: lint</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-ex">&#9632;</div>
+        <div>
+          <div class="card-title">Report generation &mdash; All passed</div>
+          <div class="card-subtitle">3 checks: acceptance + artifact + quality metric</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Verdict: PASS</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> All 4 sections present, file exists</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> Readability: 62.3</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-ex">&#9632;</div>
+        <div>
+          <div class="card-title">Deploy &mdash; Blocking test failure</div>
+          <div class="card-subtitle">3 checks: test failed, lint/typecheck passed</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Verdict: FAIL</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> 4 tests failed (blocking)</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Lint + typecheck: passed</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHAT NOT TO DO YET -->
+  <div class="section-label">Not Implemented Yet</div>
+  <div class="diagram">
+    <span class="dim">&#10007; Command runner</span><br>
+    <span class="dim">&#10007; CI pipeline integration</span><br>
+    <span class="dim">&#10007; LLM-as-judge grader</span><br>
+    <span class="dim">&#10007; Mutation testing</span><br>
+    <span class="dim">&#10007; Coverage enforcement</span><br>
+    <span class="dim">&#10007; Flaky test handling</span><br>
+    <span class="dim">&#10007; Benchmark dashboards</span>
+  </div>
+
+  <!-- PRIMITIVES -->
+  <div class="section-label">Primitives So Far</div>
+  <div class="diagram">
+    <span class="hl" style="color:#818cf8;">P1  INSTRUCTION LAYERING</span>       <span class="dim">Global + Project + Task layers</span><br>
+    <span class="hl" style="color:#34d399;">P2  TASK CONTRACT SCHEMA</span>       <span class="dim">Nested Pydantic + 2-layer validation</span><br>
+    <span class="hl" style="color:#38bdf8;">P3  CONTEXT DELIVERY SCHEMA</span>     <span class="dim">Structured bundle + reason-annotated items</span><br>
+    <span class="hl" style="color:#fbbf24;">P4  CONTEXT SELECTION POLICY</span>   <span class="dim">Heuristic pipeline + exclusions + caps</span><br>
+    <span class="hl" style="color:#f87171;">P5  TOOL INTERFACE SCHEMA</span>      <span class="dim">Definition, Invocation, Result</span><br>
+    <span class="hl" style="color:#a78bfa;">P6  EXECUTION ENVIRONMENT</span>     <span class="dim">Provider-agnostic runtime contract</span><br>
+    <span class="hl" style="color:#fbbf24;">P7  DURABLE STATE SCHEMA</span>      <span class="dim">Run-centric execution persistence</span><br>
+    <span class="hl" style="color:#34d399;">P8  VERIFICATION SCHEMA</span>       <span class="dim">Multi-check quality gate contract — <span style="color:#34d399;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P8 &bull; Verification Schema &bull; 203/203 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

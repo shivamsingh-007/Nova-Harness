@@ -1,0 +1,122 @@
+{
+  "identity_examples": [
+    {
+      "label": "autonomous_bounded_agent",
+      "value": {
+        "agent_id": "agent-cicd-pipeline-v2",
+        "agent_name": "CI/CD Pipeline Agent v2",
+        "identity_type": "workload",
+        "authority_model": "bounded",
+        "owner": {
+          "owner_id": "team-platform",
+          "owner_type": "team",
+          "owner_name": "Platform Engineering",
+          "contact_ref": "slack://#platform-eng"
+        },
+        "lifecycle_status": "active",
+        "credential_reference": "vault://cicd-pipeline-key",
+        "review_due_at": "2026-12-01T00:00:00Z"
+      }
+    },
+    {
+      "label": "delegated_agent_identity",
+      "value": {
+        "agent_id": "agent-codex-delegated",
+        "agent_name": "Codex Agent (Delegated)",
+        "identity_type": "service_principal",
+        "authority_model": "delegated",
+        "owner": {
+          "owner_id": "user-shiva",
+          "owner_type": "user",
+          "owner_name": "Shiva Kumar",
+          "contact_ref": "shiva@example.com"
+        },
+        "lifecycle_status": "active",
+        "review_due_at": "2026-09-01T00:00:00Z"
+      }
+    },
+    {
+      "label": "revoked_identity",
+      "value": {
+        "agent_id": "agent-deprecated-legacy",
+        "agent_name": "Legacy Deprecated Agent",
+        "identity_type": "api_key",
+        "authority_model": "delegated",
+        "owner": {
+          "owner_id": "team-security",
+          "owner_type": "team",
+          "owner_name": "Security Team"
+        },
+        "lifecycle_status": "revoked",
+        "credential_reference": "vault://legacy-deprecated-key"
+      }
+    }
+  ],
+  "run_ownership_examples": [
+    {
+      "label": "user_initiated_run_with_delegation",
+      "value": {
+        "run_id": "run-a1b2c3",
+        "agent_id": "agent-codex-delegated",
+        "initiator_type": "user",
+        "requested_by_id": "user-shiva",
+        "owning_principal_id": "user-shiva",
+        "delegation_context": {
+          "delegated_by_principal_id": "user-shiva",
+          "on_behalf_of_user_id": "user-shiva",
+          "delegation_reason": "Manual code generation request via CLI",
+          "authority_scopes": [
+            {
+              "scope_id": "scope-tool-read",
+              "scope_type": "tool",
+              "scope_value": "read_file",
+              "description": "Read files in workspace"
+            },
+            {
+              "scope_id": "scope-tool-write",
+              "scope_type": "tool",
+              "scope_value": "write_file",
+              "description": "Write files in workspace"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "label": "system_scheduled_run",
+      "value": {
+        "run_id": "run-nightly-001",
+        "agent_id": "agent-cicd-pipeline-v2",
+        "initiator_type": "schedule",
+        "requested_by_id": "system-cron-daily",
+        "owning_principal_id": "team-platform"
+      }
+    }
+  ],
+  "authority_assertion_examples": [
+    {
+      "label": "bounded_authority_with_scoped_access",
+      "value": {
+        "assertion_id": "aa-run-a1b2c3-001",
+        "run_id": "run-a1b2c3",
+        "agent_id": "agent-codex-delegated",
+        "authority_model": "bounded",
+        "effective_scopes": [
+          {
+            "scope_id": "scope-file-read",
+            "scope_type": "filesystem",
+            "scope_value": "/workspace/**",
+            "description": "Read access to workspace files"
+          },
+          {
+            "scope_id": "scope-file-write",
+            "scope_type": "filesystem",
+            "scope_value": "/workspace/solution.py",
+            "description": "Write access limited to solution.py"
+          }
+        ],
+        "expires_at": "2026-07-04T18:00:00Z"
+      }
+    }
+  ]
+}

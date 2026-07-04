@@ -1,0 +1,196 @@
+{
+  "evaluation_examples": [
+    {
+      "label": "passing_evaluation_with_metrics",
+      "value": {
+        "evaluation_id": "eval-step-042",
+        "scope": "step",
+        "subject_id": "step-3",
+        "evaluator_type": "deterministic",
+        "metric_results": [
+          {
+            "metric_name": "output_valid_json",
+            "score": 1.0,
+            "outcome": "pass",
+            "threshold": 1.0,
+            "mandatory": true
+          },
+          {
+            "metric_name": "execution_time_ms",
+            "score": 0.8,
+            "outcome": "pass",
+            "threshold": 0.5,
+            "mandatory": false,
+            "rationale": "Completed within expected time bounds"
+          }
+        ],
+        "mandatory_checks": [
+          { "check_name": "output_valid_json", "passed": true }
+        ],
+        "aggregate_score": 0.9,
+        "confidence": 0.95
+      }
+    },
+    {
+      "label": "mandatory_safety_failure_leads_to_block",
+      "value": {
+        "evaluation_id": "eval-output-099",
+        "scope": "output",
+        "subject_id": "output-gen-001",
+        "evaluator_type": "policy_checker",
+        "metric_results": [
+          {
+            "metric_name": "toxicity",
+            "score": 0.0,
+            "outcome": "pass",
+            "threshold": 0.3,
+            "mandatory": true
+          },
+          {
+            "metric_name": "faithfulness",
+            "score": 0.35,
+            "outcome": "fail",
+            "threshold": 0.8,
+            "mandatory": true,
+            "rationale": "Output hallucinated function signature"
+          }
+        ],
+        "mandatory_checks": [
+          { "check_name": "toxicity", "passed": true },
+          { "check_name": "faithfulness", "passed": false, "rationale": "Output hallucinated function signature" }
+        ],
+        "aggregate_score": 0.45,
+        "evidence": [
+          {
+            "evidence_id": "ev-faith-001",
+            "label": "Faithfulness check details",
+            "content": "Expected 'def add(a, b): return a + b', got 'def add(a, b, c): return a + b'",
+            "content_type": "text"
+          }
+        ]
+      }
+    },
+    {
+      "label": "low_confidence_leads_to_escalate",
+      "value": {
+        "evaluation_id": "eval-output-102",
+        "scope": "output",
+        "subject_id": "output-gen-002",
+        "evaluator_type": "llm_judge",
+        "metric_results": [
+          {
+            "metric_name": "coherence",
+            "score": 0.6,
+            "outcome": "warn",
+            "threshold": 0.7,
+            "mandatory": false,
+            "rationale": "Judge assigned moderate coherence score"
+          }
+        ],
+        "mandatory_checks": [],
+        "aggregate_score": 0.6,
+        "confidence": 0.35,
+        "evidence": [
+          {
+            "evidence_id": "ev-judge-001",
+            "label": "Judge reasoning",
+            "content": "The output is mostly coherent but has a minor logical gap in step 3.",
+            "content_type": "text"
+          }
+        ]
+      }
+    },
+    {
+      "label": "retryable_soft_failure",
+      "value": {
+        "evaluation_id": "eval-step-055",
+        "scope": "step",
+        "subject_id": "step-2",
+        "evaluator_type": "deterministic",
+        "metric_results": [
+          {
+            "metric_name": "output_valid_format",
+            "score": 1.0,
+            "outcome": "pass",
+            "threshold": 1.0,
+            "mandatory": true
+          },
+          {
+            "metric_name": "latency_p95",
+            "score": 0.3,
+            "outcome": "fail",
+            "threshold": 0.5,
+            "mandatory": false,
+            "rationale": "Transient network spike caused slowdown"
+          }
+        ],
+        "mandatory_checks": [
+          { "check_name": "output_valid_format", "passed": true }
+        ],
+        "aggregate_score": 0.65,
+        "evidence": [
+          {
+            "evidence_id": "ev-latency-001",
+            "label": "Latency trace",
+            "content": "p95=2200ms (threshold=1500ms), may be transient",
+            "content_type": "text"
+          }
+        ]
+      }
+    }
+  ],
+  "gate_examples": [
+    {
+      "label": "gate_decision_pass",
+      "value": {
+        "decision_id": "gd-042",
+        "evaluation_id": "eval-step-042",
+        "policy_id": "policy-step-v1",
+        "final_action": "allow",
+        "passed_gate": true,
+        "failed_metric_names": [],
+        "failed_mandatory_checks": [],
+        "rationale": "All 2 metrics passed thresholds, mandatory checks passed."
+      }
+    },
+    {
+      "label": "gate_decision_block_safety",
+      "value": {
+        "decision_id": "gd-099",
+        "evaluation_id": "eval-output-099",
+        "policy_id": "policy-output-v1",
+        "final_action": "block",
+        "passed_gate": false,
+        "failed_metric_names": ["faithfulness"],
+        "failed_mandatory_checks": ["faithfulness"],
+        "rationale": "Faithfulness mandatory check failed: output hallucination detected. Blocking output."
+      }
+    },
+    {
+      "label": "gate_decision_escalate_low_confidence",
+      "value": {
+        "decision_id": "gd-102",
+        "evaluation_id": "eval-output-102",
+        "policy_id": "policy-output-v1",
+        "final_action": "escalate",
+        "passed_gate": false,
+        "failed_metric_names": ["coherence"],
+        "failed_mandatory_checks": [],
+        "rationale": "Low confidence (0.35) and borderline coherence score. Escalating for human review."
+      }
+    },
+    {
+      "label": "gate_decision_retry_latency",
+      "value": {
+        "decision_id": "gd-055",
+        "evaluation_id": "eval-step-055",
+        "policy_id": "policy-step-v1",
+        "final_action": "retry",
+        "passed_gate": false,
+        "failed_metric_names": ["latency_p95"],
+        "failed_mandatory_checks": [],
+        "rationale": "Latency threshold exceeded but format is valid. Retrying step."
+      }
+    }
+  ]
+}

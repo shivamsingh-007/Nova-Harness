@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P2: Task Contract Schema + Validation</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero {
+  margin-bottom: 2.5rem;
+  position: relative;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  padding: 0.35rem 0.9rem;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #34d399;
+  margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #34d399 50%, #10b981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.75rem;
+}
+
+.hero p {
+  font-size: 1.05rem;
+  color: #9494a8;
+  max-width: 640px;
+}
+
+.card {
+  background: #12121a;
+  border: 1px solid #1e1e2a;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  transition: border-color 0.2s;
+}
+
+.card:hover { border-color: #2a2a3a; }
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.icon-field { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.icon-model-v { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.icon-pass { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-stack { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+.icon-arch { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+
+.card-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #f0f0ff;
+}
+
+.card-subtitle {
+  font-size: 0.85rem;
+  color: #6b6b80;
+  margin-top: 0.1rem;
+}
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) {
+  .grid-2 { grid-template-columns: 1fr; }
+}
+
+.tag {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.tag-field { background: rgba(99, 102, 241, 0.1); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.15); }
+.tag-model { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.15); }
+.tag-pass { background: rgba(52, 211, 153, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.2); }
+
+.section-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #6b6b80;
+  margin-bottom: 1rem;
+  margin-top: 2rem;
+}
+
+.tree { padding-left: 1.2rem; border-left: 1px solid #1e1e2a; margin: 0.75rem 0; }
+
+.tree-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+  font-size: 0.9rem;
+}
+
+.tree-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: #34d399; }
+.dot-yellow { background: #fbbf24; }
+.dot-red { background: #ef4444; }
+.dot-blue { background: #38bdf8; }
+.dot-gray { background: #52525b; }
+.dot-purple { background: #a78bfa; }
+
+.divider { height: 1px; background: #1e1e2a; margin: 1.5rem 0; }
+
+.diagram {
+  background: #0d0d15;
+  border: 1px solid #1a1a28;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  line-height: 1.8;
+  overflow-x: auto;
+}
+
+.diagram .hl { color: #34d399; }
+.diagram .hl2 { color: #fbbf24; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #52525b;
+  padding: 2rem 0 1rem;
+  border-top: 1px solid #1e1e2a;
+  margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  color: #34d399;
+}
+
+.validation-chain {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 1rem 0;
+}
+
+.validation-step {
+  background: #0d0d15;
+  border: 1px solid #1a1a28;
+  border-radius: 8px;
+  padding: 0.75rem 1.25rem;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+}
+
+.validation-step .num { font-size: 1.5rem; font-weight: 800; display: block; }
+.validation-step .label { color: #9494a8; }
+.vs1 .num { color: #818cf8; }
+.vs2 .num { color: #fbbf24; }
+.vs3 .num { color: #ef4444; }
+.vs4 .num { color: #34d399; }
+
+.arrow { color: #52525b; font-size: 1.5rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 2 &mdash; Validation Layer Added</div>
+    <h1>Field-Level + Model-Level Validation</h1>
+    <p>
+      Two-layer validation: <code>field_validator</code> for single values, <code>model_validator</code> for cross-field
+      relationships. Rejects dangerous or low-quality tasks before the agent runs.
+    </p>
+  </div>
+
+  <!-- VALIDATION CHAIN -->
+  <div class="section-label">Validation Strategy</div>
+  <div class="validation-chain">
+    <div class="validation-step vs1">
+      <span class="num">1</span>
+      <span class="label">Field quality</span>
+    </div>
+    <span class="arrow">&rarr;</span>
+    <div class="validation-step vs2">
+      <span class="num">2</span>
+      <span class="label">Cross-field consistency</span>
+    </div>
+    <span class="arrow">&rarr;</span>
+    <div class="validation-step vs3">
+      <span class="num">3</span>
+      <span class="label">Safety policy</span>
+    </div>
+    <span class="arrow">&rarr;</span>
+    <div class="validation-step vs4">
+      <span class="num">4</span>
+      <span class="label">Execution readiness</span>
+    </div>
+  </div>
+
+  <!-- TEST RESULTS -->
+  <div class="success-banner">
+    &#10003; 26/26 tests passed &mdash; 5 valid contracts + 21 edge cases
+  </div>
+
+  <!-- FILES -->
+  <div class="section-label">Files Modified</div>
+  <div class="diagram">
+    <span class="hl">UPDATED</span>  models/task_contract.py          <span class="dim">(8 validators added: 6 field, 2 model)</span><br>
+    <span class="hl">UPDATED</span>  tests/test_task_contract.py       <span class="dim">(26 tests: 5 valid + 14 field failures + 4 model failures + 3 defaults/serialization)</span><br>
+    <span class="hl">UPDATED</span>  examples/task_contract_examples.json <span class="dim">(3 examples fixed to pass new validators)</span>
+  </div>
+
+  <!-- FIELD VALIDATORS -->
+  <div class="section-label">Field-Level Validators &mdash; 6</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-field">&#9881;</div>
+        <div>
+          <div class="card-title">Non-blank title &amp; goal</div>
+          <div class="card-subtitle">TaskContract.title, TaskContract.goal</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> <code>validate_non_blank</code> &mdash; strips and rejects empty</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Blank string &rarr; ValueError</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-field">&#9881;</div>
+        <div>
+          <div class="card-title">Non-empty tools &amp; criteria</div>
+          <div class="card-subtitle">TaskContract.tools_allowed, TaskContract.success_criteria</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> <code>tools_must_not_be_empty</code></div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> <code>success_criteria_must_not_be_empty</code></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-field">&#9881;</div>
+        <div>
+          <div class="card-title">Bounded retries &amp; files</div>
+          <div class="card-subtitle">TaskConstraints.max_retries, TaskConstraints.max_files_changed</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> <code>validate_max_retries</code> &mdash; 0 to 5</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> <code>validate_max_files_changed</code> &mdash; 1 to 50</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> -1, 6, 0, 51 &rarr; ValueError</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-field">&#9881;</div>
+        <div>
+          <div class="card-title">Clean repo &amp; subpaths</div>
+          <div class="card-subtitle">TaskScope.repo_path, allowed_paths, blocked_paths</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> <code>validate_repo_path</code> &mdash; non-empty</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> <code>validate_subpaths</code> &mdash; no empties, no <code>..</code>, no absolute</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Deduplicates identical paths</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODEL VALIDATORS -->
+  <div class="section-label">Model-Level Validators &mdash; 3</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-model-v">&#9881;</div>
+        <div>
+          <div class="card-title">Path overlap check</div>
+          <div class="card-subtitle">TaskScope.validate_no_path_overlap</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Same path in allowed + blocked &rarr; ValueError</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Prevents contradictory scope</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-model-v">&#9881;</div>
+        <div>
+          <div class="card-title">Tool-criterion alignment</div>
+          <div class="card-subtitle">TaskContract.validate_tool_criterion_alignment</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> RUN_TESTS allowed but no TEST criterion &rarr; ValueError</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Forces proof-aligned permissions</div>
+      </div>
+    </div>
+
+    <div class="card" style="grid-column: 1 / -1;">
+      <div class="card-header">
+        <div class="card-icon icon-model-v">&#9881;</div>
+        <div>
+          <div class="card-title">Dependency policy enforcement</div>
+          <div class="card-subtitle">TaskContract.validate_dependency_policy</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> allow_dependency_changes=False but no DEPENDENCY_CHANGE gate &rarr; ValueError</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Prevents silent project drift</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEST COVERAGE -->
+  <div class="section-label">Test Coverage &mdash; 26 tests</div>
+
+  <div class="diagram">
+    <span class="hl">5 valid contracts</span>     <span class="dim">bug fix, feature, refactor, network allowed, test-only</span><br>
+    <span class="hl">14 field failure cases</span>  <span class="dim">empty title, empty goal, empty tools, empty criteria,</span><br>
+    <span class="dim" style="padding-left:1.5rem;">                     retries -1, retries 6, retries 0 (valid edge),</span><br>
+    <span class="dim" style="padding-left:1.5rem;">                     files 0, files 51, empty repo_path,</span><br>
+    <span class="dim" style="padding-left:1.5rem;">                     empty path entry, absolute path, parent traversal, duplicate dedup</span><br>
+    <span class="hl">4 model failure cases</span>    <span class="dim">path overlap, RUN_TESTS no TEST, deps no gate, deps allowed no gate (valid)</span><br>
+    <span class="hl">3 defaults/serialization</span>  <span class="dim">default values, serialization to dict</span>
+  </div>
+
+  <!-- PRIMITIVES -->
+  <div class="section-label">Primitives So Far</div>
+  <div class="diagram">
+    <span class="hl" style="color:#818cf8;">P1  INSTRUCTION LAYERING</span>   <span class="dim">Global + Project + Task layers</span><br>
+    <span class="hl" style="color:#34d399;">P2  TASK CONTRACT SCHEMA</span>   <span class="dim">Nested Pydantic + 2-layer validation &mdash; <span style="color:#34d399;">YOU ARE HERE</span></span><br>
+    <span class="dim">P3  (next)</span><br>
+    <span class="dim">P4  (next)</span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P2v2 &bull; Validation Layer &bull; 26/26 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

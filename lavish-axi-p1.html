@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P1: Instruction Layering</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container {
+  max-width: 1000px;
+  width: 100%;
+}
+
+.hero {
+  margin-bottom: 2.5rem;
+  position: relative;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  padding: 0.35rem 0.9rem;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #818cf8;
+  margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #818cf8 50%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.75rem;
+}
+
+.hero p {
+  font-size: 1.05rem;
+  color: #9494a8;
+  max-width: 640px;
+}
+
+.card {
+  background: #12121a;
+  border: 1px solid #1e1e2a;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  transition: border-color 0.2s;
+}
+
+.card:hover { border-color: #2a2a3a; }
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.icon-global { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.icon-project { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-task { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.icon-axiom { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+.icon-why { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+
+.card-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #f0f0ff;
+}
+
+.card-subtitle {
+  font-size: 0.85rem;
+  color: #6b6b80;
+  margin-top: 0.1rem;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+}
+
+.tag {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.tag-global { background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.2); }
+.tag-project { background: rgba(52, 211, 153, 0.1); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.15); }
+.tag-task { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.15); }
+.tag-omit { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.15); }
+
+.section-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #6b6b80;
+  margin-bottom: 1rem;
+  margin-top: 2rem;
+}
+
+.tree { padding-left: 1.2rem; border-left: 1px solid #1e1e2a; margin: 0.75rem 0; }
+
+.tree-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+  font-size: 0.9rem;
+}
+
+.tree-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: #34d399; }
+.dot-yellow { background: #fbbf24; }
+.dot-red { background: #ef4444; }
+.dot-blue { background: #38bdf8; }
+.dot-gray { background: #52525b; }
+.dot-purple { background: #a78bfa; }
+
+.divider { height: 1px; background: #1e1e2a; margin: 1.5rem 0; }
+
+.diagram {
+  background: #0d0d15;
+  border: 1px solid #1a1a28;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.8;
+  overflow-x: auto;
+}
+
+.diagram .hl-gl { color: #818cf8; }
+.diagram .hl-pr { color: #34d399; }
+.diagram .hl-tk { color: #fbbf24; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #52525b;
+  padding: 2rem 0 1rem;
+  border-top: 1px solid #1e1e2a;
+  margin-top: 2rem;
+}
+
+.big-number {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.layer-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.layer-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.layer-g::before { background: linear-gradient(90deg, #818cf8, #6366f1); }
+.layer-p::before { background: linear-gradient(90deg, #34d399, #10b981); }
+.layer-t::before { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">Primitive 1 &mdash; Instruction Layering</div>
+    <h1>Three-Layer Instruction Architecture</h1>
+    <p>
+      Separate permanent behavior from project rules and task-time guidance.
+      Prevents rule collisions, reduces noise, and makes debugging easier when the agent misbehaves.
+    </p>
+  </div>
+
+  <!-- LAYER OVERVIEW -->
+  <div class="section-label">The Three Layers</div>
+
+  <div class="grid-3">
+    <!-- GLOBAL -->
+    <div class="card layer-card layer-g">
+      <div class="card-header">
+        <div class="card-icon icon-global">&#127758;</div>
+        <div>
+          <div class="card-title">Global</div>
+          <div class="card-subtitle">Personal working style</div>
+        </div>
+      </div>
+      <div class="big-number" style="color:#818cf8;">01</div>
+      <div class="tree" style="margin-top:0.5rem;">
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> <code>~/.config/opencode/AGENTS.md</code></div>
+        <div class="tree-item" style="color:#9494a8;font-size:0.85rem;padding-left:1.2rem;">Things true for almost every repo</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.75rem;">
+        <span class="tag tag-global">Working Style</span>
+        <span class="tag tag-global">Coding Behavior</span>
+        <span class="tag tag-global">Verification</span>
+        <span class="tag tag-global">Safety</span>
+      </div>
+    </div>
+
+    <!-- PROJECT -->
+    <div class="card layer-card layer-p">
+      <div class="card-header">
+        <div class="card-icon icon-project">&#9632;</div>
+        <div>
+          <div class="card-title">Project</div>
+          <div class="card-subtitle">Repository truth</div>
+        </div>
+      </div>
+      <div class="big-number" style="color:#34d399;">02</div>
+      <div class="tree" style="margin-top:0.5rem;">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> <code>./AGENTS.md</code></div>
+        <div class="tree-item" style="color:#9494a8;font-size:0.85rem;padding-left:1.2rem;">Things true for this harness repo only</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.75rem;">
+        <span class="tag tag-project">Project Identity</span>
+        <span class="tag tag-project">Repository Rules</span>
+        <span class="tag tag-project">Safety Boundaries</span>
+        <span class="tag tag-project">Verification Standard</span>
+        <span class="tag tag-project">Response Shape</span>
+      </div>
+    </div>
+
+    <!-- TASK -->
+    <div class="card layer-card layer-t">
+      <div class="card-header">
+        <div class="card-icon icon-task">&#9997;</div>
+        <div>
+          <div class="card-title">Task</div>
+          <div class="card-subtitle">One-run objective</div>
+        </div>
+      </div>
+      <div class="big-number" style="color:#fbbf24;">03</div>
+      <div class="tree" style="margin-top:0.5rem;">
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> Runtime prompt / task file</div>
+        <div class="tree-item" style="color:#9494a8;font-size:0.85rem;padding-left:1.2rem;">Things true for this one job only</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.75rem;">
+        <span class="tag tag-task">Scope</span>
+        <span class="tag tag-task">Constraints</span>
+        <span class="tag tag-task">Success Criteria</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DECISION TEST -->
+  <div class="section-label">Placement Rule</div>
+  <div class="diagram">
+    <span class="hl-gl">Applies to every repo you use</span>  <span class="dim">&rarr;</span>  <span class="hl-gl">Global</span><br>
+    <span class="hl-pr">Applies to this harness repo only</span>  <span class="dim">&rarr;</span>  <span class="hl-pr">Project</span><br>
+    <span class="hl-tk">Applies to this one task only</span>     <span class="dim">&rarr;</span>  <span class="hl-tk">Task</span>
+  </div>
+
+  <!-- SEPARATION -->
+  <div class="section-label">Why Three Layers (Not One File)</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-why">&#10003;</div>
+        <div>
+          <div class="card-title">One Big AGENTS.md</div>
+          <div class="card-subtitle">Rejected</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Becomes long and noisy</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Harder to debug agent behavior</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Mixes permanent + transient rules</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-why">&#10003;</div>
+        <div>
+          <div class="card-title">Many Micro-Files</div>
+          <div class="card-subtitle">Rejected (v1)</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Adds indirection before control model proven</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Premature modularization</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-why">&#10003;</div>
+        <div>
+          <div class="card-title">Claude-Only Design</div>
+          <div class="card-subtitle">Rejected</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Reduces portability across OpenCode and other agents</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Harness should be agent-agnostic</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-why">&#10003;</div>
+        <div>
+          <div class="card-title">Three-Layer Separation</div>
+          <div class="card-subtitle">Chosen</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Clean responsibility per layer</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> No rule duplication or collision</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Debuggable: which layer caused what</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILE STATE -->
+  <div class="section-label">File State</div>
+  <div class="diagram">
+    <span class="hl-gl">UPDATED</span>  ~/.config/opencode/AGENTS.md     <span class="dim">(global layer &mdash; 4 sections)</span><br>
+    <span class="hl-pr">REWRITTEN</span> ./AGENTS.md                    <span class="dim">(project layer &mdash; 5 sections)</span><br>
+    <span class="dim">RUNTIME</span>   Task prompt / task file        <span class="dim">(task layer &mdash; not a file)</span><br>
+    <span class="dim">KEPT</span>     lavish-axi-p1.html              <span class="dim">(this file, updated)</span>
+  </div>
+
+  <!-- GLOBAL CONTENT -->
+  <div class="section-label">Global Layer &mdash; <code>~/.config/opencode/AGENTS.md</code></div>
+  <div class="diagram">
+    <span class="hl-gl"># Global AGENTS.md</span><br>
+    <span class="dim">## Working Style</span><br>
+    <span class="dim">- Be concise, clear, and structured.</span><br>
+    <span class="dim">- Solve one bounded problem at a time.</span><br>
+    <span class="dim">## Coding Behavior</span><br>
+    <span class="dim">- Minimize scope of edits.</span><br>
+    <span class="dim">- Prefer existing project patterns.</span><br>
+    <span class="dim">## Verification</span><br>
+    <span class="dim">- Run the smallest relevant check first.</span><br>
+    <span class="dim">## Safety</span><br>
+    <span class="dim">- Avoid destructive actions without confirmation.</span>
+  </div>
+
+  <!-- PROJECT CONTENT -->
+  <div class="section-label">Project Layer &mdash; <code>./AGENTS.md</code></div>
+  <div class="diagram">
+    <span class="hl-pr"># AGENTS.md</span><br>
+    <span class="dim">## Project Identity</span><br>
+    <span class="dim">- Harness system for AI coding agents</span><br>
+    <span class="dim">## Repository Rules</span><br>
+    <span class="dim">- Build one primitive at a time</span><br>
+    <span class="dim">- Keep modules independent and composable</span><br>
+    <span class="dim">## Safety Boundaries</span><br>
+    <span class="dim">- No secrets, CI/CD, or infra changes</span><br>
+    <span class="dim">## Verification Standard</span><br>
+    <span class="dim">- Task not done until receipts exist</span><br>
+    <span class="dim">## Expected Response Shape</span><br>
+    <span class="dim">- 6-part structure for every task</span>
+  </div>
+
+  <!-- RISKS -->
+  <div class="section-label">Risks &amp; Mitigations</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-axiom">&#9888;</div>
+        <div>
+          <div class="card-title">Rule Duplication</div>
+          <div class="card-subtitle">Same rule in global + project</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> Creates confusion about which evolves</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> <span style="color:#34d399;">Mitigation:</span> project rules override global; keep global generic</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-axiom">&#9888;</div>
+        <div>
+          <div class="card-title">Layer Leakage</div>
+          <div class="card-subtitle">Project rules in global file</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> Affects unrelated repos</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> <span style="color:#34d399;">Mitigation:</span> strict placement test before adding rules</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-axiom">&#9888;</div>
+        <div>
+          <div class="card-title">Task Details in Permanent Files</div>
+          <div class="card-subtitle">Makes instructions noisy and stale</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> Long-lived files accumulate transient rules</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> <span style="color:#34d399;">Mitigation:</span> task details stay in runtime prompt only</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-axiom">&#9888;</div>
+        <div>
+          <div class="card-title">Conflicting Rules</div>
+          <div class="card-subtitle">One layer says minimal, other says full refactor</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> Reduces consistency</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> <span style="color:#34d399;">Mitigation:</span> precedence: task &gt; project &gt; global</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P1 &bull; Instruction Layering &bull; 3 Layers
+  </div>
+
+</div>
+</body>
+</html>

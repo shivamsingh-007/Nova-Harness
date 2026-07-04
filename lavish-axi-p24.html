@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P24: Evaluation Result &amp; Quality Gate Contract</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #a855f7; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #a855f7 50%, #7c3aed 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p { font-size: 1.05rem; color: #9494a8; max-width: 640px; }
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-g { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-y { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.icon-b { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.icon-r { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.icon-p { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+.icon-c { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #a855f7; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+
+.flow { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; line-height: 2.2; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 24 &mdash; Quality Gate Contract</div>
+    <h1>Evaluation Result &amp; Quality Gate Contract</h1>
+    <p>
+      Structured metric outcomes, mandatory checks, threshold policies,
+      and runtime gate actions for production-safe evaluation.
+    </p>
+  </div>
+
+  <div class="section-label">Files</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/quality_gate_contract.py              <span class="dim">(3 enums + 7 models)</span><br>
+    <span class="hl">CREATED</span>  tests/test_quality_gate_contract.py         <span class="dim">(60 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/quality_gate_contract_examples.json <span class="dim">(8 examples)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 970/970 tests pass across all primitives
+  </div>
+
+  <div class="section-label">Enums</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9881;</div>
+        <div>
+          <div class="card-title">EvaluationScope</div>
+          <div class="card-subtitle">4 scopes</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        step &bull; run &bull; output &bull; regression
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9881;</div>
+        <div>
+          <div class="card-title">MetricOutcome</div>
+          <div class="card-subtitle">4 outcomes</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        pass &bull; fail &bull; warn &bull; not_evaluated
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9881;</div>
+        <div>
+          <div class="card-title">GateAction</div>
+          <div class="card-subtitle">5 actions</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        allow &bull; retry &bull; hold &bull; escalate &bull; block
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Models</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">EvaluationResult</div>
+          <div class="card-subtitle">top-level evaluation outcome</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        evaluation_id &bull; scope &bull; subject_id &bull; evaluator_type<br>
+        metric_results <span class="dim">List[MetricResult]</span><br>
+        mandatory_checks <span class="dim">List[MandatoryCheck]</span><br>
+        aggregate_score <span class="dim">float | None (0.0-1.0)</span><br>
+        confidence <span class="dim">float | None (0.0-1.0)</span><br>
+        evidence <span class="dim">List[EvaluationEvidence]</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">MetricResult</div>
+          <div class="card-subtitle">single metric measurement</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        metric_name &bull; score <span class="dim">float | None</span><br>
+        outcome <span class="dim">MetricOutcome</span><br>
+        threshold <span class="dim">float | None (0.0-1.0)</span><br>
+        rationale <span class="dim">str | None</span><br>
+        mandatory <span class="dim">bool = False</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9632;</div>
+        <div>
+          <div class="card-title">MandatoryCheck / EvaluationEvidence</div>
+          <div class="card-subtitle">booleans + attachments</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        <span class="hl">MandatoryCheck</span> &mdash; check_name, passed, rationale?<br>
+        <span class="hl">EvaluationEvidence</span> &mdash; evidence_id, label, content, content_type
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9632;</div>
+        <div>
+          <div class="card-title">QualityGateThreshold</div>
+          <div class="card-subtitle">per-metric gate rule</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        metric_name &bull; minimum_score <span class="dim">float | None</span><br>
+        mandatory <span class="dim">bool</span><br>
+        action_on_fail <span class="dim">GateAction</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9632;</div>
+        <div>
+          <div class="card-title">QualityGatePolicy</div>
+          <div class="card-subtitle">full gate configuration</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        policy_id &bull; applies_to_scope <span class="dim">EvaluationScope</span><br>
+        thresholds <span class="dim">List[QualityGateThreshold] (min 1)</span><br>
+        minimum_confidence <span class="dim">float | None</span><br>
+        block_on_mandatory_check_failure <span class="dim">bool = True</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9632;</div>
+        <div>
+          <div class="card-title">QualityGateDecision</div>
+          <div class="card-subtitle">runtime gate outcome</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        decision_id &bull; evaluation_id &bull; policy_id<br>
+        final_action <span class="dim">GateAction</span><br>
+        passed_gate <span class="dim">bool</span><br>
+        failed_metric_names <span class="dim">List[str]</span><br>
+        failed_mandatory_checks <span class="dim">List[str]</span><br>
+        rationale <span class="dim">str (required for BLOCK/ESCALATE)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Enforcement Flow</div>
+
+  <div class="flow">
+<span class="dim">EvaluationResult created with metrics + mandatory checks</span>
+<span class="dim">  &#9500;&#8594; QualityGatePolicy evaluated against metric results</span>
+<span class="dim">  &#9500;&#8594; Each threshold checked: score &gt;= minimum_score?</span>
+<span class="dim">  &#9500;&#8594; Mandatory check failures trigger BLOCK/ESCALATE/HOLD</span>
+<span class="dim">  &#9500;&#8594; Low confidence vs minimum_confidence prevents auto-ALLOW</span>
+<span class="dim">  &#9492;&#8594; QualityGateDecision produced:</span>
+<span class="dim">       &#9500;&#8594; ALLOW &#8594; output proceeds</span>
+<span class="dim">       &#9500;&#8594; RETRY &#8594; step re-executes (soft failure)</span>
+<span class="dim">       &#9500;&#8594; HOLD &#8594; paused for review</span>
+<span class="dim">       &#9500;&#8594; ESCALATE &#8594; human-in-the-loop review</span>
+<span class="dim">       &#9492;&#8594; BLOCK &#8594; output rejected, run halted</span>
+  </div>
+
+  <div class="section-label">Validation Rules</div>
+
+  <div class="diagram">
+    <span class="hl">NON-EMPTY</span>  evaluation_id, subject_id, evaluator_type, policy_id, decision_id, metric_name, check_name, evidence_id, label, content<br>
+    <span class="hl">RANGE</span>      score, threshold, aggregate_score, confidence all in [0.0, 1.0]<br>
+    <span class="hl">MANDATORY</span>   mandatory threshold action_on_fail must be BLOCK, ESCALATE, or HOLD (not ALLOW/RETRY)<br>
+    <span class="hl">POLICY</span>      thresholds not empty &bull; metric_names unique<br>
+    <span class="hl">DECISION</span>    passed_gate must result in ALLOW &bull; BLOCK/ESCALATE need rationale &bull; failure must list at least one failed metric or check
+  </div>
+
+  <div class="section-label">Test Coverage</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">60 tests</div>
+          <div class="card-subtitle">All passing</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">7 models</div>
+          <div class="card-subtitle">enums + validators</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#10003;</div>
+        <div>
+          <div class="card-title">Gate enforcement</div>
+          <div class="card-subtitle">mandatory checks, action constraints, audit trail</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Not Implemented Yet</div>
+  <div class="diagram">
+    <span class="dim">&#10007; Evaluator orchestration / judge pipeline</span><br>
+    <span class="dim">&#10007; Judge calibration and LLM-as-judge integration</span><br>
+    <span class="dim">&#10007; Regression dashboard and trend tracking</span><br>
+    <span class="dim">&#10007; Human rating UI</span><br>
+    <span class="dim">&#10007; Metric weighting optimizer</span><br>
+    <span class="dim">&#10007; Production analytics service</span>
+  </div>
+
+  <div class="section-label">Primitives So Far</div>
+  <div class="diagram">
+    <span class="hl2">P1&nbsp;&nbsp;INSTRUCTION LAYERING</span>            <span class="dim">Global + Project + Task layers</span><br>
+    <span style="color:#34d399;">P2&nbsp;&nbsp;TASK CONTRACT SCHEMA</span>            <span class="dim">Nested Pydantic + 2-layer validation</span><br>
+    <span style="color:#38bdf8;">P3&nbsp;&nbsp;CONTEXT DELIVERY SCHEMA</span>          <span class="dim">Structured bundle + reason-annotated items</span><br>
+    <span style="color:#fbbf24;">P4&nbsp;&nbsp;CONTEXT SELECTION POLICY</span>        <span class="dim">Heuristic pipeline + exclusions + caps</span><br>
+    <span style="color:#f87171;">P5&nbsp;&nbsp;TOOL INTERFACE SCHEMA</span>           <span class="dim">Definition, Invocation, Result</span><br>
+    <span style="color:#a78bfa;">P6&nbsp;&nbsp;EXECUTION ENVIRONMENT</span>          <span class="dim">Provider-agnostic runtime contract</span><br>
+    <span style="color:#fbbf24;">P7&nbsp;&nbsp;DURABLE STATE SCHEMA</span>           <span class="dim">Run-centric execution persistence</span><br>
+    <span style="color:#34d399;">P8&nbsp;&nbsp;VERIFICATION SCHEMA</span>            <span class="dim">Multi-check quality gate contract</span><br>
+    <span style="color:#38bdf8;">P9&nbsp;&nbsp;PROMPT ASSEMBLY SCHEMA</span>         <span class="dim">Layered prompt assembly</span><br>
+    <span class="hl2">P10 RUN ORCHESTRATION STATE MACHINE</span>     <span class="dim">Deterministic control-flow contract</span><br>
+    <span style="color:#fbbf24;">P11 RETRY AND RECOVERY POLICY</span>     <span class="dim">Failure-classified retry contract</span><br>
+    <span style="color:#ef4444;">P12 APPROVAL AND SAFETY POLICY</span>     <span class="dim">Risk-classified governance contract</span><br>
+    <span style="color:#34d399;">P13 EVALUATION AND BENCHMARK SCHEMA</span>     <span class="dim">Task-grader-run benchmark contract</span><br>
+    <span style="color:#a855f7;">P14 OBSERVABILITY AND TRACE SCHEMA</span>     <span class="dim">Step-level execution evidence contract</span><br>
+    <span style="color:#fbbf24;">P15 STATE MACHINE DRIVER</span>          <span class="dim">Trigger, guard, history runtime</span><br>
+    <span style="color:#34d399;">P16 PIPELINE EXECUTOR</span>            <span class="dim">Single-run orchestration pipeline</span><br>
+    <span style="color:#fbbf24;">P17 PRODUCTION CONFIG &amp; SECRETS</span>    <span class="dim">Typed config + secret references + startup validation + redaction</span><br>
+    <span style="color:#a855f7;">P18 BUDGET &amp; RATE LIMIT POLICY</span>    <span class="dim">Hierarchical token/cost/runtime/tool-call/rate-limit contract</span><br>
+    <span style="color:#ef4444;">P19 FAILURE TAXONOMY &amp; ERROR ENVELOPE</span>  <span class="dim">Typed failure taxonomy + rich envelope + public-safe view + classification</span><br>
+    <span style="color:#38bdf8;">P20 INPUT &amp; OUTPUT GUARDRAILS</span>    <span class="dim">Input/output screening + risk classification + sanitization + decisions</span><br>
+    <span style="color:#34d399;">P21 APPROVAL &amp; ESCALATION</span>      <span class="dim">Risk-tiered approval + reviewer roles + evidence + timeout + escalation + outcome</span><br>
+    <span style="color:#a855f7;">P22 CAPABILITY MATRIX</span>          <span class="dim">Default-deny capability matrix + per-agent grants + environment-aware permissions + runtime authorization</span><br>
+    <span class="hl2">P23 SESSION STATE &amp; CHECKPOINT</span>  <span class="dim">Working session lifecycle + checkpointing + replay safety + side-effect tracking + resume/recovery</span><br>
+    <span class="hl" style="color:#a855f7;">P24 EVALUATION &amp; QUALITY GATE</span>  <span class="dim">Structured metrics + mandatory checks + threshold policies + runtime gate actions — <span style="color:#a855f7;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P24 &bull; Evaluation &amp; Quality Gate &bull; 970/970 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

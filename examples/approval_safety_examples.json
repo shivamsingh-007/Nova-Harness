@@ -1,0 +1,119 @@
+{
+  "examples": [
+    {
+      "name": "Safe read-only action — auto-allowed",
+      "description": "Reading a workspace file is classified as LOW risk. The harness auto-allows it without human intervention.",
+      "rule": {
+        "rule_id": "read-sources",
+        "action_name": "read_file",
+        "resource_type": "filesystem",
+        "risk_level": "low",
+        "safety_action": "allow",
+        "rationale": "Reading files within workspace is safe and scoped to project directory.",
+        "allowed_path_prefixes": ["/workspace"],
+        "allowed_hosts": [],
+        "allowed_secret_names": []
+      },
+      "decision": {
+        "decision_id": "dec-read-001",
+        "run_id": "run-042",
+        "action_name": "read_file",
+        "risk_level": "low",
+        "safety_action": "allow",
+        "approved": null,
+        "approver_id": null,
+        "decision_reason": "Auto-allowed: LOW risk read-only action within workspace."
+      }
+    },
+    {
+      "name": "Approval-required file mutation",
+      "description": "Editing a source file is MEDIUM risk. The harness pauses and requests human approval before proceeding.",
+      "rule": {
+        "rule_id": "edit-sources",
+        "action_name": "edit_file",
+        "resource_type": "filesystem",
+        "risk_level": "medium",
+        "safety_action": "require_approval",
+        "rationale": "Editing files can introduce errors or overwrite work.",
+        "allowed_path_prefixes": ["/workspace"],
+        "allowed_hosts": [],
+        "allowed_secret_names": [],
+        "approval_requirement": {
+          "require_human": true,
+          "reason_required": true,
+          "expires_in_seconds": null
+        }
+      },
+      "request": {
+        "request_id": "req-edit-042",
+        "run_id": "run-042",
+        "action_name": "edit_file",
+        "risk_level": "medium",
+        "reason": "Fix type error in src/parser.py line 88",
+        "requested_by_agent": "agent-01",
+        "requested_arguments_summary": "Edit src/parser.py: change 'Any' to 'str' at line 88",
+        "expires_at": null
+      },
+      "decision": {
+        "decision_id": "dec-edit-042",
+        "run_id": "run-042",
+        "action_name": "edit_file",
+        "risk_level": "medium",
+        "safety_action": "require_approval",
+        "approved": true,
+        "approver_id": "user-shiva",
+        "decision_reason": "Approved: scoped type fix in parser.py, low blast radius."
+      }
+    },
+    {
+      "name": "Blocked secret access",
+      "description": "An agent tried to read an env file containing credentials. The harness blocks it entirely.",
+      "rule": {
+        "rule_id": "credential-files",
+        "action_name": "read_file",
+        "resource_type": "filesystem",
+        "risk_level": "critical",
+        "safety_action": "block",
+        "rationale": "Access to credential files is blocked entirely regardless of agent request.",
+        "allowed_path_prefixes": ["/workspace/.env", "/workspace/credentials"],
+        "allowed_hosts": [],
+        "allowed_secret_names": []
+      },
+      "decision": {
+        "decision_id": "dec-block-042",
+        "run_id": "run-042",
+        "action_name": "read_file",
+        "risk_level": "critical",
+        "safety_action": "block",
+        "approved": null,
+        "approver_id": null,
+        "decision_reason": "Blocked by policy: credential file access is CRITICAL risk and not permitted."
+      }
+    },
+    {
+      "name": "Allowlisted network operation with approval",
+      "description": "An agent wants to fetch a package from an allowlisted host. The operation is allowed since pypi.org is in the allowlist.",
+      "rule": {
+        "rule_id": "allowlisted-docs",
+        "action_name": "network_request",
+        "resource_type": "network",
+        "risk_level": "medium",
+        "safety_action": "allow",
+        "rationale": "Network requests to allowlisted documentation and package hosts are permitted.",
+        "allowed_path_prefixes": [],
+        "allowed_hosts": ["pypi.org", "docs.python.org", "npmjs.com"],
+        "allowed_secret_names": []
+      },
+      "decision": {
+        "decision_id": "dec-net-042",
+        "run_id": "run-042",
+        "action_name": "network_request",
+        "risk_level": "medium",
+        "safety_action": "allow",
+        "approved": null,
+        "approver_id": null,
+        "decision_reason": "Auto-allowed: target host 'pypi.org' is in allowlist for network requests."
+      }
+    }
+  ]
+}

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P12: Approval and Safety Policy</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #ef4444; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #ef4444 50%, #dc2626 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p { font-size: 1.05rem; color: #9494a8; max-width: 640px; }
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-s { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.icon-rec { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.icon-g { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-ex { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.tree { padding-left: 1.2rem; border-left: 1px solid #1e1e2a; margin: 0.75rem 0; }
+
+.tree-item {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.3rem 0; font-size: 0.9rem;
+}
+
+.tree-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: #34d399; }
+.dot-yellow { background: #fbbf24; }
+.dot-red { background: #ef4444; }
+.dot-purple { background: #a78bfa; }
+.dot-blue { background: #38bdf8; }
+.dot-orange { background: #f97316; }
+.dot-grey { background: #6b6b80; }
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #ef4444; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+
+.model-tree { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 2; }
+.model-tree .cls { color: #ef4444; font-weight: 600; }
+.model-tree .cls2 { color: #818cf8; font-weight: 600; }
+.model-tree .fld { color: #94a3b8; }
+.model-tree .typ { color: #818cf8; }
+.model-tree .def { color: #6b6b80; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 12 &mdash; Approval and Safety Policy</div>
+    <h1>Risk-Classified Governance Contract</h1>
+    <p>
+      The policy contract that defines what actions are auto-allowed, what requires
+      human approval, what is blocked entirely, and how safety decisions are recorded.
+    </p>
+  </div>
+
+  <!-- FILES -->
+  <div class="section-label">Files Created</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/approval_safety.py                       <span class="dim">(5 BaseModels, 3 Enums)</span><br>
+    <span class="hl">CREATED</span>  tests/test_approval_safety_policy.py             <span class="dim">(62 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/approval_safety_examples.json             <span class="dim">(4 examples)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 385/385 tests pass across all 12 primitives
+  </div>
+
+  <!-- MODELS -->
+  <div class="section-label">Models &mdash; 5</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-s">&#9632;</div>
+        <div>
+          <div class="card-title">ApprovalSafetyPolicy</div>
+          <div class="card-subtitle">policy_id + rules</div>
+        </div>
+      </div>
+      <div class="model-tree">
+        <span class="cls">ApprovalSafetyPolicy</span><br>
+        <span style="padding-left:1rem;display:block;">
+          <span class="fld">&#9500;&#9472; policy_id</span>: <span class="typ">str</span><br>
+          <span class="fld">&#9492;&#9472; rules</span>: <span class="typ">List[ActionRiskRule]</span>
+        </span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">ActionRiskRule</div>
+          <div class="card-subtitle">rule_id + action_name + resource_type + risk_level + safety_action</div>
+        </div>
+      </div>
+      <div class="model-tree">
+        <span class="cls2">ActionRiskRule</span><br>
+        <span style="padding-left:1rem;display:block;">
+          <span class="fld">&#9500;&#9472; rule_id, action_name, rationale</span><br>
+          <span class="fld">&#9500;&#9472; resource_type, risk_level, safety_action</span><br>
+          <span class="fld">&#9500;&#9472; allowed_path_prefixes</span><br>
+          <span class="fld">&#9500;&#9472; allowed_hosts</span><br>
+          <span class="fld">&#9500;&#9472; allowed_secret_names</span><br>
+          <span class="fld">&#9492;&#9472; approval_requirement</span>: <span class="typ">ApprovalRequirement</span>
+        </span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">ApprovalRequirement</div>
+          <div class="card-subtitle">require_human + approver_role + reason_required + expires_in_seconds</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">ApprovalRequest &amp; SafetyDecision</div>
+          <div class="card-subtitle">Request metadata + final decision record</div>
+        </div>
+      </div>
+      <div class="model-tree">
+        <span class="cls2">ApprovalRequest</span> &mdash; <span class="fld">request_id + run_id + action_name + risk_level + reason + requested_by_agent + arguments_summary + expires_at</span><br>
+        <span class="cls2">SafetyDecision</span> &mdash; <span class="fld">decision_id + run_id + action_name + risk_level + safety_action + approved + approver_id + decision_reason</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENUMS -->
+  <div class="section-label">Enums &mdash; 3</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title" style="color:#ef4444;">RiskLevel (4)</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> low</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> medium</div>
+        <div class="tree-item"><span class="tree-dot dot-orange"></span> high</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> critical</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#818cf8;">SafetyAction (3)</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> allow</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> require_approval</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> block</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#38bdf8;">ResourceType (5)</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> filesystem</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> network</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> secret</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> process</div>
+        <div class="tree-item"><span class="tree-dot dot-orange"></span> external_side_effect</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEFAULT POLICY -->
+  <div class="section-label">Default v1 Policy &mdash; 10 Rules</div>
+
+  <div class="diagram">
+    <span class="hl2">ALLOW</span>    read/search/list files          <span class="dim">LOW &bull; workspace-scoped</span><br>
+    <span class="hl2">ALLOW</span>    run test/lint/typecheck         <span class="dim">LOW &bull; sandboxed</span><br>
+    <span class="hl2">ALLOW</span>    network to allowlisted hosts    <span class="dim">MEDIUM &bull; docs.python.org, pypi.org, npmjs.com</span><br>
+    <span class="hl" style="color:#fbbf24;">APPROVE</span>  edit workspace files            <span class="dim">MEDIUM &bull; human required</span><br>
+    <span class="hl" style="color:#fbbf24;">APPROVE</span>  delete files                    <span class="dim">HIGH &bull; irreversible</span><br>
+    <span class="hl" style="color:#fbbf24;">APPROVE</span>  access secrets                  <span class="dim">CRITICAL &bull; security_lead only</span><br>
+    <span class="hl" style="color:#fbbf24;">APPROVE</span>  deployment changes              <span class="dim">CRITICAL &bull; expires 300s</span><br>
+    <span class="hl">BLOCK</span>    arbitrary network calls          <span class="dim">HIGH &bull; no allowlist</span><br>
+    <span class="hl">BLOCK</span>    credential file access           <span class="dim">CRITICAL &bull; .env, credentials</span>
+  </div>
+
+  <!-- VALIDATION -->
+  <div class="section-label">Validation Rules</div>
+  <div class="diagram">
+    <span class="hl">Non-empty rule_id, action_name, rationale</span>       <span class="dim">prevents weak records</span><br>
+    <span class="hl">Approval req required when safety_action=REQUIRE_APPROVAL</span><br>
+    <span class="hl">Network ALLOW must specify allowed_hosts</span>          <span class="dim">least privilege for network</span><br>
+    <span class="hl">SECRET rules must specify allowed_secret_names</span>    <span class="dim">no vague secret access</span><br>
+    <span class="hl">Positive expires_in_seconds when set</span><br>
+    <span class="hl">approver_id required when approved=True</span>           <span class="dim">accountability</span><br>
+    <span class="hl">BLOCK cannot be overridden with approved=True</span>     <span class="dim">safety invariant</span><br>
+    <span class="hl">Unique rule_ids within policy</span>
+  </div>
+
+  <!-- APPROVAL REQUEST -->
+  <div class="section-label">Approval Request Content</div>
+  <div class="card">
+    <div class="tree">
+      <div class="tree-item"><span class="tree-dot dot-blue"></span> action name</div>
+      <div class="tree-item"><span class="tree-dot dot-yellow"></span> risk level</div>
+      <div class="tree-item"><span class="tree-dot dot-blue"></span> short reason</div>
+      <div class="tree-item"><span class="tree-dot dot-blue"></span> affected files/hosts/secrets summary</div>
+      <div class="tree-item"><span class="tree-dot dot-purple"></span> whether action is reversible</div>
+      <div class="tree-item"><span class="tree-dot dot-green"></span> whether action is idempotent</div>
+      <div class="tree-item"><span class="tree-dot dot-yellow"></span> expiration window</div>
+      <div class="tree-item"><span class="tree-dot dot-blue"></span> who requested it</div>
+    </div>
+  </div>
+
+  <!-- NOT IMPLEMENTED -->
+  <div class="section-label">Not Implemented Yet</div>
+  <div class="diagram">
+    <span class="dim">&#10007; Approval UI</span><br>
+    <span class="dim">&#10007; RBAC service / org-wide policy sync</span><br>
+    <span class="dim">&#10007; Anomaly detection</span><br>
+    <span class="dim">&#10007; Policy-learning system</span><br>
+    <span class="dim">&#10007; Multi-party approval chains</span><br>
+    <span class="dim">&#10007; Override / escalation workflow</span>
+  </div>
+
+  <!-- PRIMITIVES -->
+  <div class="section-label">Primitives So Far</div>
+  <div class="diagram">
+    <span class="hl2">P1  INSTRUCTION LAYERING</span>       <span class="dim">Global + Project + Task layers</span><br>
+    <span class="hl" style="color:#34d399;">P2  TASK CONTRACT SCHEMA</span>       <span class="dim">Nested Pydantic + 2-layer validation</span><br>
+    <span class="hl" style="color:#38bdf8;">P3  CONTEXT DELIVERY SCHEMA</span>     <span class="dim">Structured bundle + reason-annotated items</span><br>
+    <span class="hl" style="color:#fbbf24;">P4  CONTEXT SELECTION POLICY</span>   <span class="dim">Heuristic pipeline + exclusions + caps</span><br>
+    <span class="hl" style="color:#f87171;">P5  TOOL INTERFACE SCHEMA</span>      <span class="dim">Definition, Invocation, Result</span><br>
+    <span class="hl" style="color:#a78bfa;">P6  EXECUTION ENVIRONMENT</span>     <span class="dim">Provider-agnostic runtime contract</span><br>
+    <span class="hl" style="color:#fbbf24;">P7  DURABLE STATE SCHEMA</span>      <span class="dim">Run-centric execution persistence</span><br>
+    <span class="hl" style="color:#34d399;">P8  VERIFICATION SCHEMA</span>       <span class="dim">Multi-check quality gate contract</span><br>
+    <span class="hl" style="color:#38bdf8;">P9  PROMPT ASSEMBLY SCHEMA</span>    <span class="dim">Layered prompt assembly</span><br>
+    <span class="hl2">P10 RUN ORCHESTRATION STATE MACHINE</span> <span class="dim">Deterministic control-flow contract</span><br>
+    <span class="hl" style="color:#fbbf24;">P11 RETRY AND RECOVERY POLICY</span> <span class="dim">Failure-classified retry contract</span><br>
+    <span class="hl" style="color:#ef4444;">P12 APPROVAL AND SAFETY POLICY</span> <span class="dim">Risk-classified governance contract — <span style="color:#ef4444;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P12 &bull; Approval and Safety Policy &bull; 385/385 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

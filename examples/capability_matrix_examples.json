@@ -1,0 +1,130 @@
+{
+  "examples": [
+    {
+      "name": "Read-only search tool grant",
+      "description": "A low-risk read-only grant for a code search tool. The agent 'agent-code' can only READ in development and staging environments. No destructive verbs, no approval required.",
+      "tool_descriptor": {
+        "tool_id": "search-code",
+        "tool_name": "SearchCode",
+        "description": "Searches across the codebase for patterns and definitions",
+        "risk_level": "low",
+        "supported_verbs": ["read", "execute"],
+        "destructive": false
+      },
+      "grant": {
+        "grant_id": "grant-search-readonly",
+        "agent_identity": "agent-code",
+        "tool_id": "search-code",
+        "allowed_verbs": ["read"],
+        "scope_constraints": [
+          {
+            "scope_type": "repo",
+            "scope_value": "harness",
+            "description": "Only the harness repository"
+          }
+        ],
+        "environments": ["development", "staging"],
+        "approval_required": false,
+        "enabled": true
+      }
+    },
+    {
+      "name": "Production write tool requiring approval",
+      "description": "A high-risk tool grant for editing files in production. The agent 'agent-swe' is allowed WRITE only in production, but it requires human approval. Scope is constrained to src/ directory.",
+      "tool_descriptor": {
+        "tool_id": "edit-file",
+        "tool_name": "EditFile",
+        "description": "Creates and modifies files on disk",
+        "risk_level": "high",
+        "supported_verbs": ["read", "write", "delete"],
+        "destructive": false
+      },
+      "grant": {
+        "grant_id": "grant-prod-write",
+        "agent_identity": "agent-swe",
+        "tool_id": "edit-file",
+        "allowed_verbs": ["read", "write"],
+        "scope_constraints": [
+          {
+            "scope_type": "path",
+            "scope_value": "src/",
+            "description": "Only production code in src/"
+          }
+        ],
+        "environments": ["production"],
+        "approval_required": true,
+        "enabled": true
+      },
+      "permission_rule": {
+        "rule_id": "rule-prod-write-approval",
+        "tool_id": "edit-file",
+        "effect": "require_approval",
+        "applies_to_agent_identity": "agent-swe",
+        "verbs": ["write"],
+        "environments": ["production"],
+        "rationale": "Production write requires human approval per change-control policy"
+      },
+      "authorization_decision": {
+        "decision_id": "dec-prod-write-042",
+        "request_id": "ar-prod-042",
+        "allowed": false,
+        "effect": "require_approval",
+        "matched_rule_ids": ["rule-prod-write-approval"],
+        "rationale": "Production write on edit-file for agent-swe requires human approval before execution",
+        "approval_required": true
+      }
+    },
+    {
+      "name": "Denied access because no matching grant exists",
+      "description": "An agent tries to use the DELETE verb on the delete-resource tool in production. No grant covers this combination. The default-deny effect applies and the request is rejected.",
+      "access_request": {
+        "request_id": "ar-deny-999",
+        "run_id": "run-999",
+        "step_id": "step-7",
+        "agent_identity": "agent-swe",
+        "tool_id": "delete-resource",
+        "requested_verb": "delete",
+        "environment": "production",
+        "requested_scope": []
+      },
+      "authorization_decision": {
+        "decision_id": "dec-deny-999",
+        "request_id": "ar-deny-999",
+        "allowed": false,
+        "effect": "deny",
+        "matched_rule_ids": [],
+        "rationale": "No matching grant found for agent-swe on delete-resource with verb=delete in production. Default-deny applied.",
+        "approval_required": false
+      }
+    },
+    {
+      "name": "Destructive tool descriptor with strict policy",
+      "description": "A destructive tool that deletes cloud resources. Risk level is CRITICAL. Only the DELETE verb is supported. The tool is marked destructive, which forces approval_required=True on any grant.",
+      "tool_descriptor": {
+        "tool_id": "delete-cloud-resource",
+        "tool_name": "DeleteCloudResource",
+        "description": "Deletes cloud infrastructure resources (buckets, databases, instances)",
+        "risk_level": "critical",
+        "supported_verbs": ["delete"],
+        "destructive": true
+      },
+      "grant": {
+        "grant_id": "grant-delete-prod",
+        "agent_identity": "agent-ops",
+        "tool_id": "delete-cloud-resource",
+        "allowed_verbs": ["delete"],
+        "scope_constraints": [
+          {
+            "scope_type": "resource_group",
+            "scope_value": "staging-cluster",
+            "description": "Only staging cluster resources"
+          }
+        ],
+        "environments": ["staging"],
+        "approval_required": true,
+        "enabled": true
+      },
+      "note": "This grant scopes DELETE to staging only. Even in staging, approval is required because delete is destructive. A production grant for this tool would follow the same pattern but with stricter reviewer requirements via P21."
+    }
+  ]
+}

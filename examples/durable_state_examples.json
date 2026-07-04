@@ -1,0 +1,284 @@
+{
+  "examples": [
+    {
+      "name": "Running task with one completed step",
+      "description": "A feature-implementation run that completed its first step (running tests) and checkpointed.",
+      "run": {
+        "run_id": "run-feat-042",
+        "task_id": "task-feat-042",
+        "status": "running",
+        "steps": [
+          {
+            "step_id": "step-001",
+            "name": "Run existing tests to establish baseline",
+            "status": "success",
+            "tool_calls": [
+              {
+                "tool_call_id": "tc-001",
+                "tool_name": "bash",
+                "status": "success",
+                "arguments": {
+                  "command": "pytest tests/"
+                },
+                "output": {
+                  "stdout": "115 passed in 0.71s",
+                  "exit_code": 0
+                },
+                "error": null,
+                "started_at": "2025-03-15T10:00:00Z",
+                "finished_at": "2025-03-15T10:00:45Z"
+              }
+            ],
+            "artifacts": [
+              {
+                "artifact_id": "art-001",
+                "artifact_type": "test_report",
+                "path": "/workspace/test-results/baseline.xml",
+                "description": "Baseline test results before feature changes",
+                "created_at": "2025-03-15T10:00:45Z"
+              }
+            ],
+            "retry": {
+              "retry_count": 0,
+              "max_retries": 2,
+              "last_error": null,
+              "last_attempt_at": null
+            },
+            "started_at": "2025-03-15T10:00:00Z",
+            "finished_at": "2025-03-15T10:00:45Z"
+          }
+        ],
+        "checkpoints": [
+          {
+            "checkpoint_id": "cp-001",
+            "run_id": "run-feat-042",
+            "step_id": "step-001",
+            "summary": "Baseline tests pass, proceeding to implementation",
+            "created_at": "2025-03-15T10:00:46Z",
+            "state_version": 1
+          }
+        ],
+        "resume": {
+          "next_step_id": "step-002",
+          "last_checkpoint_id": "cp-001",
+          "can_resume": true,
+          "resume_reason": null
+        },
+        "created_at": "2025-03-15T10:00:00Z",
+        "updated_at": "2025-03-15T10:00:46Z"
+      }
+    },
+    {
+      "name": "Failed run with checkpoint and retry state",
+      "description": "A deployment run that failed after exhausting retries on a build step, with a checkpoint saved before the failure.",
+      "run": {
+        "run_id": "run-deploy-117",
+        "task_id": "task-deploy-117",
+        "status": "failed",
+        "steps": [
+          {
+            "step_id": "step-001",
+            "name": "Build application",
+            "status": "success",
+            "tool_calls": [
+              {
+                "tool_call_id": "tc-001",
+                "tool_name": "bash",
+                "status": "success",
+                "arguments": {
+                  "command": "npm run build"
+                },
+                "output": {
+                  "stdout": "Build completed successfully",
+                  "exit_code": 0
+                },
+                "error": null,
+                "started_at": "2025-03-15T11:00:00Z",
+                "finished_at": "2025-03-15T11:02:30Z"
+              }
+            ],
+            "artifacts": [
+              {
+                "artifact_id": "art-002",
+                "artifact_type": "file",
+                "path": "/workspace/dist/bundle.js",
+                "description": "Production bundle",
+                "created_at": "2025-03-15T11:02:30Z"
+              }
+            ],
+            "retry": {
+              "retry_count": 0,
+              "max_retries": 2,
+              "last_error": null,
+              "last_attempt_at": null
+            },
+            "started_at": "2025-03-15T11:00:00Z",
+            "finished_at": "2025-03-15T11:02:30Z"
+          },
+          {
+            "step_id": "step-002",
+            "name": "Deploy to staging",
+            "status": "failed",
+            "tool_calls": [
+              {
+                "tool_call_id": "tc-002",
+                "tool_name": "bash",
+                "status": "error",
+                "arguments": {
+                  "command": "deploy/staging.sh"
+                },
+                "output": null,
+                "error": "Connection timeout after 30s",
+                "started_at": "2025-03-15T11:03:00Z",
+                "finished_at": "2025-03-15T11:03:30Z"
+              },
+              {
+                "tool_call_id": "tc-003",
+                "tool_name": "bash",
+                "status": "error",
+                "arguments": {
+                  "command": "deploy/staging.sh --retry"
+                },
+                "output": null,
+                "error": "Connection refused",
+                "started_at": "2025-03-15T11:04:00Z",
+                "finished_at": "2025-03-15T11:04:25Z"
+              },
+              {
+                "tool_call_id": "tc-004",
+                "tool_name": "bash",
+                "status": "error",
+                "arguments": {
+                  "command": "deploy/staging.sh --force"
+                },
+                "output": null,
+                "error": "Authentication failed",
+                "started_at": "2025-03-15T11:05:00Z",
+                "finished_at": "2025-03-15T11:05:20Z"
+              }
+            ],
+            "artifacts": [],
+            "retry": {
+              "retry_count": 3,
+              "max_retries": 3,
+              "last_error": "Authentication failed",
+              "last_attempt_at": "2025-03-15T11:05:20Z"
+            },
+            "started_at": "2025-03-15T11:03:00Z",
+            "finished_at": "2025-03-15T11:05:20Z"
+          }
+        ],
+        "checkpoints": [
+          {
+            "checkpoint_id": "cp-002",
+            "run_id": "run-deploy-117",
+            "step_id": "step-001",
+            "summary": "Build succeeded, starting deployment",
+            "created_at": "2025-03-15T11:02:30Z",
+            "state_version": 1
+          },
+          {
+            "checkpoint_id": "cp-003",
+            "run_id": "run-deploy-117",
+            "step_id": "step-002",
+            "summary": "Deployment failed after 3 retries, marking run as failed",
+            "created_at": "2025-03-15T11:05:20Z",
+            "state_version": 1
+          }
+        ],
+        "resume": {
+          "next_step_id": null,
+          "last_checkpoint_id": "cp-003",
+          "can_resume": false,
+          "resume_reason": "Deployment step exhausted retries; manual intervention required"
+        },
+        "created_at": "2025-03-15T11:00:00Z",
+        "updated_at": "2025-03-15T11:05:20Z"
+      }
+    },
+    {
+      "name": "Paused run waiting for approval",
+      "description": "A refactoring run paused at a human-approval gate before deleting a public API.",
+      "run": {
+        "run_id": "run-refactor-231",
+        "task_id": "task-refactor-231",
+        "status": "paused",
+        "steps": [
+          {
+            "step_id": "step-001",
+            "name": "Audit deprecated API usage",
+            "status": "success",
+            "tool_calls": [
+              {
+                "tool_call_id": "tc-005",
+                "tool_name": "grep",
+                "status": "success",
+                "arguments": {
+                  "pattern": "deprecated_api_v1",
+                  "path": "src/"
+                },
+                "output": {
+                  "matches": 12,
+                  "files": ["src/legacy.py", "src/middleware.py"]
+                },
+                "error": null,
+                "started_at": "2025-03-15T14:00:00Z",
+                "finished_at": "2025-03-15T14:00:15Z"
+              }
+            ],
+            "artifacts": [
+              {
+                "artifact_id": "art-003",
+                "artifact_type": "diff",
+                "path": "/workspace/patches/deprecation-audit.diff",
+                "description": "Diff showing all callers of deprecated_api_v1",
+                "created_at": "2025-03-15T14:00:15Z"
+              }
+            ],
+            "retry": {
+              "retry_count": 0,
+              "max_retries": 1,
+              "last_error": null,
+              "last_attempt_at": null
+            },
+            "started_at": "2025-03-15T14:00:00Z",
+            "finished_at": "2025-03-15T14:00:15Z"
+          },
+          {
+            "step_id": "step-002",
+            "name": "Remove deprecated API",
+            "status": "pending",
+            "tool_calls": [],
+            "artifacts": [],
+            "retry": {
+              "retry_count": 0,
+              "max_retries": 2,
+              "last_error": null,
+              "last_attempt_at": null
+            },
+            "started_at": null,
+            "finished_at": null
+          }
+        ],
+        "checkpoints": [
+          {
+            "checkpoint_id": "cp-004",
+            "run_id": "run-refactor-231",
+            "step_id": "step-001",
+            "summary": "Deprecation audit complete. Waiting for human approval before deletion.",
+            "created_at": "2025-03-15T14:00:16Z",
+            "state_version": 1
+          }
+        ],
+        "resume": {
+          "next_step_id": "step-002",
+          "last_checkpoint_id": "cp-004",
+          "can_resume": true,
+          "resume_reason": null
+        },
+        "created_at": "2025-03-15T14:00:00Z",
+        "updated_at": "2025-03-15T14:00:16Z"
+      }
+    }
+  ]
+}

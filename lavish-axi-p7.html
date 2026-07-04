@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P7: Durable State Schema</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #fbbf24; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #fbbf24 50%, #f59e0b 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p { font-size: 1.05rem; color: #9494a8; max-width: 640px; }
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-run { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.icon-rec { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.icon-test { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-ex { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.tag {
+  display: inline-block; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 500;
+}
+
+.tag-state { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.15); }
+.tag-pass { background: rgba(52, 211, 153, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.2); }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.tree { padding-left: 1.2rem; border-left: 1px solid #1e1e2a; margin: 0.75rem 0; }
+
+.tree-item {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.3rem 0; font-size: 0.9rem;
+}
+
+.tree-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: #34d399; }
+.dot-yellow { background: #fbbf24; }
+.dot-red { background: #ef4444; }
+.dot-purple { background: #a78bfa; }
+.dot-blue { background: #38bdf8; }
+.dot-orange { background: #f97316; }
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #fbbf24; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+}
+
+.model-tree { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 2; }
+.model-tree .cls { color: #fbbf24; font-weight: 600; }
+.model-tree .cls2 { color: #818cf8; font-weight: 600; }
+.model-tree .fld { color: #94a3b8; }
+.model-tree .typ { color: #818cf8; }
+.model-tree .def { color: #6b6b80; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 7 &mdash; Durable State Schema</div>
+    <h1>Run-Centric Durable Execution Contract</h1>
+    <p>
+      What must be persisted so a run can be resumed, inspected, retried, or replayed
+      safely. Seven records, four enums — no database layer yet.
+    </p>
+  </div>
+
+  <!-- FILES -->
+  <div class="section-label">Files Created</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/durable_state.py                    <span class="dim">(7 BaseModels, 4 Enums)</span><br>
+    <span class="hl">CREATED</span>  tests/test_durable_state.py                 <span class="dim">(47 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/durable_state_examples.json          <span class="dim">(3 examples)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 162/162 tests pass across all 7 primitives
+  </div>
+
+  <!-- ARCHITECTURE -->
+  <div class="section-label">RunState — 7 Records + 4 Enums</div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-run">&#9632;</div>
+      <div>
+        <div class="card-title">RunState</div>
+        <div class="card-subtitle">run_id + task_id + status + step list + checkpoints + resume pointer + timestamps</div>
+      </div>
+    </div>
+    <div class="model-tree">
+      <span class="cls">RunState</span><br>
+      <span style="padding-left:1rem;display:block;">
+        <span class="fld">&#9500;&#9472; run_id</span>: <span class="typ">str</span> <span class="def">(non-empty)</span><br>
+        <span class="fld">&#9500;&#9472; task_id</span>: <span class="typ">str</span> <span class="def">(non-empty)</span><br>
+        <span class="fld">&#9500;&#9472; status</span>: <span class="typ">RunStatus</span><br>
+        <span class="fld">&#9500;&#9472; steps</span>: <span class="typ">List[StepRecord]</span><br>
+        <span class="fld">&#9500;&#9472; checkpoints</span>: <span class="typ">List[CheckpointRecord]</span><br>
+        <span class="fld">&#9500;&#9472; resume</span>: <span class="typ">ResumePointer</span><br>
+        <span class="fld">&#9500;&#9472; created_at</span>: <span class="typ">str</span> <span class="def">(non-empty)</span><br>
+        <span class="fld">&#9492;&#9472; updated_at</span>: <span class="typ">str</span> <span class="def">(non-empty)</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- RECORDS -->
+  <div class="section-label">Seven Records</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">CheckpointRecord</div>
+          <div class="card-subtitle">checkpoint_id, run_id, step_id, summary, created_at, state_version</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Empty checkpoint_id &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Empty run_id &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Empty created_at &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Default state_version = 1</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">StepRecord</div>
+          <div class="card-subtitle">step_id, name, status, tool_calls, artifacts, retry, timestamps</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Empty step_id or name &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> SUCCESS/FAILED without finished_at &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> retry_count &gt; max_retries &rarr; error</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">ToolCallRecord</div>
+          <div class="card-subtitle">tool_call_id, tool_name, status, arguments, output/error, timestamps</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Empty tool_call_id or tool_name &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> ERROR without error message &rarr; error</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">ArtifactRecord</div>
+          <div class="card-subtitle">artifact_id, artifact_type, path, description, created_at</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Empty artifact_id &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Empty path &rarr; error</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">RetryState</div>
+          <div class="card-subtitle">retry_count, max_retries, last_error, last_attempt_at</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Defaults: count=0, max_retries=0</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> Cross-validated in StepRecord</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">ResumePointer</div>
+          <div class="card-subtitle">next_step_id, last_checkpoint_id, can_resume, resume_reason</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> can_resume=False without reason &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Default: can_resume=True</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENUMS -->
+  <div class="section-label">Enums &mdash; 4</div>
+
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-title" style="color:#fbbf24;">RunStatus</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> pending</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> running</div>
+        <div class="tree-item"><span class="tree-dot dot-orange"></span> paused</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> failed</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> completed</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> cancelled</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#818cf8;">StepStatus</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> pending</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> running</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> success</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> failed</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> skipped</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#34d399;">ToolCallStatus</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> requested</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> started</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> success</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> error</div>
+        <div class="tree-item"><span class="tree-dot dot-orange"></span> blocked</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#38bdf8;">ArtifactType</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> file</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> log</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> diff</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> test_report</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALIDATION RULES -->
+  <div class="section-label">Validation Rules</div>
+  <div class="diagram">
+    <span class="hl">Non-empty IDs</span>    <span class="dim">run_id, task_id, step_id, tool_call_id, artifact_id, checkpoint_id</span><br>
+    <span class="hl">Non-empty names</span>  <span class="dim">step name, tool name</span><br>
+    <span class="hl">Terminal check</span>    <span class="dim">SUCCESS/FAILED step requires finished_at</span><br>
+    <span class="hl">Retry bound</span>       <span class="dim">retry_count must not exceed max_retries</span><br>
+    <span class="hl">Error presence</span>    <span class="dim">ERROR tool call requires error message</span><br>
+    <span class="hl">Resume reason</span>     <span class="dim">can_resume=False requires resume_reason</span><br>
+    <span class="hl">Timestamps</span>        <span class="dim">created_at, updated_at on RunState; created_at on CheckpointRecord</span>
+  </div>
+
+  <!-- CHECKPOINT POLICY -->
+  <div class="section-label">Checkpoint Moments (v1 Guidance)</div>
+  <div class="diagram">
+    <span class="hl">&#9654; After each completed model turn</span><br>
+    <span class="hl">&#9654; After each completed tool call</span><br>
+    <span class="hl">&#9654; After each completed step</span><br>
+    <span class="hl">&#9654; Before pausing for approval</span><br>
+    <span class="hl">&#9654; Before marking failure terminal</span>
+  </div>
+
+  <!-- EXAMPLES -->
+  <div class="section-label">Examples &mdash; 3</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-ex">&#9632;</div>
+        <div>
+          <div class="card-title">Running with one completed step</div>
+          <div class="card-subtitle">Feature run that passed baseline tests, checkpointed, waiting for next step</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Status: running</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> 1 completed step with 1 tool call</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> 1 checkpoint created</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Resume: can_resume=True, next step queued</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-ex">&#9632;</div>
+        <div>
+          <div class="card-title">Failed with retry exhaustion</div>
+          <div class="card-subtitle">Deployment run that retried 3 times then failed</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Status: failed</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> 3 ERROR tool calls, retry_count=3</div>
+        <div class="tree-item"><span class="tree-dot dot-orange"></span> Resume: can_resume=False, reason given</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> 2 checkpoints (build + deploy failure)</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-ex">&#9632;</div>
+        <div>
+          <div class="card-title">Paused for approval</div>
+          <div class="card-subtitle">Refactoring run paused at human-approval gate before destructive step</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> Status: paused</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> 1 completed audit step, 1 pending deletion step</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Resume: can_resume=True, next_step="Remove API"</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHAT NOT TO STORE -->
+  <div class="section-label">Not Stored in Durable State</div>
+  <div class="diagram">
+    <span class="dim">&#10007; Open file handles</span><br>
+    <span class="dim">&#10007; Active process objects</span><br>
+    <span class="dim">&#10007; Live sockets</span><br>
+    <span class="dim">&#10007; Raw huge logs</span><br>
+    <span class="dim">&#10007; Non-serializable objects</span><br>
+    <span class="dim">&#10007; Whole repo snapshots every step</span>
+  </div>
+
+  <!-- PRIMITIVES -->
+  <div class="section-label">Primitives So Far</div>
+  <div class="diagram">
+    <span class="hl" style="color:#818cf8;">P1  INSTRUCTION LAYERING</span>       <span class="dim">Global + Project + Task layers</span><br>
+    <span class="hl" style="color:#34d399;">P2  TASK CONTRACT SCHEMA</span>       <span class="dim">Nested Pydantic + 2-layer validation</span><br>
+    <span class="hl" style="color:#38bdf8;">P3  CONTEXT DELIVERY SCHEMA</span>     <span class="dim">Structured bundle + reason-annotated items</span><br>
+    <span class="hl" style="color:#fbbf24;">P4  CONTEXT SELECTION POLICY</span>   <span class="dim">Heuristic pipeline + exclusions + caps</span><br>
+    <span class="hl" style="color:#f87171;">P5  TOOL INTERFACE SCHEMA</span>      <span class="dim">Definition, Invocation, Result</span><br>
+    <span class="hl" style="color:#a78bfa;">P6  EXECUTION ENVIRONMENT</span>     <span class="dim">Provider-agnostic runtime contract</span><br>
+    <span class="hl" style="color:#fbbf24;">P7  DURABLE STATE SCHEMA</span>      <span class="dim">Run-centric execution persistence — <span style="color:#fbbf24;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P7 &bull; Durable State Schema &bull; 162/162 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

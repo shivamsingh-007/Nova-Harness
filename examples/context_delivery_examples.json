@@ -1,0 +1,113 @@
+{
+  "examples": [
+    {
+      "name": "Bug Fix — Null pointer with failing test and stack trace",
+      "bundle": {
+        "task_id": "ctx-001",
+        "task_brief": "Fix null pointer in context packer when file list is empty.",
+        "repo_snapshot": {
+          "repo_root": "/repo",
+          "top_level_paths": ["src/", "tests/", "README.md"],
+          "primary_language": "python",
+          "build_system": "pytest",
+          "test_command": "pytest tests/",
+          "lint_command": "ruff check ."
+        },
+        "selected_files": [
+          {
+            "item_id": "f1",
+            "content_type": "file_snippet",
+            "source_path": "src/context_packer.py",
+            "title": "context_packer.py",
+            "reason": "Contains the null pointer bug in the scan_files method.",
+            "content": "def scan_files(paths):\n    if not paths:\n        return None\n    results = []\n    for p in paths:\n        results.append(FileEntry(path=p))\n    return results",
+            "priority": 1
+          }
+        ],
+        "selected_failures": [
+          {
+            "item_id": "err1",
+            "content_type": "test_failure",
+            "source_path": "tests/test_context_packer.py",
+            "title": "test_empty_file_list failure",
+            "reason": "This test exposes the null pointer by passing an empty list.",
+            "content": "FAILED test_empty_file_list - TypeError: 'NoneType' object is not iterable\n\n    def test_empty_file_list():\n        packer = ContextPacker()\n>       result = packer.scan_files([])\nE       TypeError: 'NoneType' object is not iterable",
+            "priority": 1
+          }
+        ],
+        "selected_docs": [
+          {
+            "item_id": "d1",
+            "content_type": "doc_snippet",
+            "title": "Context Packer API — scan_files",
+            "reason": "Documents the expected return type of scan_files.",
+            "content": "scan_files(paths: list[str]) -> list[FileEntry]\nReturns a list of FileEntry objects for each valid path. Returns an empty list if paths is empty.",
+            "priority": 2
+          }
+        ],
+        "verification_hints": {
+          "recommended_commands": [
+            "pytest tests/test_context_packer.py::test_empty_file_list -v"
+          ],
+          "success_signals": [
+            "test_empty_file_list passes with exit code 0",
+            "no TypeError raised"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Feature — File watcher with selected docs and file snippets",
+      "bundle": {
+        "task_id": "ctx-002",
+        "task_brief": "Add a file watcher that triggers context repack when files are modified.",
+        "repo_snapshot": {
+          "repo_root": "/repo",
+          "top_level_paths": ["src/", "tests/", "docs/", "pyproject.toml"],
+          "primary_language": "python",
+          "build_system": "pytest",
+          "test_command": "pytest tests/"
+        },
+        "selected_files": [
+          {
+            "item_id": "f1",
+            "content_type": "file_snippet",
+            "source_path": "src/context_packer.py",
+            "title": "context_packer.py",
+            "reason": "Existing packer that needs watcher integration — the pack() method must be called on file change.",
+            "content": "class ContextPacker:\n    def __init__(self, root: str):\n        self.root = root\n        self._cache = {}\n\n    def pack(self) -> dict:\n        files = self.scan_files(self.root)\n        return {f.path: f.read() for f in files}\n\n    def scan_files(self, path: str) -> list:\n        ...",
+            "priority": 1
+          },
+          {
+            "item_id": "f2",
+            "content_type": "file_snippet",
+            "title": "watcher.py (new file)",
+            "reason": "New file to create with the file watcher implementation.",
+            "content": "# TODO: implement FileWatcher that calls ContextPacker.pack() on file system events",
+            "priority": 1
+          }
+        ],
+        "selected_failures": [],
+        "selected_docs": [
+          {
+            "item_id": "d1",
+            "content_type": "doc_snippet",
+            "title": "watchdog — Observer pattern",
+            "reason": "Reference for the filesystem event observer API used to implement file watching.",
+            "content": "from watchdog.observers import Observer\nfrom watchdog.events import FileSystemEventHandler\n\nclass MyHandler(FileSystemEventHandler):\n    def on_modified(self, event):\n        print(f'File modified: {event.src_path}')\n\nobserver = Observer()\nobserver.schedule(MyHandler(), path='.', recursive=True)\nobserver.start()",
+            "priority": 2
+          }
+        ],
+        "verification_hints": {
+          "recommended_commands": [
+            "pytest tests/test_watcher.py -v"
+          ],
+          "success_signals": [
+            "all watcher tests pass",
+            "context repack triggers on file modification"
+          ]
+        }
+      }
+    }
+  ]
+}

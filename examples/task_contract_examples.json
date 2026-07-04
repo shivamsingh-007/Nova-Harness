@@ -1,0 +1,94 @@
+{
+  "examples": [
+    {
+      "name": "Bug Fix — Null pointer in context packer",
+      "contract": {
+        "task_id": "task-001",
+        "title": "Fix null pointer in context packer",
+        "task_type": "bug_fix",
+        "goal": "Fix the null pointer exception when context_packer receives an empty file list.",
+        "scope": {
+          "repo_path": "/repo",
+          "allowed_paths": ["src/context_packer.py"],
+          "blocked_paths": ["src/deployment/", "secrets/"]
+        },
+        "inputs": {
+          "user_request": "Fix null pointer in context_packer when file list is empty",
+          "relevant_files": ["src/context_packer.py"],
+          "failing_tests": ["tests/test_context_packer.py::test_empty_file_list"],
+          "error_logs": ["TypeError: 'NoneType' object is not iterable"]
+        },
+        "constraints": {
+          "max_files_changed": 2,
+          "max_retries": 2,
+          "allow_network": false,
+          "allow_dependency_changes": false
+        },
+        "tools_allowed": ["read_file", "search_code", "edit_file", "run_tests"],
+        "success_criteria": [
+          { "kind": "test", "target": "tests/test_context_packer.py::test_empty_file_list" },
+          { "kind": "lint", "target": "src/" }
+        ],
+        "approval_gates": ["large_diff", "dependency_change"]
+      }
+    },
+    {
+      "name": "Feature — File watcher for context repack",
+      "contract": {
+        "task_id": "task-002",
+        "title": "Add file watcher to context packer",
+        "task_type": "feature",
+        "goal": "Add a file watcher that triggers context repack on file change.",
+        "scope": {
+          "repo_path": "/repo",
+          "allowed_paths": ["src/", "tests/"]
+        },
+        "inputs": {
+          "user_request": "Add file watcher that triggers context repack",
+          "relevant_files": ["src/context_packer.py", "src/watcher.py"]
+        },
+        "constraints": {
+          "max_files_changed": 5,
+          "max_retries": 2,
+          "allow_network": false,
+          "allow_dependency_changes": false
+        },
+        "tools_allowed": ["read_file", "search_code", "edit_file", "run_tests"],
+        "success_criteria": [
+          { "kind": "test", "target": "tests/test_watcher.py" },
+          { "kind": "typecheck", "target": "src/" }
+        ],
+        "approval_gates": ["dependency_change"]
+      }
+    },
+    {
+      "name": "Refactor — Extract file scanning module",
+      "contract": {
+        "task_id": "task-003",
+        "title": "Extract file scanning from context packer",
+        "task_type": "refactor",
+        "goal": "Extract file scanning logic into a separate module without changing behavior.",
+        "scope": {
+          "repo_path": "/repo",
+          "allowed_paths": ["src/"]
+        },
+        "inputs": {
+          "user_request": "Extract file scanning into a separate module",
+          "relevant_files": ["src/context_packer.py"]
+        },
+        "constraints": {
+          "max_files_changed": 4,
+          "max_retries": 2,
+          "allow_network": false,
+          "allow_dependency_changes": false
+        },
+        "tools_allowed": ["read_file", "search_code", "edit_file", "run_tests", "git_diff"],
+        "success_criteria": [
+          { "kind": "test", "target": "tests/" },
+          { "kind": "diff_review", "target": "all" }
+        ],
+        "approval_gates": ["dependency_change"]
+      }
+    }
+  ]
+}

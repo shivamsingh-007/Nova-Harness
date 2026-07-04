@@ -1,0 +1,123 @@
+{
+  "examples": [
+    {
+      "name": "Standard coding run — happy path",
+      "description": "A feature-implementation run that follows the main harness loop: assemble prompt, call model, no tool needed, verify, succeed.",
+      "machine": {
+        "machine_id": "harness-v1",
+        "initial_state": "created",
+        "terminal_states": ["succeeded", "failed", "cancelled"],
+        "transitions": [
+          { "from_state": "created", "event": "start_run", "to_state": "assembling_prompt", "guards": [] },
+          { "from_state": "assembling_prompt", "event": "prompt_ready", "to_state": "model_pending", "guards": [] },
+          { "from_state": "model_pending", "event": "model_response_received", "to_state": "model_completed", "guards": [] },
+          { "from_state": "model_completed", "event": "no_tool_needed", "to_state": "verifying", "guards": [] },
+          { "from_state": "verifying", "event": "verification_passed", "to_state": "succeeded", "guards": [] },
+          { "from_state": "created", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "assembling_prompt", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "model_pending", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "model_completed", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "tool_pending", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "tool_running", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "verifying", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "awaiting_approval", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "retry_pending", "event": "cancel_run", "to_state": "cancelled", "guards": [] }
+        ],
+        "trace": [
+          { "state": "created", "event": "start_run" },
+          { "state": "assembling_prompt", "event": "prompt_ready" },
+          { "state": "model_pending", "event": "model_response_received" },
+          { "state": "model_completed", "event": "no_tool_needed" },
+          { "state": "verifying", "event": "verification_passed" },
+          { "state": "succeeded", "event": null }
+        ]
+      }
+    },
+    {
+      "name": "Approval-required tool flow",
+      "description": "A run where the model requests a tool call that requires human approval before execution.",
+      "machine": {
+        "machine_id": "harness-v1",
+        "initial_state": "created",
+        "terminal_states": ["succeeded", "failed", "cancelled"],
+        "transitions": [
+          { "from_state": "created", "event": "start_run", "to_state": "assembling_prompt", "guards": [] },
+          { "from_state": "assembling_prompt", "event": "prompt_ready", "to_state": "model_pending", "guards": [] },
+          { "from_state": "model_pending", "event": "model_response_received", "to_state": "model_completed", "guards": [] },
+          { "from_state": "model_completed", "event": "tool_call_requested", "to_state": "tool_pending", "guards": [] },
+          { "from_state": "tool_pending", "event": "approval_required", "to_state": "awaiting_approval", "guards": [] },
+          { "from_state": "awaiting_approval", "event": "approval_granted", "to_state": "tool_running", "guards": [{ "name": "approval_granted_if_required", "description": "Approval has been granted by the required approver" }] },
+          { "from_state": "tool_running", "event": "tool_completed", "to_state": "verifying", "guards": [] },
+          { "from_state": "verifying", "event": "verification_passed", "to_state": "succeeded", "guards": [] },
+          { "from_state": "created", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "assembling_prompt", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "model_pending", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "model_completed", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "tool_pending", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "tool_running", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "verifying", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "awaiting_approval", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "retry_pending", "event": "cancel_run", "to_state": "cancelled", "guards": [] }
+        ],
+        "trace": [
+          { "state": "created", "event": "start_run" },
+          { "state": "assembling_prompt", "event": "prompt_ready" },
+          { "state": "model_pending", "event": "model_response_received" },
+          { "state": "model_completed", "event": "tool_call_requested" },
+          { "state": "tool_pending", "event": "approval_required" },
+          { "state": "awaiting_approval", "event": "approval_granted" },
+          { "state": "tool_running", "event": "tool_completed" },
+          { "state": "verifying", "event": "verification_passed" },
+          { "state": "succeeded", "event": null }
+        ]
+      }
+    },
+    {
+      "name": "Retry after verification failure",
+      "description": "A run where verification fails but retry is allowed, then succeeds on the second attempt.",
+      "machine": {
+        "machine_id": "harness-v1",
+        "initial_state": "created",
+        "terminal_states": ["succeeded", "failed", "cancelled"],
+        "transitions": [
+          { "from_state": "created", "event": "start_run", "to_state": "assembling_prompt", "guards": [] },
+          { "from_state": "assembling_prompt", "event": "prompt_ready", "to_state": "model_pending", "guards": [] },
+          { "from_state": "model_pending", "event": "model_response_received", "to_state": "model_completed", "guards": [] },
+          { "from_state": "model_completed", "event": "tool_call_requested", "to_state": "tool_pending", "guards": [] },
+          { "from_state": "tool_pending", "event": "tool_approved_or_not_required", "to_state": "tool_running", "guards": [] },
+          { "from_state": "tool_running", "event": "tool_completed", "to_state": "verifying", "guards": [] },
+          { "from_state": "verifying", "event": "verification_failed_retryable", "to_state": "retry_pending", "guards": [] },
+          { "from_state": "retry_pending", "event": "retry_allowed", "to_state": "assembling_prompt", "guards": [{ "name": "retry_budget_available", "description": "Retry count has not exceeded max_retries" }] },
+          { "from_state": "assembling_prompt", "event": "prompt_ready", "to_state": "model_pending", "guards": [] },
+          { "from_state": "model_pending", "event": "model_response_received", "to_state": "model_completed", "guards": [] },
+          { "from_state": "model_completed", "event": "no_tool_needed", "to_state": "verifying", "guards": [] },
+          { "from_state": "verifying", "event": "verification_passed", "to_state": "succeeded", "guards": [] },
+          { "from_state": "created", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "assembling_prompt", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "model_pending", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "model_completed", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "tool_pending", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "tool_running", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "verifying", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "awaiting_approval", "event": "cancel_run", "to_state": "cancelled", "guards": [] },
+          { "from_state": "retry_pending", "event": "cancel_run", "to_state": "cancelled", "guards": [] }
+        ],
+        "trace": [
+          { "state": "created", "event": "start_run" },
+          { "state": "assembling_prompt", "event": "prompt_ready" },
+          { "state": "model_pending", "event": "model_response_received" },
+          { "state": "model_completed", "event": "tool_call_requested" },
+          { "state": "tool_pending", "event": "tool_approved_or_not_required" },
+          { "state": "tool_running", "event": "tool_completed" },
+          { "state": "verifying", "event": "verification_failed_retryable" },
+          { "state": "retry_pending", "event": "retry_allowed" },
+          { "state": "assembling_prompt", "event": "prompt_ready" },
+          { "state": "model_pending", "event": "model_response_received" },
+          { "state": "model_completed", "event": "no_tool_needed" },
+          { "state": "verifying", "event": "verification_passed" },
+          { "state": "succeeded", "event": null }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P25: Trace, Audit &amp; Provenance Contract</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #a855f7; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #a855f7 50%, #7c3aed 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p { font-size: 1.05rem; color: #9494a8; max-width: 640px; }
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-g { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-y { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.icon-b { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.icon-r { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.icon-p { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+.icon-c { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #a855f7; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+
+.flow { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; line-height: 2.2; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 25 &mdash; Audit &amp; Provenance</div>
+    <h1>Trace, Audit &amp; Provenance Contract</h1>
+    <p>
+      Chronological, attributable, tamper-resistant records for consequential
+      events — linking execution context, actor identity, target resources,
+      evidence, and decision lineage.
+    </p>
+  </div>
+
+  <div class="section-label">Files</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/audit_contract.py              <span class="dim">(3 enums + 8 models)</span><br>
+    <span class="hl">CREATED</span>  tests/test_audit_contract.py         <span class="dim">(46 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/audit_contract_examples.json <span class="dim">(5 examples)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 1016/1016 tests pass across all primitives
+  </div>
+
+  <div class="section-label">Enums</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9881;</div>
+        <div>
+          <div class="card-title">AuditEventType</div>
+          <div class="card-subtitle">13 event types</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        run_started &bull; run_completed<br>
+        step_started &bull; step_completed<br>
+        tool_requested &bull; tool_executed<br>
+        model_called &bull; guardrail_evaluated<br>
+        approval_requested &bull; approval_decided<br>
+        quality_gate_decided &bull; error_recorded<br>
+        checkpoint_created
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9881;</div>
+        <div>
+          <div class="card-title">ActorType</div>
+          <div class="card-subtitle">5 actor types</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        user &bull; agent &bull; reviewer<br>
+        system &bull; service
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9881;</div>
+        <div>
+          <div class="card-title">ResourceType</div>
+          <div class="card-subtitle">9 resource types</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        run &bull; step &bull; tool &bull; model<br>
+        policy &bull; approval &bull; checkpoint<br>
+        output &bull; data_object
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Models</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">TraceContext</div>
+          <div class="card-subtitle">execution location</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        trace_id &bull; run_id<br>
+        session_id <span class="dim">str | None</span><br>
+        step_id <span class="dim">str | None</span><br>
+        parent_event_id <span class="dim">str | None</span><br>
+        environment <span class="dim">str (non-empty)</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9632;</div>
+        <div>
+          <div class="card-title">ActorRef / ResourceRef</div>
+          <div class="card-subtitle">identity &amp; target</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        <span class="hl">ActorRef</span> &mdash; actor_id, actor_type, role?<br>
+        <span class="hl">ResourceRef</span> &mdash; resource_id, resource_type, label?
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9632;</div>
+        <div>
+          <div class="card-title">EvidenceRef / ProvenanceLink</div>
+          <div class="card-subtitle">evidence + graph edges</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        <span class="hl">EvidenceRef</span> &mdash; evidence_id, source_type,
+        source_ref, digest?<br>
+        <span class="hl">ProvenanceLink</span> &mdash; link_id, from_event_id,
+        to_event_id, relationship_type
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9632;</div>
+        <div>
+          <div class="card-title">DecisionLineage</div>
+          <div class="card-subtitle">inputs &#8594; evidence &#8594; policies &#8594; outputs</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        lineage_id<br>
+        input_refs <span class="dim">List[ResourceRef]</span><br>
+        evidence_refs <span class="dim">List[EvidenceRef]</span><br>
+        policy_refs <span class="dim">List[ResourceRef]</span><br>
+        output_refs <span class="dim">List[ResourceRef]</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">AuditEvent</div>
+          <div class="card-subtitle">single attributable record</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        event_id &bull; event_type &bull; occurred_at<br>
+        trace_context <span class="dim">TraceContext</span><br>
+        actor <span class="dim">ActorRef</span><br>
+        target_resource <span class="dim">ResourceRef</span><br>
+        action_summary &bull; outcome<br>
+        decision_lineage <span class="dim">DecisionLineage | None</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">AuditEnvelope</div>
+          <div class="card-subtitle">event + graph + integrity</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        envelope_id<br>
+        event <span class="dim">AuditEvent</span><br>
+        provenance_links <span class="dim">List[ProvenanceLink]</span><br>
+        integrity_hash <span class="dim">str | None</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Provenance Graph Flow</div>
+
+  <div class="flow">
+<span class="dim">AuditEnvelope captures one consequential event + surrounding graph</span>
+<span class="dim">  </span><br>
+<span class="hl">RUN_STARTED</span><span class="dim"> (ev-001)</span><br>
+<span class="dim">  &#9492;&#8594; </span><span class="hl">TOOL_REQUESTED</span><span class="dim"> (ev-002)  [caused]</span><br>
+<span class="dim">       &#9492;&#8594; </span><span class="hl">TOOL_EXECUTED</span><span class="dim"> (ev-003)  [preceded]</span><br>
+<span class="dim">            &#9500;&#8594; </span><span class="hl">VERIFICATION</span><span class="dim"> (ev-004)  [produced]</span><br>
+<span class="dim">            &#9500;&#8594; </span><span class="hl">QUALITY_GATE</span><span class="dim"> (ev-005)  [evaluated]</span><br>
+<span class="dim">            &#9492;&#8594; </span><span class="hl">STEP_COMPLETED</span><span class="dim"> (ev-006)  [completed]</span><br>
+<span class="dim">                   &#9492;&#8594; </span><span class="hl">RUN_COMPLETED</span><span class="dim"> (ev-007) [final]</span><br>
+<span class="dim">  </span><br>
+<span class="dim">ProvenanceLink edges: caused, preceded, produced, evaluated, completed, triggered, referenced</span>
+  </div>
+
+  <div class="section-label">Validation Rules</div>
+
+  <div class="diagram">
+    <span class="hl">NON-EMPTY</span>  event_id, trace_id, run_id, environment, actor_id, resource_id, evidence_id, source_type, source_ref, link_id, from_event_id, to_event_id, relationship_type, lineage_id, envelope_id, action_summary, outcome, occurred_at<br>
+    <span class="hl">NO SELF-LINK</span> ProvenanceLink from_event_id != to_event_id &bull; TraceContext parent_event_id != trace_id<br>
+    <span class="hl">DIGEST</span>      integrity_hash / digest must be non-empty if provided<br>
+    <span class="hl">LINEAGE</span>     DecisionLineage must have at least one reference (input/evidence/policy/output)<br>
+    <span class="hl">ENUMS</span>       All event_type, actor_type, resource_type must be valid enum values
+  </div>
+
+  <div class="section-label">Test Coverage</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">46 tests</div>
+          <div class="card-subtitle">All passing</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">8 models</div>
+          <div class="card-subtitle">enums + validators</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#10003;</div>
+        <div>
+          <div class="card-title">13 event types</div>
+          <div class="card-subtitle">All accepted by AuditEvent</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Not Implemented Yet</div>
+  <div class="diagram">
+    <span class="dim">&#10007; Immutable log store / append-only ledger</span><br>
+    <span class="dim">&#10007; SIEM integration and forwarding</span><br>
+    <span class="dim">&#10007; Full OpenTelemetry mapping</span><br>
+    <span class="dim">&#10007; Compliance dashboard and query UI</span><br>
+    <span class="dim">&#10007; Forensic event reconstruction engine</span><br>
+    <span class="dim">&#10007; Cross-system event correlation service</span>
+  </div>
+
+  <div class="section-label">Primitives So Far</div>
+  <div class="diagram">
+    <span class="hl2">P1&nbsp;&nbsp;INSTRUCTION LAYERING</span>            <span class="dim">Global + Project + Task layers</span><br>
+    <span style="color:#34d399;">P2&nbsp;&nbsp;TASK CONTRACT SCHEMA</span>            <span class="dim">Nested Pydantic + 2-layer validation</span><br>
+    <span style="color:#38bdf8;">P3&nbsp;&nbsp;CONTEXT DELIVERY SCHEMA</span>          <span class="dim">Structured bundle + reason-annotated items</span><br>
+    <span style="color:#fbbf24;">P4&nbsp;&nbsp;CONTEXT SELECTION POLICY</span>        <span class="dim">Heuristic pipeline + exclusions + caps</span><br>
+    <span style="color:#f87171;">P5&nbsp;&nbsp;TOOL INTERFACE SCHEMA</span>           <span class="dim">Definition, Invocation, Result</span><br>
+    <span style="color:#a78bfa;">P6&nbsp;&nbsp;EXECUTION ENVIRONMENT</span>          <span class="dim">Provider-agnostic runtime contract</span><br>
+    <span style="color:#fbbf24;">P7&nbsp;&nbsp;DURABLE STATE SCHEMA</span>           <span class="dim">Run-centric execution persistence</span><br>
+    <span style="color:#34d399;">P8&nbsp;&nbsp;VERIFICATION SCHEMA</span>            <span class="dim">Multi-check quality gate contract</span><br>
+    <span style="color:#38bdf8;">P9&nbsp;&nbsp;PROMPT ASSEMBLY SCHEMA</span>         <span class="dim">Layered prompt assembly</span><br>
+    <span class="hl2">P10 RUN ORCHESTRATION STATE MACHINE</span>     <span class="dim">Deterministic control-flow contract</span><br>
+    <span style="color:#fbbf24;">P11 RETRY AND RECOVERY POLICY</span>     <span class="dim">Failure-classified retry contract</span><br>
+    <span style="color:#ef4444;">P12 APPROVAL AND SAFETY POLICY</span>     <span class="dim">Risk-classified governance contract</span><br>
+    <span style="color:#34d399;">P13 EVALUATION AND BENCHMARK SCHEMA</span>     <span class="dim">Task-grader-run benchmark contract</span><br>
+    <span style="color:#a855f7;">P14 OBSERVABILITY AND TRACE SCHEMA</span>     <span class="dim">Step-level execution evidence contract</span><br>
+    <span style="color:#fbbf24;">P15 STATE MACHINE DRIVER</span>          <span class="dim">Trigger, guard, history runtime</span><br>
+    <span style="color:#34d399;">P16 PIPELINE EXECUTOR</span>            <span class="dim">Single-run orchestration pipeline</span><br>
+    <span style="color:#fbbf24;">P17 PRODUCTION CONFIG &amp; SECRETS</span>    <span class="dim">Typed config + secret references + startup validation + redaction</span><br>
+    <span style="color:#a855f7;">P18 BUDGET &amp; RATE LIMIT POLICY</span>    <span class="dim">Hierarchical token/cost/runtime/tool-call/rate-limit contract</span><br>
+    <span style="color:#ef4444;">P19 FAILURE TAXONOMY &amp; ERROR ENVELOPE</span>  <span class="dim">Typed failure taxonomy + rich envelope + public-safe view + classification</span><br>
+    <span style="color:#38bdf8;">P20 INPUT &amp; OUTPUT GUARDRAILS</span>    <span class="dim">Input/output screening + risk classification + sanitization + decisions</span><br>
+    <span style="color:#34d399;">P21 APPROVAL &amp; ESCALATION</span>      <span class="dim">Risk-tiered approval + reviewer roles + evidence + timeout + escalation + outcome</span><br>
+    <span style="color:#a855f7;">P22 CAPABILITY MATRIX</span>          <span class="dim">Default-deny capability matrix + per-agent grants + environment-aware permissions + runtime authorization</span><br>
+    <span class="hl2">P23 SESSION STATE &amp; CHECKPOINT</span>  <span class="dim">Working session lifecycle + checkpointing + replay safety + side-effect tracking + resume/recovery</span><br>
+    <span style="color:#34d399;">P24 EVALUATION &amp; QUALITY GATE</span>  <span class="dim">Structured metrics + mandatory checks + threshold policies + runtime gate actions</span><br>
+    <span class="hl" style="color:#a855f7;">P25 TRACE, AUDIT &amp; PROVENANCE</span>  <span class="dim">Chronological audit events + actor attribution + resource refs + evidence lineage + provenance graph + integrity envelopes — <span style="color:#a855f7;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P25 &bull; Trace, Audit &amp; Provenance &bull; 1016/1016 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

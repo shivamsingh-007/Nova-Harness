@@ -1,0 +1,270 @@
+{
+  "examples": [
+    {
+      "name": "Successful coding run trace",
+      "description": "A full run that wrote a solution.py file. All steps succeeded.",
+      "trace": {
+        "run_id": "run-integration-001",
+        "task_id": "task-add",
+        "prompt_assembly_id": "asm-abc123",
+        "terminal_status": "success",
+        "total_latency_seconds": 3.5,
+        "started_at": "2025-04-01T10:00:00Z",
+        "finished_at": "2025-04-01T10:00:04Z",
+        "steps": [
+          {
+            "step_id": "step-prompt",
+            "step_index": 0,
+            "step_type": "prompt_assembly",
+            "status": "success",
+            "started_at": "2025-04-01T10:00:00Z",
+            "finished_at": "2025-04-01T10:00:01Z",
+            "latency_seconds": 0.2,
+            "context_item_ids": ["file:solution.py"]
+          },
+          {
+            "step_id": "step-context",
+            "step_index": 1,
+            "step_type": "context_selection",
+            "status": "success",
+            "started_at": "2025-04-01T10:00:01Z",
+            "finished_at": "2025-04-01T10:00:01Z",
+            "latency_seconds": 0.1,
+            "context_item_ids": ["file:solution.py"]
+          },
+          {
+            "step_id": "step-policy",
+            "step_index": 2,
+            "step_type": "policy_check",
+            "status": "success",
+            "started_at": "2025-04-01T10:00:01Z",
+            "finished_at": "2025-04-01T10:00:01Z",
+            "latency_seconds": 0.05,
+            "policy": {
+              "policy_name": "approval-safety-v1",
+              "outcome": "allowed",
+              "risk_level": "low",
+              "reason": "Writing solution.py to workspace is auto-allowed"
+            }
+          },
+          {
+            "step_id": "step-tool",
+            "step_index": 3,
+            "step_type": "tool_execution",
+            "status": "success",
+            "started_at": "2025-04-01T10:00:01Z",
+            "finished_at": "2025-04-01T10:00:02Z",
+            "latency_seconds": 0.5,
+            "tool": {
+              "tool_name": "write_file",
+              "argument_summary": "Write solution.py with add() function",
+              "status": "success",
+              "latency_seconds": 0.5
+            }
+          },
+          {
+            "step_id": "step-verify",
+            "step_index": 4,
+            "step_type": "verification",
+            "status": "success",
+            "started_at": "2025-04-01T10:00:02Z",
+            "finished_at": "2025-04-01T10:00:03Z",
+            "latency_seconds": 0.5,
+            "verification": {
+              "check_name": "Solution file exists",
+              "status": "success",
+              "summary": "solution.py found with correct content"
+            }
+          }
+        ],
+        "summary": {
+          "total_steps": 5,
+          "successful_steps": 5,
+          "failed_steps": 0,
+          "blocked_steps": 0,
+          "total_tool_calls": 1,
+          "total_policy_checks": 1,
+          "policy_blocks": 0,
+          "total_retries": 0,
+          "total_verification_checks": 1,
+          "verification_failures": 0,
+          "total_latency_seconds": 3.5
+        }
+      }
+    },
+    {
+      "name": "Tool failure with retry trace",
+      "description": "A tool call failed due to a transient error and was retried once before succeeding.",
+      "trace": {
+        "run_id": "run-retry-002",
+        "task_id": "task-deploy",
+        "prompt_assembly_id": "asm-def456",
+        "terminal_status": "success",
+        "total_latency_seconds": 8.2,
+        "started_at": "2025-04-01T11:00:00Z",
+        "finished_at": "2025-04-01T11:00:08Z",
+        "steps": [
+          {
+            "step_id": "step-tool-1",
+            "step_index": 0,
+            "step_type": "tool_execution",
+            "status": "failure",
+            "started_at": "2025-04-01T11:00:00Z",
+            "finished_at": "2025-04-01T11:00:03Z",
+            "latency_seconds": 3.0,
+            "tool": {
+              "tool_name": "deploy_service",
+              "argument_summary": "Deploy to staging",
+              "status": "failure",
+              "latency_seconds": 3.0,
+              "error": "HTTP 503 Service Unavailable"
+            }
+          },
+          {
+            "step_id": "step-retry",
+            "step_index": 1,
+            "step_type": "retry",
+            "status": "success",
+            "started_at": "2025-04-01T11:00:03Z",
+            "finished_at": "2025-04-01T11:00:05Z",
+            "latency_seconds": 2.0,
+            "retry": {
+              "attempt": 1,
+              "max_attempts": 3,
+              "reason": "Transient HTTP 503",
+              "backoff_delay_seconds": 2.0
+            }
+          },
+          {
+            "step_id": "step-tool-2",
+            "step_index": 2,
+            "step_type": "tool_execution",
+            "status": "success",
+            "started_at": "2025-04-01T11:00:05Z",
+            "finished_at": "2025-04-01T11:00:08Z",
+            "latency_seconds": 3.2,
+            "tool": {
+              "tool_name": "deploy_service",
+              "argument_summary": "Deploy to staging (retry 1)",
+              "status": "success",
+              "latency_seconds": 3.2
+            }
+          }
+        ],
+        "summary": {
+          "total_steps": 3,
+          "successful_steps": 2,
+          "failed_steps": 1,
+          "blocked_steps": 0,
+          "total_tool_calls": 2,
+          "total_policy_checks": 0,
+          "policy_blocks": 0,
+          "total_retries": 1,
+          "total_verification_checks": 0,
+          "verification_failures": 0,
+          "total_latency_seconds": 8.2
+        }
+      }
+    },
+    {
+      "name": "Policy-blocked run trace",
+      "description": "An agent attempted to access a credential file. The policy check blocked the action and terminated the run.",
+      "trace": {
+        "run_id": "run-blocked-003",
+        "task_id": "task-config",
+        "prompt_assembly_id": null,
+        "terminal_status": "blocked",
+        "total_latency_seconds": 0.5,
+        "started_at": "2025-04-01T12:00:00Z",
+        "finished_at": "2025-04-01T12:00:01Z",
+        "steps": [
+          {
+            "step_id": "step-policy",
+            "step_index": 0,
+            "step_type": "policy_check",
+            "status": "blocked",
+            "started_at": "2025-04-01T12:00:00Z",
+            "finished_at": "2025-04-01T12:00:01Z",
+            "latency_seconds": 0.3,
+            "policy": {
+              "policy_name": "approval-safety-v1",
+              "outcome": "blocked",
+              "risk_level": "critical",
+              "reason": "Credential file access is blocked entirely by policy"
+            }
+          }
+        ],
+        "summary": {
+          "total_steps": 1,
+          "successful_steps": 0,
+          "failed_steps": 0,
+          "blocked_steps": 1,
+          "total_tool_calls": 0,
+          "total_policy_checks": 1,
+          "policy_blocks": 1,
+          "total_retries": 0,
+          "total_verification_checks": 0,
+          "verification_failures": 0,
+          "total_latency_seconds": 0.5
+        }
+      }
+    },
+    {
+      "name": "Verification failure trace",
+      "description": "The tool executed successfully but the verification check failed because the output was malformed.",
+      "trace": {
+        "run_id": "run-verify-fail-004",
+        "task_id": "task-parse-json",
+        "prompt_assembly_id": "asm-ghi789",
+        "terminal_status": "failure",
+        "total_latency_seconds": 4.0,
+        "started_at": "2025-04-01T13:00:00Z",
+        "finished_at": "2025-04-01T13:00:04Z",
+        "steps": [
+          {
+            "step_id": "step-tool",
+            "step_index": 0,
+            "step_type": "tool_execution",
+            "status": "success",
+            "started_at": "2025-04-01T13:00:00Z",
+            "finished_at": "2025-04-01T13:00:02Z",
+            "latency_seconds": 2.0,
+            "tool": {
+              "tool_name": "write_file",
+              "argument_summary": "Write parse_json.py",
+              "status": "success",
+              "latency_seconds": 2.0
+            }
+          },
+          {
+            "step_id": "step-verify",
+            "step_index": 1,
+            "step_type": "verification",
+            "status": "failure",
+            "started_at": "2025-04-01T13:00:02Z",
+            "finished_at": "2025-04-01T13:00:04Z",
+            "latency_seconds": 2.0,
+            "verification": {
+              "check_name": "Output matches expected JSON",
+              "status": "failure",
+              "summary": "Expected 'name' field, got None"
+            }
+          }
+        ],
+        "summary": {
+          "total_steps": 2,
+          "successful_steps": 1,
+          "failed_steps": 1,
+          "blocked_steps": 0,
+          "total_tool_calls": 1,
+          "total_policy_checks": 0,
+          "policy_blocks": 0,
+          "total_retries": 0,
+          "total_verification_checks": 1,
+          "verification_failures": 1,
+          "total_latency_seconds": 4.0
+        }
+      }
+    }
+  ]
+}

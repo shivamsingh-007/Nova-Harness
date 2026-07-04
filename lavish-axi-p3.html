@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P3: Context Delivery Schema</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 0.35rem 0.9rem;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #38bdf8;
+  margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #38bdf8 50%, #0891b2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.75rem;
+}
+
+.hero p {
+  font-size: 1.05rem;
+  color: #9494a8;
+  max-width: 640px;
+}
+
+.card {
+  background: #12121a;
+  border: 1px solid #1e1e2a;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.card:hover { border-color: #2a2a3a; }
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-mod { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.icon-field { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.icon-ex { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-test { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+.tag {
+  display: inline-block; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 500;
+}
+
+.tag-mod { background: rgba(56, 189, 248, 0.1); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.15); }
+.tag-field { background: rgba(99, 102, 241, 0.1); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.15); }
+.tag-pass { background: rgba(52, 211, 153, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.2); }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.tree { padding-left: 1.2rem; border-left: 1px solid #1e1e2a; margin: 0.75rem 0; }
+
+.tree-item {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.3rem 0; font-size: 0.9rem;
+}
+
+.tree-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: #34d399; }
+.dot-yellow { background: #fbbf24; }
+.dot-red { background: #ef4444; }
+.dot-blue { background: #38bdf8; }
+.dot-gray { background: #52525b; }
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #38bdf8; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+}
+
+.model-tree { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; line-height: 2; }
+.model-tree .cls { color: #38bdf8; font-weight: 600; }
+.model-tree .fld { color: #94a3b8; }
+.model-tree .typ { color: #818cf8; }
+.model-tree .def { color: #6b6b80; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 3 &mdash; Context Delivery Schema</div>
+    <h1>Structured, Inspectable, Reason-Annotated</h1>
+    <p>
+      Packages exactly the runtime evidence a task needs: summary, files, failures, docs,
+      repo snapshot, and verification hints. Every item carries its <em>reason</em> for inclusion.
+    </p>
+  </div>
+
+  <!-- FILES -->
+  <div class="section-label">Files Created</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/context_delivery.py           <span class="dim">(3 BaseModels, 1 Enum)</span><br>
+    <span class="hl">CREATED</span>  tests/test_context_delivery.py        <span class="dim">(15 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/context_delivery_examples.json <span class="dim">(2 examples)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 41/41 tests pass across P1 + P2 + P3
+  </div>
+
+  <!-- SCHEMA -->
+  <div class="section-label">ContextDeliveryBundle Hierarchy</div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-mod">&#9632;</div>
+      <div>
+        <div class="card-title">ContextDeliveryBundle (root)</div>
+        <div class="card-subtitle">Structured runtime evidence for one task</div>
+      </div>
+    </div>
+    <div class="model-tree">
+      <span class="cls">ContextDeliveryBundle</span><br>
+      <span style="padding-left:1.5rem;display:block;">
+        <span class="fld">&#9500;&#9472; task_id</span>: <span class="typ">str</span><br>
+        <span class="fld">&#9500;&#9472; task_brief</span>: <span class="typ">str</span><br>
+        <span class="fld">&#9500;&#9472; repo_snapshot</span>: <span class="typ">RepoSnapshot</span><br>
+        <span style="padding-left:1.5rem;display:block;">
+          <span class="fld">&#9492;&#9472; repo_root</span>, top_level_paths, primary_language,<br>
+          <span class="fld" style="padding-left:1.5rem;">&#9492;&#9472;</span> build_system, test_command, lint_command<br>
+        </span>
+        <span class="fld">&#9500;&#9472; selected_files</span>: <span class="typ">List[DeliveryItem]</span><br>
+        <span class="fld">&#9500;&#9472; selected_failures</span>: <span class="typ">List[DeliveryItem]</span><br>
+        <span class="fld">&#9500;&#9472; selected_docs</span>: <span class="typ">List[DeliveryItem]</span><br>
+        <span class="fld">&#9492;&#9472; verification_hints</span>: <span class="typ">VerificationHints</span><br>
+        <span style="padding-left:1.5rem;display:block;">
+          <span class="fld">&#9492;&#9472; recommended_commands</span>, success_signals<br>
+        </span>
+      </span>
+    </div>
+  </div>
+
+  <!-- DELIVERY ITEM -->
+  <div class="section-label">DeliveryItem &mdash; Atomic Context Unit</div>
+  <div class="diagram">
+    <span class="hl">DeliveryItem</span><br>
+    <span class="dim" style="padding-left:1rem;">&#9500;&#9472; item_id</span>: str<br>
+    <span class="dim" style="padding-left:1rem;">&#9500;&#9472; content_type</span>: <span class="hl">ContentType</span> (enum)<br>
+    <span class="dim" style="padding-left:1rem;">&#9500;&#9472; source_path</span>: Optional[str]<br>
+    <span class="dim" style="padding-left:1rem;">&#9500;&#9472; title</span>: str  <span class="dim">// validated non-empty</span><br>
+    <span class="dim" style="padding-left:1rem;">&#9500;&#9472; <span style="color:#fbbf24;">reason</span></span>: str  <span class="dim">// validated non-empty — why this item is in context</span><br>
+    <span class="dim" style="padding-left:1rem;">&#9500;&#9472; content</span>: str  <span class="dim">// validated non-empty</span><br>
+    <span class="dim" style="padding-left:1rem;">&#9492;&#9472; priority</span>: int  <span class="dim">// 1–5, default 1</span>
+  </div>
+
+  <!-- CONTENT TYPES -->
+  <div class="section-label">ContentType Enum &mdash; 6 values</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-field">&#9881;</div>
+        <div><div class="card-title">file_snippet</div></div>
+      </div>
+      <div class="tree"><div class="tree-item"><span class="tree-dot dot-blue"></span> Source code excerpt</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-field">&#9881;</div>
+        <div><div class="card-title">error_log</div></div>
+      </div>
+      <div class="tree"><div class="tree-item"><span class="tree-dot dot-blue"></span> Runtime error / stack trace</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-field">&#9881;</div>
+        <div><div class="card-title">test_failure</div></div>
+      </div>
+      <div class="tree"><div class="tree-item"><span class="tree-dot dot-blue"></span> Failing test output</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-field">&#9881;</div>
+        <div><div class="card-title">doc_snippet</div></div>
+      </div>
+      <div class="tree"><div class="tree-item"><span class="tree-dot dot-blue"></span> Documentation excerpt</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-field">&#9881;</div>
+        <div><div class="card-title">repo_map</div></div>
+      </div>
+      <div class="tree"><div class="tree-item"><span class="tree-dot dot-blue"></span> Repository structure overview</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-field">&#9881;</div>
+        <div><div class="card-title">command_hint</div></div>
+      </div>
+      <div class="tree"><div class="tree-item"><span class="tree-dot dot-blue"></span> Suggested terminal command</div></div>
+    </div>
+  </div>
+
+  <!-- VALIDATORS -->
+  <div class="section-label">Validators</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-field">&#9881;</div>
+        <div>
+          <div class="card-title">Field Validators</div>
+          <div class="card-subtitle">3 field_validator rules</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> title, reason, content must not be empty</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> priority must be 1–5</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> task_id, task_brief must not be empty</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> repo_root must not be empty</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-ex">&#10003;</div>
+        <div>
+          <div class="card-title">Design Decisions</div>
+          <div class="card-subtitle">What was excluded</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> No embeddings or reranking</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> No vector DB references</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> No full repo dumps</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> No chat history</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> <code>reason</code> field makes context selection debuggable</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXAMPLES -->
+  <div class="section-label">Example Bundles &mdash; 2</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-test">&#9881;</div>
+        <div>
+          <div class="card-title">Bug Fix</div>
+          <div class="card-subtitle">Null pointer with failing test + stack trace</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> 1 file snippet (bug location)</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> 1 test failure (stack trace)</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> 1 doc snippet (expected API contract)</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> Verification: targeted pytest command</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-test">&#9881;</div>
+        <div>
+          <div class="card-title">Feature</div>
+          <div class="card-subtitle">File watcher with selected docs + snippets</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> 2 file snippets (existing + stub)</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> 1 doc snippet (watchdog API ref)</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> No failures yet (greenfield)</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> Verification: new test suite</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRIMITIVES -->
+  <div class="section-label">Primitives So Far</div>
+  <div class="diagram">
+    <span class="hl" style="color:#818cf8;">P1  INSTRUCTION LAYERING</span>   <span class="dim">Global + Project + Task layers</span><br>
+    <span class="hl" style="color:#34d399;">P2  TASK CONTRACT SCHEMA</span>   <span class="dim">Nested Pydantic + 2-layer validation</span><br>
+    <span class="hl" style="color:#38bdf8;">P3  CONTEXT DELIVERY SCHEMA</span> <span class="dim">Structured bundle with reason-annotated items — <span style="color:#38bdf8;">YOU ARE HERE</span></span><br>
+    <span class="dim">P4  (next)</span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P3 &bull; Context Delivery Schema &bull; 41/41 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

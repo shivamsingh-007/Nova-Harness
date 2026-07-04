@@ -1,0 +1,132 @@
+{
+  "examples": [
+    {
+      "name": "Per-run budget policy",
+      "description": "A default budget policy for a single agent run. Limits tokens, cost, runtime steps, retries, and tool calls with a warn threshold on cost.",
+      "policy": {
+        "policy_id": "policy-run-default",
+        "token_budget": {
+          "max_input_tokens": 32000,
+          "max_output_tokens": 16000,
+          "max_total_tokens": 48000
+        },
+        "cost_budget": {
+          "max_cost_usd": 1.0,
+          "warn_cost_usd": 0.75
+        },
+        "runtime_budget": {
+          "max_runtime_seconds": 120,
+          "max_steps": 12,
+          "max_retries": 2
+        },
+        "tool_call_budget": {
+          "max_total_tool_calls": 20,
+          "max_tool_calls_per_tool": 8,
+          "restricted_tools": [
+            "delete_file",
+            "run_shell"
+          ]
+        },
+        "rate_limit_rules": []
+      }
+    },
+    {
+      "name": "Per-tenant rate-limit rule",
+      "description": "A tenant-level rate limit that throttles after 500 requests per hour and blocks after 2000 requests per day. The policy also includes a per-run token budget.",
+      "policy": {
+        "policy_id": "policy-tenant-platinum",
+        "token_budget": {
+          "max_input_tokens": 64000,
+          "max_output_tokens": 32000,
+          "max_total_tokens": 96000
+        },
+        "cost_budget": {
+          "max_cost_usd": 10.0,
+          "warn_cost_usd": 8.0
+        },
+        "runtime_budget": {
+          "max_runtime_seconds": 300,
+          "max_steps": 50,
+          "max_retries": 3
+        },
+        "tool_call_budget": {
+          "max_total_tool_calls": 100,
+          "max_tool_calls_per_tool": 25,
+          "restricted_tools": []
+        },
+        "rate_limit_rules": [
+          {
+            "scope": "tenant",
+            "window": "per_hour",
+            "identifier_key": "tenant-platinum-001",
+            "max_requests": 500,
+            "action_on_exceed": "throttle"
+          },
+          {
+            "scope": "tenant",
+            "window": "per_day",
+            "identifier_key": "tenant-platinum-001",
+            "max_requests": 2000,
+            "action_on_exceed": "block"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Allowed budget decision",
+      "description": "A budget check that passes — the run is within all limits. The decision records ALLOW with no violated rules.",
+      "decision": {
+        "decision_id": "dec-run-042",
+        "run_id": "run-042",
+        "allowed": true,
+        "action": "allow",
+        "reason": "usage within all budgets: 0.35/1.00 USD, 4/12 steps, 15000/32000 input tokens",
+        "violated_rules": []
+      },
+      "usage_snapshot": {
+        "run_id": "run-042",
+        "input_tokens_used": 15000,
+        "output_tokens_used": 5000,
+        "total_tokens_used": 20000,
+        "cost_usd_used": 0.35,
+        "runtime_seconds_used": 45,
+        "steps_used": 4,
+        "retries_used": 0,
+        "tool_calls_used": 6
+      }
+    },
+    {
+      "name": "Blocked violation caused by over-budget tool loop",
+      "description": "A budget decision that blocks the next step because cost exceeded the hard limit. The violation records the observed value against the allowed value and the action taken.",
+      "decision": {
+        "decision_id": "dec-run-099",
+        "run_id": "run-099",
+        "allowed": false,
+        "action": "block",
+        "reason": "cost limit exceeded: 1.15/1.00 USD; tool loop detected across 18 tool calls",
+        "violated_rules": [
+          "cost_budget.max_cost_usd",
+          "tool_call_budget.max_total_tool_calls"
+        ]
+      },
+      "violations": [
+        {
+          "rule_id": "cost_budget.max_cost_usd",
+          "run_id": "run-099",
+          "scope": "run",
+          "observed_value": 1.15,
+          "allowed_value": 1.0,
+          "action_taken": "block"
+        },
+        {
+          "rule_id": "tool_call_budget.max_total_tool_calls",
+          "run_id": "run-099",
+          "scope": "run",
+          "observed_value": 18.0,
+          "allowed_value": 15.0,
+          "action_taken": "block"
+        }
+      ]
+    }
+  ]
+}

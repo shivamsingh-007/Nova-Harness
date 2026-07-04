@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P4: Context Selection Policy</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #fbbf24; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #fbbf24 50%, #f59e0b 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p { font-size: 1.05rem; color: #9494a8; max-width: 640px; }
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-pipe { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.icon-score { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.icon-excl { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.icon-cap { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-test { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.tag {
+  display: inline-block; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 500;
+}
+
+.tag-pipe { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.15); }
+.tag-rule { background: rgba(99, 102, 241, 0.1); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.15); }
+.tag-pass { background: rgba(52, 211, 153, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.2); }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.tree { padding-left: 1.2rem; border-left: 1px solid #1e1e2a; margin: 0.75rem 0; }
+
+.tree-item {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.3rem 0; font-size: 0.9rem;
+}
+
+.tree-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: #34d399; }
+.dot-yellow { background: #fbbf24; }
+.dot-red { background: #ef4444; }
+.dot-blue { background: #38bdf8; }
+.dot-gray { background: #52525b; }
+.dot-purple { background: #a78bfa; }
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #fbbf24; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .hl3 { color: #34d399; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+}
+
+.pipeline {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0.4rem; flex-wrap: wrap; padding: 1rem 0;
+}
+
+.stage {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 8px;
+  padding: 0.6rem 1rem; text-align: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  min-width: 100px;
+}
+
+.stage .num { font-size: 1.2rem; font-weight: 800; display: block; }
+.stage .label { color: #9494a8; }
+.s1 .num { color: #818cf8; }
+.s2 .num { color: #fbbf24; }
+.s3 .num { color: #ef4444; }
+.s4 .num { color: #34d399; }
+
+.pipeline-arrow { color: #52525b; font-size: 1.2rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 4 &mdash; Context Selection Policy</div>
+    <h1>Deterministic Heuristic Selection Pipeline</h1>
+    <p>
+      Decides what enters the Context Delivery bundle. Scoring, exclusions, hard caps,
+      and decision logging — the first real guard against context rot.
+    </p>
+  </div>
+
+  <!-- FILES -->
+  <div class="section-label">Files Created</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  context_selection/candidates.py   <span class="dim">(CandidateFile, Failure, Doc + gather functions)</span><br>
+    <span class="hl">CREATED</span>  context_selection/scoring.py      <span class="dim">(score_file, score_failure, score_doc, proximity, dir)</span><br>
+    <span class="hl">CREATED</span>  context_selection/policy.py       <span class="dim">(ContextSelectionPolicy + SelectionResult/Decision models)</span><br>
+    <span class="hl">CREATED</span>  context_selection/exclusions.py   <span class="dim">(is_excluded — noise/security filters)</span><br>
+    <span class="hl">CREATED</span>  tests/test_context_selection_policy.py <span class="dim">(22 tests, all PASS)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 63/63 tests pass across all 4 primitives
+  </div>
+
+  <!-- PIPELINE -->
+  <div class="section-label">Selection Pipeline</div>
+  <div class="pipeline">
+    <div class="stage s1">
+      <span class="num">1</span>
+      <span class="label">Candidate Generation</span>
+    </div>
+    <span class="pipeline-arrow">&rarr;</span>
+    <div class="stage s2">
+      <span class="num">2</span>
+      <span class="label">Heuristic Scoring</span>
+    </div>
+    <span class="pipeline-arrow">&rarr;</span>
+    <div class="stage s3">
+      <span class="num">3</span>
+      <span class="label">Exclusion Filtering</span>
+    </div>
+    <span class="pipeline-arrow">&rarr;</span>
+    <div class="stage s4">
+      <span class="num">4</span>
+      <span class="label">Pruning &amp; Caps</span>
+    </div>
+  </div>
+
+  <!-- MODULES -->
+  <div class="section-label">Module Breakdown</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-pipe">&#9632;</div>
+        <div>
+          <div class="card-title">candidates.py</div>
+          <div class="card-subtitle">Candidate generation</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> <code>CandidateFile</code>, <code>CandidateFailure</code>, <code>CandidateDoc</code></div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> <code>gather_file_candidates()</code></div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> <code>gather_failure_candidates()</code></div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> <code>gather_doc_candidates()</code></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-score">&#9881;</div>
+        <div>
+          <div class="card-title">scoring.py</div>
+          <div class="card-subtitle">Heuristic scoring signals</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> <code>score_file()</code></div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> <code>score_failure()</code></div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> <code>score_doc()</code></div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> <code>score_file_import_proximity()</code></div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> <code>score_file_same_directory()</code></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-cap">&#9881;</div>
+        <div>
+          <div class="card-title">policy.py</div>
+          <div class="card-subtitle">Orchestration + caps</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> <code>ContextSelectionPolicy</code> class</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> <code>SelectionResult</code> (selected + dropped + decisions)</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> Cap enforcement</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> Decision logging</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCORING TABLE -->
+  <div class="section-label">Scoring Signals</div>
+
+  <div class="diagram">
+    <span class="hl">Signal</span>                                    <span class="hl">Score</span><br>
+    <span class="dim" style="padding-left:1rem;">&#9500;&#9472; Explicitly named in task</span>              <span class="hl2">+100</span><br>
+    <span class="dim" style="padding-left:1rem;">&#9500;&#9472; Failing test file</span>                    <span class="hl2">+90</span><br>
+    <span class="dim" style="padding-left:1rem;">&#9500;&#9472; Imported / imported by selected file</span>  <span class="hl2">+40</span><br>
+    <span class="dim" style="padding-left:1rem;">&#9500;&#9472; Test file pattern</span>                     <span class="hl2">+40</span><br>
+    <span class="dim" style="padding-left:1rem;">&#9500;&#9472; Doc matches task keyword</span>              <span class="hl2">+30</span><br>
+    <span class="dim" style="padding-left:1rem;">&#9500;&#9472; Same directory as selected</span>            <span class="hl2">+20</span><br>
+    <span class="dim" style="padding-left:1rem;">&#9500;&#9472; Failure file matches keyword</span>           <span class="hl2">+20</span><br>
+    <span class="dim" style="padding-left:1rem;">&#9500;&#9472; src/lib/app directory</span>                 <span class="hl2">+15</span><br>
+    <span class="dim" style="padding-left:1rem;">&#9500;&#9472; Path matches task keyword</span>             <span class="hl2">+10</span><br>
+    <span class="dim" style="padding-left:1rem;">&#9492;&#9472; Title matches task keyword</span>            <span class="hl2">+5</span>
+  </div>
+
+  <!-- EXCLUSIONS -->
+  <div class="section-label">Exclusions (noise filters)</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-excl">&#9888;</div>
+        <div>
+          <div class="card-title">Excluded Directories</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> node_modules, __pycache__, .git</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> dist, build, .next</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> .venv, venv, .nox, .tox</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> site-packages, .pytest_cache</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-excl">&#9888;</div>
+        <div>
+          <div class="card-title">Excluded Files &amp; Extensions</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> package-lock.json, yarn.lock, etc.</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> .pyc, .pyo, .so, .dll</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> .png, .jpg, .svg, .ico (binaries)</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> .zip, .tar, .gz (archives)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAPS -->
+  <div class="section-label">Hard Caps</div>
+  <div class="diagram">
+    <span class="hl3">Max selected files</span>     <span class="dim">5</span><br>
+    <span class="hl3">Max selected failures</span>  <span class="dim">3</span><br>
+    <span class="hl3">Max selected docs</span>       <span class="dim">2</span><br>
+    <span class="hl3">Max total snippet items</span> <span class="dim">10</span>
+  </div>
+
+  <!-- PRIMITIVES -->
+  <div class="section-label">Primitives So Far</div>
+  <div class="diagram">
+    <span class="hl" style="color:#818cf8;">P1  INSTRUCTION LAYERING</span>       <span class="dim">Global + Project + Task layers</span><br>
+    <span class="hl" style="color:#34d399;">P2  TASK CONTRACT SCHEMA</span>       <span class="dim">Nested Pydantic + 2-layer validation</span><br>
+    <span class="hl" style="color:#38bdf8;">P3  CONTEXT DELIVERY SCHEMA</span>     <span class="dim">Structured bundle + reason-annotated items</span><br>
+    <span class="hl" style="color:#fbbf24;">P4  CONTEXT SELECTION POLICY</span>   <span class="dim">Heuristic pipeline + exclusions + caps — <span style="color:#fbbf24;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P4 &bull; Context Selection Policy &bull; 63/63 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,328 @@
+{
+  "examples": [
+    {
+      "name": "Coding task prompt assembly",
+      "description": "A feature-implementation task with system identity, repository rules, file context, tools, and verification requirements.",
+      "assembly": {
+        "assembly_id": "as-feat-042",
+        "run_id": "run-feat-042",
+        "instruction_layers": [
+          {
+            "layer_id": "sys-global",
+            "layer_type": "system",
+            "title": "System identity",
+            "content": "You are an expert software engineer. You write clean, testable, well-typed code.",
+            "priority": 0
+          },
+          {
+            "layer_id": "repo-rules",
+            "layer_type": "repository",
+            "title": "Repository conventions",
+            "content": "This project uses Python with Pydantic. All models must be validated. Use ruff for linting. Tests run with pytest.",
+            "priority": 1
+          },
+          {
+            "layer_id": "task-brief",
+            "layer_type": "task",
+            "title": "Task goal",
+            "content": "Add a RetryPolicy model to the execution environment schema. It should support max_retries, backoff_factor, and retryable_errors.",
+            "priority": 2
+          }
+        ],
+        "context_blocks": [
+          {
+            "block_id": "ctx-exec-env",
+            "block_type": "file",
+            "title": "models/execution_environment.py",
+            "content": "Current file with FilesystemPolicy, NetworkPolicy, ResourceLimits, etc. Add RetryPolicy alongside them.",
+            "source_ref": "models/execution_environment.py",
+            "priority": 0
+          },
+          {
+            "block_id": "ctx-existing-tests",
+            "block_type": "file",
+            "title": "tests/test_execution_environment.py",
+            "content": "Test file for execution environment. Follow the pattern of existing test classes.",
+            "source_ref": "tests/test_execution_environment.py",
+            "priority": 1
+          }
+        ],
+        "tool_exposures": [
+          {
+            "tool_name": "read",
+            "description": "Read a file from the filesystem",
+            "input_schema_summary": "file_path: string",
+            "requires_approval": false
+          },
+          {
+            "tool_name": "edit",
+            "description": "Edit a file with exact string replacement",
+            "input_schema_summary": "file_path: string, old_string: string, new_string: string",
+            "requires_approval": false
+          },
+          {
+            "tool_name": "bash",
+            "description": "Execute a shell command",
+            "input_schema_summary": "command: string",
+            "requires_approval": false
+          },
+          {
+            "tool_name": "run_tests",
+            "description": "Run pytest on a specific file or directory",
+            "input_schema_summary": "target: string",
+            "requires_approval": true
+          }
+        ],
+        "constraints": [
+          {
+            "title": "Scope constraint",
+            "rules": [
+              "Do not modify files outside models/ and tests/",
+              "Do not add new dependencies"
+            ]
+          },
+          {
+            "title": "Safety rules",
+            "rules": [
+              "Do not modify existing public API signatures",
+              "Do not remove existing validators"
+            ]
+          }
+        ],
+        "verification": {
+          "summary": "Proof required before declaring completion",
+          "required_checks": ["pytest tests/test_execution_environment.py -v"],
+          "done_definition": [
+            "RetryPolicy model exists in models/execution_environment.py",
+            "All existing tests still pass",
+            "New tests cover RetryPolicy validation",
+            "Examples updated with RetryPolicy entry"
+          ]
+        },
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are an expert software engineer building a harness for AI coding agents. Follow the instruction layers, respect constraints, and verify before finishing."
+          },
+          {
+            "role": "user",
+            "content": "Add a RetryPolicy model with max_retries, backoff_factor, and retryable_errors fields. Add validation: max_retries must be >= 0, backoff_factor must be > 0, retryable_errors must be non-empty. Update tests and examples."
+          }
+        ]
+      }
+    },
+    {
+      "name": "Debugging task with failure context",
+      "description": "A debugging task that includes failure context blocks and repository instructions.",
+      "assembly": {
+        "assembly_id": "as-debug-117",
+        "run_id": "run-debug-117",
+        "instruction_layers": [
+          {
+            "layer_id": "sys-global",
+            "layer_type": "system",
+            "title": "System identity",
+            "content": "You are a senior debugging engineer. Find root causes, do not apply superficial fixes.",
+            "priority": 0
+          },
+          {
+            "layer_id": "task-debug",
+            "layer_type": "task",
+            "title": "Debug task",
+            "content": "Investigate and fix the test failure in test_durable_state.py. The error suggests a validation issue with ResumePointer.",
+            "priority": 1
+          }
+        ],
+        "context_blocks": [
+          {
+            "block_id": "ctx-source",
+            "block_type": "file",
+            "title": "models/durable_state.py",
+            "content": "Durable state schema. ResumePointer has can_resume and resume_reason fields with a model_validator.",
+            "source_ref": "models/durable_state.py",
+            "priority": 0
+          },
+          {
+            "block_id": "ctx-failure",
+            "block_type": "failure",
+            "title": "Test failure: test_cannot_resume_without_reason",
+            "content": "FAILED test_durable_state.py::TestResumePointer::test_cannot_resume_without_reason - AssertionError: assert 'resume_reason is required' in '...ValidationError...'",
+            "source_ref": "tests/test_durable_state.py",
+            "priority": 1
+          },
+          {
+            "block_id": "ctx-test-file",
+            "block_type": "file",
+            "title": "tests/test_durable_state.py",
+            "content": "Test file with ResumePointer test cases. The failing test expects a specific error message.",
+            "source_ref": "tests/test_durable_state.py",
+            "priority": 2
+          },
+          {
+            "block_id": "ctx-prev-run",
+            "block_type": "summary",
+            "title": "Previous run summary",
+            "content": "The test was added in P7. The exact error message from the model_validator may not match what the test expects.",
+            "source_ref": null,
+            "priority": 3
+          }
+        ],
+        "tool_exposures": [
+          {
+            "tool_name": "read",
+            "description": "Read a file",
+            "input_schema_summary": "file_path: string",
+            "requires_approval": false
+          },
+          {
+            "tool_name": "edit",
+            "description": "Edit a file",
+            "input_schema_summary": "file_path: string, old_string: string, new_string: string",
+            "requires_approval": false
+          },
+          {
+            "tool_name": "bash",
+            "description": "Execute shell command",
+            "input_schema_summary": "command: string",
+            "requires_approval": false
+          }
+        ],
+        "constraints": [
+          {
+            "title": "Debug discipline",
+            "rules": [
+              "Read the error message first before making changes",
+              "Reproduce the failure before fixing",
+              "Run tests after every change"
+            ]
+          }
+        ],
+        "verification": {
+          "summary": "Confirm the fix resolves the failure",
+          "required_checks": ["pytest tests/test_durable_state.py -v"],
+          "done_definition": [
+            "All 47 durable state tests pass",
+            "Root cause is documented in the fix"
+          ]
+        },
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are a debugging specialist. Investigate systematically, reproduce before fixing, verify after."
+          },
+          {
+            "role": "user",
+            "content": "The test test_cannot_resume_without_reason is failing. Find the root cause and fix it."
+          }
+        ]
+      }
+    },
+    {
+      "name": "Report-generation task with artifact verification",
+      "description": "A documentation task verified by acceptance checks and artifact presence.",
+      "assembly": {
+        "assembly_id": "as-report-089",
+        "run_id": "run-report-089",
+        "instruction_layers": [
+          {
+            "layer_id": "sys-global",
+            "layer_type": "system",
+            "title": "System identity",
+            "content": "You are a technical writer. Produce clear, structured documentation with examples.",
+            "priority": 0
+          },
+          {
+            "layer_id": "repo-conventions",
+            "layer_type": "repository",
+            "title": "Project conventions",
+            "content": "Documentation is written in Markdown. Code examples must be runnable. Diagrams use Mermaid.",
+            "priority": 1
+          },
+          {
+            "layer_id": "task-report",
+            "layer_type": "task",
+            "title": "Report goal",
+            "content": "Generate a usage guide for the verification schema. Include: check types, evidence types, verdict logic, and an end-to-end example.",
+            "priority": 2
+          }
+        ],
+        "context_blocks": [
+          {
+            "block_id": "ctx-source",
+            "block_type": "file",
+            "title": "models/verification.py",
+            "content": "The verification schema source code with all models, enums, and validators.",
+            "source_ref": "models/verification.py",
+            "priority": 0
+          },
+          {
+            "block_id": "ctx-tests",
+            "block_type": "file",
+            "title": "tests/test_verification_schema.py",
+            "content": "Test file with example usage patterns for the verification schema.",
+            "source_ref": "tests/test_verification_schema.py",
+            "priority": 1
+          },
+          {
+            "block_id": "ctx-prev-guides",
+            "block_type": "summary",
+            "title": "Existing documentation style",
+            "content": "Previous primitives were documented with a README-style guide. Focus on practical usage, include code snippets, and end with a full example.",
+            "source_ref": null,
+            "priority": 2
+          }
+        ],
+        "tool_exposures": [
+          {
+            "tool_name": "read",
+            "description": "Read a file",
+            "input_schema_summary": "file_path: string",
+            "requires_approval": false
+          },
+          {
+            "tool_name": "write",
+            "description": "Write content to a file",
+            "input_schema_summary": "file_path: string, content: string",
+            "requires_approval": false
+          },
+          {
+            "tool_name": "edit",
+            "description": "Edit a file",
+            "input_schema_summary": "file_path: string, old_string: string, new_string: string",
+            "requires_approval": false
+          }
+        ],
+        "constraints": [
+          {
+            "title": "Content standards",
+            "rules": [
+              "All code examples must use Python 3.11+ syntax",
+              "Include at least one full end-to-end example",
+              "Do not copy the entire source file into the guide"
+            ]
+          }
+        ],
+        "verification": {
+          "summary": "Artifact and acceptance checks",
+          "required_checks": [],
+          "done_definition": [
+            "File docs/verification-guide.md exists",
+            "Guide covers all check types",
+            "Guide includes a runnable end-to-end example",
+            "Markdown renders without errors"
+          ]
+        },
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are a technical writer for an AI agent harness project. Produce clear documentation with practical examples."
+          },
+          {
+            "role": "user",
+            "content": "Write a usage guide for the verification schema. The audience is developers integrating verification into their agent workflows."
+          }
+        ]
+      }
+    }
+  ]
+}

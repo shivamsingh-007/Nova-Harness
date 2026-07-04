@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P9: Prompt Assembly Schema</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #38bdf8; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #38bdf8 50%, #0284c7 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p { font-size: 1.05rem; color: #9494a8; max-width: 640px; }
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-pr { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.icon-rec { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.icon-test { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-ex { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.tree { padding-left: 1.2rem; border-left: 1px solid #1e1e2a; margin: 0.75rem 0; }
+
+.tree-item {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.3rem 0; font-size: 0.9rem;
+}
+
+.tree-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: #34d399; }
+.dot-yellow { background: #fbbf24; }
+.dot-red { background: #ef4444; }
+.dot-purple { background: #a78bfa; }
+.dot-blue { background: #38bdf8; }
+.dot-orange { background: #f97316; }
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #38bdf8; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+
+.model-tree { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 2; }
+.model-tree .cls { color: #38bdf8; font-weight: 600; }
+.model-tree .cls2 { color: #818cf8; font-weight: 600; }
+.model-tree .fld { color: #94a3b8; }
+.model-tree .typ { color: #818cf8; }
+.model-tree .def { color: #6b6b80; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 9 &mdash; Prompt Assembly Schema</div>
+    <h1>Layered Prompt Assembly Contract</h1>
+    <p>
+      The final packaged input contract after all earlier primitives have done their jobs.
+      Instructions, task, context, tools, constraints, verification — structured for
+      inspectability and provider portability.
+    </p>
+  </div>
+
+  <!-- FILES -->
+  <div class="section-label">Files Created</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/prompt_assembly.py                   <span class="dim">(7 BaseModels, 3 Enums)</span><br>
+    <span class="hl">CREATED</span>  tests/test_prompt_assembly.py                <span class="dim">(46 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/prompt_assembly_examples.json          <span class="dim">(3 examples)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 249/249 tests pass across all 9 primitives
+  </div>
+
+  <!-- ARCHITECTURE -->
+  <div class="section-label">PromptAssembly — 7 Records + 3 Enums</div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-pr">&#9632;</div>
+      <div>
+        <div class="card-title">PromptAssembly</div>
+        <div class="card-subtitle">assembly_id + run_id + 6 component blocks + messages</div>
+      </div>
+    </div>
+    <div class="model-tree">
+      <span class="cls">PromptAssembly</span><br>
+      <span style="padding-left:1rem;display:block;">
+        <span class="fld">&#9500;&#9472; assembly_id</span>: <span class="typ">str</span> &#9679; <span class="fld">run_id</span>: <span class="typ">str</span><br>
+        <span class="fld">&#9500;&#9472; instruction_layers</span>: <span class="typ">List[InstructionLayer]</span> <span class="def">(&ge;1)</span><br>
+        <span class="fld">&#9500;&#9472; context_blocks</span>: <span class="typ">List[ContextBlock]</span><br>
+        <span class="fld">&#9500;&#9472; tool_exposures</span>: <span class="typ">List[ToolExposure]</span> <span class="def">(unique names)</span><br>
+        <span class="fld">&#9500;&#9472; constraints</span>: <span class="typ">List[ConstraintBlock]</span><br>
+        <span class="fld">&#9500;&#9472; verification</span>: <span class="typ">Optional[VerificationBlock]</span><br>
+        <span class="fld">&#9492;&#9472; messages</span>: <span class="typ">List[MessageBlock]</span> <span class="def">(&ge;1)</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- COMPONENTS -->
+  <div class="section-label">Six Component Blocks</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">InstructionLayer</div>
+          <div class="card-subtitle">layer_id, type (system/global/repository/task), title, content, priority</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Empty layer_id, title, or content &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Default priority = 0</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">ContextBlock</div>
+          <div class="card-subtitle">block_id, type (file/failure/doc/summary), title, content, source_ref, priority</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Empty block_id, title, or content &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> source_ref optional</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">ToolExposure</div>
+          <div class="card-subtitle">tool_name, description, input_schema_summary, requires_approval</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Empty tool_name &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Duplicate names in one assembly &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Default: no approval required</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">ConstraintBlock</div>
+          <div class="card-subtitle">title + list of rules</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Empty title &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Empty rules list &rarr; error</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">VerificationBlock</div>
+          <div class="card-subtitle">summary + required_checks + done_definition</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Must have at least one check or done_definition item</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">MessageBlock</div>
+          <div class="card-subtitle">role (system/user/assistant) + content</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Empty content &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> At least one required on assembly</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENUMS -->
+  <div class="section-label">Enums &mdash; 3</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title" style="color:#38bdf8;">InstructionLayerType</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> system</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> global</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> repository</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> task</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#818cf8;">ContextBlockType</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> file</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> failure</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> doc</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> summary</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#34d399;">MessageRole</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> system</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> user</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> assistant</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ASSEMBLY ORDER -->
+  <div class="section-label">Assembly Order (v1)</div>
+  <div class="diagram">
+    <span class="hl">1.</span> <span class="dim">System / Global instructions</span><br>
+    <span class="hl">2.</span> <span class="dim">Repository instructions</span><br>
+    <span class="hl">3.</span> <span class="dim">Task instructions</span><br>
+    <span class="hl">4.</span> <span class="dim">Constraints</span><br>
+    <span class="hl">5.</span> <span class="dim">Verification requirements</span><br>
+    <span class="hl">6.</span> <span class="dim">Selected context blocks</span><br>
+    <span class="hl">7.</span> <span class="dim">Exposed tools</span><br>
+    <span class="hl">8.</span> <span class="dim">Final user task message</span>
+  </div>
+
+  <!-- EXAMPLES -->
+  <div class="section-label">Examples &mdash; 3</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-ex">&#9632;</div>
+        <div>
+          <div class="card-title">Coding task</div>
+          <div class="card-subtitle">3 instruction layers, 2 context blocks, 4 tools, verification</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> System + Repository + Task instructions</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> File context: source + tests</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> Constraints: scope + safety</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> Verification: tests + done definition</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-ex">&#9632;</div>
+        <div>
+          <div class="card-title">Debugging with failure context</div>
+          <div class="card-subtitle">Failure block + source + summary + debug discipline</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Failure block: specific test error</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> File context: source + tests</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> Summary: previous run context</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> Verification: all 47 tests pass</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-ex">&#9632;</div>
+        <div>
+          <div class="card-title">Report generation</div>
+          <div class="card-subtitle">Acceptance checks + artifact verification</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> File context: source + tests</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> Summary: existing doc style</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> Constraint: content standards</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> Verification: artifact + acceptance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOT IMPLEMENTED -->
+  <div class="section-label">Not Implemented Yet</div>
+  <div class="diagram">
+    <span class="dim">&#10007; Token budgeting engine</span><br>
+    <span class="dim">&#10007; Automatic summarization</span><br>
+    <span class="dim">&#10007; Model-specific adapters</span><br>
+    <span class="dim">&#10007; Prompt compression</span><br>
+    <span class="dim">&#10007; Few-shot example retrieval</span><br>
+    <span class="dim">&#10007; Chain-of-thought storage</span><br>
+    <span class="dim">&#10007; Dynamic reflection loops</span>
+  </div>
+
+  <!-- PRIMITIVES -->
+  <div class="section-label">Primitives So Far</div>
+  <div class="diagram">
+    <span class="hl" style="color:#818cf8;">P1  INSTRUCTION LAYERING</span>       <span class="dim">Global + Project + Task layers</span><br>
+    <span class="hl" style="color:#34d399;">P2  TASK CONTRACT SCHEMA</span>       <span class="dim">Nested Pydantic + 2-layer validation</span><br>
+    <span class="hl" style="color:#38bdf8;">P3  CONTEXT DELIVERY SCHEMA</span>     <span class="dim">Structured bundle + reason-annotated items</span><br>
+    <span class="hl" style="color:#fbbf24;">P4  CONTEXT SELECTION POLICY</span>   <span class="dim">Heuristic pipeline + exclusions + caps</span><br>
+    <span class="hl" style="color:#f87171;">P5  TOOL INTERFACE SCHEMA</span>      <span class="dim">Definition, Invocation, Result</span><br>
+    <span class="hl" style="color:#a78bfa;">P6  EXECUTION ENVIRONMENT</span>     <span class="dim">Provider-agnostic runtime contract</span><br>
+    <span class="hl" style="color:#fbbf24;">P7  DURABLE STATE SCHEMA</span>      <span class="dim">Run-centric execution persistence</span><br>
+    <span class="hl" style="color:#34d399;">P8  VERIFICATION SCHEMA</span>       <span class="dim">Multi-check quality gate contract</span><br>
+    <span class="hl" style="color:#38bdf8;">P9  PROMPT ASSEMBLY SCHEMA</span>    <span class="dim">Layered prompt assembly — <span style="color:#38bdf8;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P9 &bull; Prompt Assembly Schema &bull; 249/249 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

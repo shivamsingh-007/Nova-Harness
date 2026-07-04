@@ -1,0 +1,148 @@
+{
+  "examples": [
+    {
+      "name": "Transient tool failure — retry with backoff",
+      "description": "A tool call failed due to a transient infrastructure error. The policy allows retry with exponential backoff + jitter, up to 3 attempts.",
+      "policy": {
+        "policy_id": "example-policy-01",
+        "rules": [
+          {
+            "failure_class": "transient_infra",
+            "max_attempts": 3,
+            "backoff_strategy": "exponential_with_jitter",
+            "base_delay_seconds": 1.0,
+            "max_delay_seconds": 30.0,
+            "respect_retry_after": false,
+            "allowed_actions": ["retry", "resume_from_checkpoint"],
+            "requires_idempotency": false
+          }
+        ],
+        "default_unknown_rule": {
+          "failure_class": "unknown",
+          "max_attempts": 1,
+          "backoff_strategy": "fixed",
+          "base_delay_seconds": 1.0,
+          "max_delay_seconds": 1.0,
+          "respect_retry_after": false,
+          "allowed_actions": ["retry", "escalate_to_human"],
+          "requires_idempotency": false
+        }
+      },
+      "decision": {
+        "failure_class": "transient_infra",
+        "chosen_action": "retry",
+        "reason": "Transient infra failure (HTTP 503), attempt 1 of 3. Retrying with exponential backoff + jitter.",
+        "retry_after_seconds": null,
+        "resume_from_checkpoint_id": null
+      }
+    },
+    {
+      "name": "Rate limit with Retry-After",
+      "description": "A rate-limited tool call includes a Retry-After header. The policy respects it before falling back to exponential backoff.",
+      "policy": {
+        "policy_id": "example-policy-02",
+        "rules": [
+          {
+            "failure_class": "rate_limit",
+            "max_attempts": 3,
+            "backoff_strategy": "exponential_with_jitter",
+            "base_delay_seconds": 1.0,
+            "max_delay_seconds": 30.0,
+            "respect_retry_after": true,
+            "allowed_actions": ["retry"],
+            "requires_idempotency": false
+          }
+        ],
+        "default_unknown_rule": {
+          "failure_class": "unknown",
+          "max_attempts": 1,
+          "backoff_strategy": "fixed",
+          "base_delay_seconds": 1.0,
+          "max_delay_seconds": 1.0,
+          "respect_retry_after": false,
+          "allowed_actions": ["retry", "escalate_to_human"],
+          "requires_idempotency": false
+        }
+      },
+      "decision": {
+        "failure_class": "rate_limit",
+        "chosen_action": "retry",
+        "reason": "Rate limited (HTTP 429), Retry-After: 5. Waiting 5 seconds before attempt 2 of 3.",
+        "retry_after_seconds": 5.0,
+        "resume_from_checkpoint_id": null
+      }
+    },
+    {
+      "name": "Verification failure leading to replan",
+      "description": "Verification failed on a model output. Rather than blindly retrying the same generation, the policy triggers a replan to fix the underlying logic.",
+      "policy": {
+        "policy_id": "example-policy-03",
+        "rules": [
+          {
+            "failure_class": "verification_failed",
+            "max_attempts": 1,
+            "backoff_strategy": "none",
+            "base_delay_seconds": 0.0,
+            "max_delay_seconds": 0.0,
+            "respect_retry_after": false,
+            "allowed_actions": ["retry", "replan"],
+            "requires_idempotency": false
+          }
+        ],
+        "default_unknown_rule": {
+          "failure_class": "unknown",
+          "max_attempts": 1,
+          "backoff_strategy": "fixed",
+          "base_delay_seconds": 1.0,
+          "max_delay_seconds": 1.0,
+          "respect_retry_after": false,
+          "allowed_actions": ["retry", "escalate_to_human"],
+          "requires_idempotency": false
+        }
+      },
+      "decision": {
+        "failure_class": "verification_failed",
+        "chosen_action": "replan",
+        "reason": "Verification failed: acceptance check 'report includes required sections' failed. Replanning to fix content before retry.",
+        "retry_after_seconds": null,
+        "resume_from_checkpoint_id": null
+      }
+    },
+    {
+      "name": "Non-idempotent tool failure — must not retry blindly",
+      "description": "A database migration tool failed mid-execution. The tool is not idempotent, so the policy escalates instead of blindly retrying and duplicating side effects.",
+      "policy": {
+        "policy_id": "example-policy-04",
+        "rules": [
+          {
+            "failure_class": "tool_execution_failed",
+            "max_attempts": 2,
+            "backoff_strategy": "exponential_with_jitter",
+            "base_delay_seconds": 1.0,
+            "max_delay_seconds": 10.0,
+            "respect_retry_after": false,
+            "allowed_actions": ["resume_from_checkpoint", "replan"],
+            "requires_idempotency": true
+          }
+        ],
+        "default_unknown_rule": {
+          "failure_class": "unknown",
+          "max_attempts": 1,
+          "backoff_strategy": "fixed",
+          "base_delay_seconds": 1.0,
+          "max_delay_seconds": 1.0,
+          "respect_retry_after": false,
+          "allowed_actions": ["retry", "escalate_to_human"],
+          "requires_idempotency": false
+        }
+      },
+      "decision": {
+        "failure_class": "tool_execution_failed",
+        "chosen_action": "resume_from_checkpoint",
+        "reason": "Non-idempotent tool failed mid-execution. Resuming from last checkpoint to avoid duplicate side effects.",
+        "retry_after_seconds": null,
+        "resume_from_checkpoint_id": "cp-migration-005"
+      }
+    }
+  ]
+}

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P10: Run Orchestration State Machine</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(244, 114, 182, 0.12);
+  border: 1px solid rgba(244, 114, 182, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #f472b6; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #f472b6 50%, #db2777 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p { font-size: 1.05rem; color: #9494a8; max-width: 640px; }
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-s { background: rgba(244, 114, 182, 0.15); color: #f472b6; }
+.icon-rec { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.icon-g { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-ex { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.tree { padding-left: 1.2rem; border-left: 1px solid #1e1e2a; margin: 0.75rem 0; }
+
+.tree-item {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.3rem 0; font-size: 0.9rem;
+}
+
+.tree-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: #34d399; }
+.dot-yellow { background: #fbbf24; }
+.dot-red { background: #ef4444; }
+.dot-purple { background: #a78bfa; }
+.dot-blue { background: #38bdf8; }
+.dot-orange { background: #f97316; }
+.dot-pink { background: #f472b6; }
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #f472b6; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+
+.model-tree { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 2; }
+.model-tree .cls { color: #f472b6; font-weight: 600; }
+.model-tree .cls2 { color: #818cf8; font-weight: 600; }
+.model-tree .fld { color: #94a3b8; }
+.model-tree .typ { color: #818cf8; }
+.model-tree .def { color: #6b6b80; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 10 &mdash; Run Orchestration State Machine</div>
+    <h1>Deterministic Control-Flow Contract</h1>
+    <p>
+      The finite state machine that governs run lifecycle: states, transitions, events,
+      guards, and terminal conditions. Inspection, approval, retry, and cancel as
+      first-class concepts.
+    </p>
+  </div>
+
+  <!-- FILES -->
+  <div class="section-label">Files Created</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/orchestration_state_machine.py        <span class="dim">(3 BaseModels, 2 Enums, helpers)</span><br>
+    <span class="hl">CREATED</span>  tests/test_orchestration_state_machine.py     <span class="dim">(36 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/orchestration_state_machine_examples.json <span class="dim">(3 examples)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 285/285 tests pass across all 10 primitives
+  </div>
+
+  <!-- MODELS -->
+  <div class="section-label">Models &mdash; OrchestrationStateMachine</div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-s">&#9632;</div>
+      <div>
+        <div class="card-title">OrchestrationStateMachine</div>
+        <div class="card-subtitle">machine_id + initial_state + terminal_states + transition rules</div>
+      </div>
+    </div>
+    <div class="model-tree">
+      <span class="cls">OrchestrationStateMachine</span><br>
+      <span style="padding-left:1rem;display:block;">
+        <span class="fld">&#9500;&#9472; machine_id</span>: <span class="typ">str</span><br>
+        <span class="fld">&#9500;&#9472; initial_state</span>: <span class="typ">RunState</span> <span class="def">(default: CREATED)</span><br>
+        <span class="fld">&#9500;&#9472; terminal_states</span>: <span class="typ">List[RunState]</span> <span class="def">(SUCCEEDED, FAILED, CANCELLED)</span><br>
+        <span class="fld">&#9492;&#9472; transitions</span>: <span class="typ">List[TransitionRule]</span>
+      </span>
+      <br>
+      <span class="cls2">TransitionRule</span> &mdash; <span class="fld">from_state</span> + <span class="fld">event</span> + <span class="fld">to_state</span> + <span class="fld">guards</span><br>
+      <span class="cls2">TransitionGuard</span> &mdash; <span class="fld">name</span> + <span class="fld">description</span>
+    </div>
+  </div>
+
+  <!-- ENUMS -->
+  <div class="section-label">Enums &mdash; 2</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title" style="color:#f472b6;">RunState (12)</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> created</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> assembling_prompt</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> model_pending</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> model_completed</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> tool_pending</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> tool_running</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> verifying</div>
+        <div class="tree-item"><span class="tree-dot dot-orange"></span> awaiting_approval</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> retry_pending</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> succeeded</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> failed</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> cancelled</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#818cf8;">RunEvent (16)</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> start_run</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> prompt_ready</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> model_response_received</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> tool_call_requested</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> no_tool_needed</div>
+        <div class="tree-item"><span class="tree-dot dot-orange"></span> tool_approved_or_not_required</div>
+        <div class="tree-item"><span class="tree-dot dot-orange"></span> approval_required</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> approval_granted</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> approval_rejected</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> tool_completed</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> tool_failed_retryable</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> verification_passed</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> verification_failed_retryable</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> verification_failed_terminal</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> retry_allowed</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> cancel_run</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATE FLOW -->
+  <div class="section-label">State Flow Diagram</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span> <span class="dim">&#8594; start_run &#8594;</span> <span class="hl">ASSEMBLING_PROMPT</span> <span class="dim">&#8594; prompt_ready &#8594;</span> <span class="hl">MODEL_PENDING</span><br>
+    <span class="hl2">MODEL_PENDING</span> <span class="dim">&#8594; model_response_received &#8594;</span> <span class="hl">MODEL_COMPLETED</span><br>
+    <span class="hl">MODEL_COMPLETED</span> <span class="dim">&#8594;</span> <span class="hl2">tool_call_requested</span> <span class="dim">&#8594;</span> <span class="hl">TOOL_PENDING</span><br>
+    <span class="dim" style="padding-left:10rem;">&#9492;&#9472; no_tool_needed &#8594;</span> <span class="hl">VERIFYING</span><br>
+    <span class="hl">TOOL_PENDING</span> <span class="dim">&#8594;</span> <span class="hl2">tool_approved_or_not_required</span> <span class="dim">&#8594;</span> <span class="hl">TOOL_RUNNING</span><br>
+    <span class="dim" style="padding-left:10rem;">&#9492;&#9472; approval_required &#8594;</span> <span class="hl">AWAITING_APPROVAL</span><br>
+    <span class="hl">AWAITING_APPROVAL</span> <span class="dim">&#8594; approval_granted &#8594;</span> <span class="hl">TOOL_RUNNING</span><br>
+    <span class="dim" style="padding-left:10rem;">&#9492;&#9472; approval_rejected &#8594;</span> <span class="hl">FAILED</span><br>
+    <span class="hl">TOOL_RUNNING</span> <span class="dim">&#8594; tool_completed &#8594;</span> <span class="hl">VERIFYING</span><br>
+    <span class="dim" style="padding-left:10rem;">&#9492;&#9472; tool_failed_retryable &#8594;</span> <span class="hl">RETRY_PENDING</span><br>
+    <span class="hl">VERIFYING</span> <span class="dim">&#8594; verification_passed &#8594;</span> <span class="hl">SUCCEEDED</span><br>
+    <span class="dim" style="padding-left:10rem;">&#9492;&#9472; verification_failed_retryable &#8594;</span> <span class="hl">RETRY_PENDING</span><br>
+    <span class="dim" style="padding-left:10rem;">&#9492;&#9472; verification_failed_terminal &#8594;</span> <span class="hl">FAILED</span><br>
+    <span class="hl">RETRY_PENDING</span> <span class="dim">&#8594; retry_allowed &#8594;</span> <span class="hl">ASSEMBLING_PROMPT</span><br>
+    <span class="dim">Any non-terminal &#8594; cancel_run &#8594;</span> <span class="hl">CANCELLED</span>
+  </div>
+
+  <!-- GUARDS -->
+  <div class="section-label">Guards &mdash; 2 Active</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9881;</div>
+        <div>
+          <div class="card-title">retry_budget_available</div>
+          <div class="card-subtitle">On RETRY_PENDING &#8594; retry_allowed &#8594; ASSEMBLING_PROMPT</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> Prevents unbounded retries</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9881;</div>
+        <div>
+          <div class="card-title">approval_granted_if_required</div>
+          <div class="card-subtitle">On AWAITING_APPROVAL &#8594; approval_granted &#8594; TOOL_RUNNING</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-orange"></span> Prevents approval policy bypass</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALIDATION -->
+  <div class="section-label">Validation Rules</div>
+  <div class="diagram">
+    <span class="hl">Non-empty</span>      <span class="dim">machine_id required</span><br>
+    <span class="hl">Initial &#8800; terminal</span> <span class="dim">initial_state excluded from terminal_states</span><br>
+    <span class="hl">Unique terminals</span>  <span class="dim">no duplicates in terminal_states</span><br>
+    <span class="hl">No duplicate pairs</span> <span class="dim">same (from_state, event) only allowed once</span><br>
+    <span class="hl">All non-terminal have outgoing</span> <span class="dim">every used non-terminal state has at least one transition out</span>
+  </div>
+
+  <!-- EXAMPLES -->
+  <div class="section-label">Examples &mdash; 3 Traces</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-ex">&#9632;</div>
+        <div>
+          <div class="card-title">Happy path</div>
+          <div class="card-subtitle">No tool call needed, direct verify &#8594; succeed</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> created &#8594; assembling_prompt</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> &#8594; model_pending &#8594; model_completed</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> &#8594; verifying &#8594; <span class="tree-dot dot-green"></span> succeeded</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-ex">&#9632;</div>
+        <div>
+          <div class="card-title">Approval flow</div>
+          <div class="card-subtitle">Tool needs approval, granted, runs, verifies</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-orange"></span> tool_pending &#8594; awaiting_approval</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> approval_granted &#8594; tool_running</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> tool_completed &#8594; verifying &#8594; succeeded</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-ex">&#9632;</div>
+        <div>
+          <div class="card-title">Retry after failure</div>
+          <div class="card-subtitle">Verification fails, retries, succeeds on attempt 2</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> verifying &#8594; retry_pending</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> retry_allowed &#8594; assembling_prompt</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> &#8594; verifying &#8594; succeeded</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOT IMPLEMENTED -->
+  <div class="section-label">Not Implemented Yet</div>
+  <div class="diagram">
+    <span class="dim">&#10007; Workflow execution engine</span><br>
+    <span class="dim">&#10007; Concurrent state branches</span><br>
+    <span class="dim">&#10007; Multi-agent handoff orchestration</span><br>
+    <span class="dim">&#10007; Workflow DSL</span><br>
+    <span class="dim">&#10007; Distributed event bus</span><br>
+    <span class="dim">&#10007; Formal verification tooling</span><br>
+    <span class="dim">&#10007; Saga compensation logic</span><br>
+    <span class="dim">&#10007; Time-based schedulers</span>
+  </div>
+
+  <!-- PRIMITIVES -->
+  <div class="section-label">Primitives So Far</div>
+  <div class="diagram">
+    <span class="hl" style="color:#818cf8;">P1  INSTRUCTION LAYERING</span>       <span class="dim">Global + Project + Task layers</span><br>
+    <span class="hl" style="color:#34d399;">P2  TASK CONTRACT SCHEMA</span>       <span class="dim">Nested Pydantic + 2-layer validation</span><br>
+    <span class="hl" style="color:#38bdf8;">P3  CONTEXT DELIVERY SCHEMA</span>     <span class="dim">Structured bundle + reason-annotated items</span><br>
+    <span class="hl" style="color:#fbbf24;">P4  CONTEXT SELECTION POLICY</span>   <span class="dim">Heuristic pipeline + exclusions + caps</span><br>
+    <span class="hl" style="color:#f87171;">P5  TOOL INTERFACE SCHEMA</span>      <span class="dim">Definition, Invocation, Result</span><br>
+    <span class="hl" style="color:#a78bfa;">P6  EXECUTION ENVIRONMENT</span>     <span class="dim">Provider-agnostic runtime contract</span><br>
+    <span class="hl" style="color:#fbbf24;">P7  DURABLE STATE SCHEMA</span>      <span class="dim">Run-centric execution persistence</span><br>
+    <span class="hl" style="color:#34d399;">P8  VERIFICATION SCHEMA</span>       <span class="dim">Multi-check quality gate contract</span><br>
+    <span class="hl" style="color:#38bdf8;">P9  PROMPT ASSEMBLY SCHEMA</span>    <span class="dim">Layered prompt assembly</span><br>
+    <span class="hl" style="color:#f472b6;">P10 RUN ORCHESTRATION STATE MACHINE</span> <span class="dim">Deterministic control-flow contract — <span style="color:#f472b6;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P10 &bull; Run Orchestration State Machine &bull; 285/285 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

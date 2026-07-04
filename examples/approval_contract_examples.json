@@ -1,0 +1,178 @@
+{
+  "examples": [
+    {
+      "name": "Low-risk auto-allow style policy record",
+      "description": "A policy for tool execution actions. Low-risk actions do not require approval. The policy has no explicit reviewer roles and a short timeout as a safety net.",
+      "policy": {
+        "policy_id": "pol-tool-low",
+        "action_type": "tool_execution",
+        "minimum_risk_level_for_approval": "high",
+        "allowed_reviewer_roles": [],
+        "timeout_seconds": 60,
+        "require_evidence": false,
+        "auto_escalate_on_timeout": false
+      },
+      "explanation": "Only high and critical risk tool executions require approval. Low and medium pass through automatically. No reviewer roles are pre-assigned since approval is rarely triggered."
+    },
+    {
+      "name": "High-risk approval request with evidence",
+      "description": "An agent wants to run a data mutation on production. The risk is CRITICAL. Evidence is attached showing the SQL and row count so the reviewer can assess impact.",
+      "request": {
+        "request_id": "req-prod-042",
+        "run_id": "run-042",
+        "step_id": "step-7",
+        "action_type": "data_mutation",
+        "risk_level": "critical",
+        "requested_by_agent_id": "agent-swe-01",
+        "summary": "Bulk delete inactive users from production database",
+        "proposed_action": "DELETE FROM users WHERE last_login < '2023-01-01' AND status = 'inactive'",
+        "status": "pending",
+        "reviewer_roles_needed": ["senior_engineer", "dba"],
+        "evidence": [
+          {
+            "evidence_id": "ev-sql-001",
+            "label": "SQL to execute",
+            "content": "DELETE FROM users WHERE last_login < '2023-01-01' AND status = 'inactive'",
+            "content_type": "sql"
+          },
+          {
+            "evidence_id": "ev-count-001",
+            "label": "Estimated rows affected",
+            "content": "~15,000 rows",
+            "content_type": "text"
+          },
+          {
+            "evidence_id": "ev-schema-001",
+            "label": "Table schema (relevant columns)",
+            "content": "users(id, email, last_login, status, created_at)",
+            "content_type": "text"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Reviewer approval decision",
+      "description": "A senior engineer reviews the high-risk approval request, examines the evidence, and approves with a note about mitigation steps.",
+      "request": {
+        "request_id": "req-prod-042",
+        "run_id": "run-042",
+        "step_id": "step-7",
+        "action_type": "data_mutation",
+        "risk_level": "critical",
+        "requested_by_agent_id": "agent-swe-01",
+        "summary": "Bulk delete inactive users from production database",
+        "proposed_action": "DELETE FROM users WHERE last_login < '2023-01-01' AND status = 'inactive'",
+        "status": "approved",
+        "reviewer_roles_needed": ["senior_engineer", "dba"],
+        "evidence": [
+          {
+            "evidence_id": "ev-sql-001",
+            "label": "SQL to execute",
+            "content": "DELETE FROM users WHERE last_login < '2023-01-01' AND status = 'inactive'",
+            "content_type": "sql"
+          }
+        ]
+      },
+      "decision": {
+        "decision_id": "dec-prod-042",
+        "request_id": "req-prod-042",
+        "reviewer_id": "user-sarah",
+        "reviewer_role": "senior_engineer",
+        "decision": "approve",
+        "rationale": "Query is scoped correctly. WHERE clause limits to inactive users with no login since 2023. Estimated 15k rows is acceptable. Ensure a backup is taken before execution."
+      },
+      "outcome": {
+        "request_id": "req-prod-042",
+        "final_status": "approved",
+        "final_decision_id": "dec-prod-042",
+        "escalation_ids": [],
+        "executable": true
+      }
+    },
+    {
+      "name": "Timeout escalation case",
+      "description": "An approval request timed out because no eligible reviewer responded. The system escalated it to a higher role per policy. The outcome is ESCALATED and not executable.",
+      "policy": {
+        "policy_id": "pol-deploy-01",
+        "action_type": "production_deployment",
+        "minimum_risk_level_for_approval": "critical",
+        "allowed_reviewer_roles": ["tech_lead"],
+        "timeout_seconds": 600,
+        "require_evidence": true,
+        "auto_escalate_on_timeout": true
+      },
+      "request": {
+        "request_id": "req-deploy-099",
+        "run_id": "run-099",
+        "step_id": "step-final",
+        "action_type": "production_deployment",
+        "risk_level": "critical",
+        "requested_by_agent_id": "agent-cicd-01",
+        "summary": "Deploy v2.3.1 to production",
+        "proposed_action": "deploy(version=v2.3.1, env=production, strategy=rolling_update)",
+        "status": "escalated",
+        "reviewer_roles_needed": ["tech_lead"],
+        "evidence": [
+          {
+            "evidence_id": "ev-ci-001",
+            "label": "CI pipeline results",
+            "content": "All 847 tests passed, 0 failures, 2 warnings",
+            "content_type": "text"
+          }
+        ]
+      },
+      "escalation": {
+        "escalation_id": "esc-deploy-099",
+        "request_id": "req-deploy-099",
+        "reason": "timeout",
+        "escalated_to_role": "engineering_manager",
+        "note": "tech_lead did not respond within 600 seconds, escalated to engineering_manager"
+      },
+      "outcome": {
+        "request_id": "req-deploy-099",
+        "final_status": "escalated",
+        "escalation_ids": ["esc-deploy-099"],
+        "executable": false
+      }
+    },
+    {
+      "name": "Rejected outcome not executable",
+      "description": "A reviewer rejected the approval request. The outcome is REJECTED and explicitly not executable, preventing the agent from proceeding.",
+      "request": {
+        "request_id": "req-fin-007",
+        "run_id": "run-007",
+        "step_id": "step-4",
+        "action_type": "financial_action",
+        "risk_level": "critical",
+        "requested_by_agent_id": "agent-fin-01",
+        "summary": "Refund $5,000 to customer invoice INV-2024-042",
+        "proposed_action": "process_refund(invoice=INV-2024-042, amount=5000.00, reason=customer_request)",
+        "status": "rejected",
+        "reviewer_roles_needed": ["finance_manager"],
+        "evidence": [
+          {
+            "evidence_id": "ev-inv-001",
+            "label": "Invoice details",
+            "content": "Invoice INV-2024-042: $5,000.00, issued 2024-03-15, customer ACME Corp",
+            "content_type": "text"
+          }
+        ]
+      },
+      "decision": {
+        "decision_id": "dec-fin-007",
+        "request_id": "req-fin-007",
+        "reviewer_id": "user-alice",
+        "reviewer_role": "finance_manager",
+        "decision": "reject",
+        "rationale": "Refund amount exceeds $2,000 single-transaction limit. Requires VP approval per policy FIN-202. Re-routing to VP of Finance."
+      },
+      "outcome": {
+        "request_id": "req-fin-007",
+        "final_status": "rejected",
+        "final_decision_id": "dec-fin-007",
+        "escalation_ids": [],
+        "executable": false
+      }
+    }
+  ]
+}

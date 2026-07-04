@@ -1,0 +1,452 @@
+{
+  "examples": [
+    {
+      "name": "Code change with test + lint + typecheck",
+      "description": "A feature branch verified against three quality gates. All passed.",
+      "plan": {
+        "plan_id": "plan-feat-042",
+        "task_id": "task-feat-042",
+        "checks": [
+          {
+            "check_id": "chk-test",
+            "name": "Run targeted tests",
+            "check_type": "test",
+            "blocking": true,
+            "command": "pytest tests/test_feature.py -v",
+            "acceptance_rule": null,
+            "status": "passed",
+            "evidence": [
+              {
+                "evidence_id": "ev-test",
+                "evidence_type": "log",
+                "path": "/workspace/test-output.log",
+                "summary": "12 passed, 0 failed",
+                "metric_name": null,
+                "metric_value": null
+              },
+              {
+                "evidence_id": "ev-coverage",
+                "evidence_type": "metric",
+                "path": null,
+                "summary": "Line coverage for new code",
+                "metric_name": "line_coverage_pct",
+                "metric_value": 94.2
+              }
+            ],
+            "failure_reason": null
+          },
+          {
+            "check_id": "chk-lint",
+            "name": "Lint check",
+            "check_type": "lint",
+            "blocking": false,
+            "command": "ruff check src/",
+            "acceptance_rule": null,
+            "status": "passed",
+            "evidence": [
+              {
+                "evidence_id": "ev-lint",
+                "evidence_type": "log",
+                "path": "/workspace/lint-output.log",
+                "summary": "No lint errors",
+                "metric_name": null,
+                "metric_value": null
+              }
+            ],
+            "failure_reason": null
+          },
+          {
+            "check_id": "chk-typecheck",
+            "name": "Type check",
+            "check_type": "typecheck",
+            "blocking": true,
+            "command": "mypy src/",
+            "acceptance_rule": null,
+            "status": "passed",
+            "evidence": [
+              {
+                "evidence_id": "ev-typecheck",
+                "evidence_type": "log",
+                "path": "/workspace/typecheck-output.log",
+                "summary": "No type errors",
+                "metric_name": null,
+                "metric_value": null
+              }
+            ],
+            "failure_reason": null
+          }
+        ]
+      },
+      "result": {
+        "plan_id": "plan-feat-042",
+        "run_id": "run-feat-042",
+        "checks": [
+          {
+            "check_id": "chk-test",
+            "name": "Run targeted tests",
+            "check_type": "test",
+            "blocking": true,
+            "command": "pytest tests/test_feature.py -v",
+            "acceptance_rule": null,
+            "status": "passed",
+            "evidence": [
+              {
+                "evidence_id": "ev-test",
+                "evidence_type": "log",
+                "path": "/workspace/test-output.log",
+                "summary": "12 passed, 0 failed",
+                "metric_name": null,
+                "metric_value": null
+              },
+              {
+                "evidence_id": "ev-coverage",
+                "evidence_type": "metric",
+                "path": null,
+                "summary": "Line coverage for new code",
+                "metric_name": "line_coverage_pct",
+                "metric_value": 94.2
+              }
+            ],
+            "failure_reason": null
+          },
+          {
+            "check_id": "chk-lint",
+            "name": "Lint check",
+            "check_type": "lint",
+            "blocking": false,
+            "command": "ruff check src/",
+            "acceptance_rule": null,
+            "status": "passed",
+            "evidence": [
+              {
+                "evidence_id": "ev-lint",
+                "evidence_type": "log",
+                "path": "/workspace/lint-output.log",
+                "summary": "No lint errors",
+                "metric_name": null,
+                "metric_value": null
+              }
+            ],
+            "failure_reason": null
+          },
+          {
+            "check_id": "chk-typecheck",
+            "name": "Type check",
+            "check_type": "typecheck",
+            "blocking": true,
+            "command": "mypy src/",
+            "acceptance_rule": null,
+            "status": "passed",
+            "evidence": [
+              {
+                "evidence_id": "ev-typecheck",
+                "evidence_type": "log",
+                "path": "/workspace/typecheck-output.log",
+                "summary": "No type errors",
+                "metric_name": null,
+                "metric_value": null
+              }
+            ],
+            "failure_reason": null
+          }
+        ],
+        "verdict": {
+          "status": "pass",
+          "blocking_failures": [],
+          "non_blocking_failures": [],
+          "summary": "All 3 checks passed: tests, lint, typecheck"
+        },
+        "started_at": "2025-03-15T10:00:00Z",
+        "finished_at": "2025-03-15T10:02:15Z"
+      }
+    },
+    {
+      "name": "Report generation with acceptance + artifact check",
+      "description": "A report-generation task verified by checking output content and artifact presence.",
+      "plan": {
+        "plan_id": "plan-report-089",
+        "task_id": "task-report-089",
+        "checks": [
+          {
+            "check_id": "chk-acceptance",
+            "name": "Acceptance check — report includes required sections",
+            "check_type": "acceptance",
+            "blocking": true,
+            "command": null,
+            "acceptance_rule": "Generated report includes sections: Summary, Methodology, Results, Conclusion",
+            "status": "passed",
+            "evidence": [
+              {
+                "evidence_id": "ev-content",
+                "evidence_type": "report",
+                "path": "/workspace/output/report.md",
+                "summary": "All 4 required sections present",
+                "metric_name": null,
+                "metric_value": null
+              }
+            ],
+            "failure_reason": null
+          },
+          {
+            "check_id": "chk-artifact",
+            "name": "Artifact presence — output report exists",
+            "check_type": "artifact",
+            "blocking": true,
+            "command": null,
+            "acceptance_rule": "File /workspace/output/report.md exists and is non-empty",
+            "status": "passed",
+            "evidence": [
+              {
+                "evidence_id": "ev-file",
+                "evidence_type": "file",
+                "path": "/workspace/output/report.md",
+                "summary": "File exists, 2.4 KB",
+                "metric_name": null,
+                "metric_value": null
+              }
+            ],
+            "failure_reason": null
+          },
+          {
+            "check_id": "chk-stats",
+            "name": "Report quality metric",
+            "check_type": "acceptance",
+            "blocking": false,
+            "command": null,
+            "acceptance_rule": "Report readability score is above threshold",
+            "status": "passed",
+            "evidence": [
+              {
+                "evidence_id": "ev-readability",
+                "evidence_type": "metric",
+                "path": null,
+                "summary": "Flesch reading ease score",
+                "metric_name": "readability_score",
+                "metric_value": 62.3
+              }
+            ],
+            "failure_reason": null
+          }
+        ]
+      },
+      "result": {
+        "plan_id": "plan-report-089",
+        "run_id": "run-report-089",
+        "checks": [
+          {
+            "check_id": "chk-acceptance",
+            "name": "Acceptance check — report includes required sections",
+            "check_type": "acceptance",
+            "blocking": true,
+            "command": null,
+            "acceptance_rule": "Generated report includes sections: Summary, Methodology, Results, Conclusion",
+            "status": "passed",
+            "evidence": [
+              {
+                "evidence_id": "ev-content",
+                "evidence_type": "report",
+                "path": "/workspace/output/report.md",
+                "summary": "All 4 required sections present",
+                "metric_name": null,
+                "metric_value": null
+              }
+            ],
+            "failure_reason": null
+          },
+          {
+            "check_id": "chk-artifact",
+            "name": "Artifact presence — output report exists",
+            "check_type": "artifact",
+            "blocking": true,
+            "command": null,
+            "acceptance_rule": "File /workspace/output/report.md exists and is non-empty",
+            "status": "passed",
+            "evidence": [
+              {
+                "evidence_id": "ev-file",
+                "evidence_type": "file",
+                "path": "/workspace/output/report.md",
+                "summary": "File exists, 2.4 KB",
+                "metric_name": null,
+                "metric_value": null
+              }
+            ],
+            "failure_reason": null
+          },
+          {
+            "check_id": "chk-stats",
+            "name": "Report quality metric",
+            "check_type": "acceptance",
+            "blocking": false,
+            "command": null,
+            "acceptance_rule": "Report readability score is above threshold",
+            "status": "passed",
+            "evidence": [
+              {
+                "evidence_id": "ev-readability",
+                "evidence_type": "metric",
+                "path": null,
+                "summary": "Flesch reading ease score",
+                "metric_name": "readability_score",
+                "metric_value": 62.3
+              }
+            ],
+            "failure_reason": null
+          }
+        ],
+        "verdict": {
+          "status": "pass",
+          "blocking_failures": [],
+          "non_blocking_failures": [],
+          "summary": "All 3 checks passed: acceptance, artifact, quality metric"
+        },
+        "started_at": "2025-03-15T14:00:00Z",
+        "finished_at": "2025-03-15T14:00:30Z"
+      }
+    },
+    {
+      "name": "Failed verification with blocking test failure",
+      "description": "A deployment task where the tests failed. The blocking failure produces a FAIL verdict.",
+      "plan": {
+        "plan_id": "plan-deploy-117",
+        "task_id": "task-deploy-117",
+        "checks": [
+          {
+            "check_id": "chk-test",
+            "name": "Run tests",
+            "check_type": "test",
+            "blocking": true,
+            "command": "pytest tests/ -v",
+            "acceptance_rule": null,
+            "status": "failed",
+            "evidence": [
+              {
+                "evidence_id": "ev-test-fail",
+                "evidence_type": "log",
+                "path": "/workspace/test-output.log",
+                "summary": "158 passed, 4 failed",
+                "metric_name": null,
+                "metric_value": null
+              }
+            ],
+            "failure_reason": "4 tests failed: test_api_errors, test_db_connection, test_auth_timeout, test_rate_limiter"
+          },
+          {
+            "check_id": "chk-lint",
+            "name": "Lint check",
+            "check_type": "lint",
+            "blocking": false,
+            "command": "ruff check src/",
+            "acceptance_rule": null,
+            "status": "passed",
+            "evidence": [
+              {
+                "evidence_id": "ev-lint-pass",
+                "evidence_type": "log",
+                "path": "/workspace/lint-output.log",
+                "summary": "No lint errors",
+                "metric_name": null,
+                "metric_value": null
+              }
+            ],
+            "failure_reason": null
+          },
+          {
+            "check_id": "chk-typecheck",
+            "name": "Type check",
+            "check_type": "typecheck",
+            "blocking": true,
+            "command": "mypy src/",
+            "acceptance_rule": null,
+            "status": "passed",
+            "evidence": [
+              {
+                "evidence_id": "ev-typecheck-pass",
+                "evidence_type": "log",
+                "path": "/workspace/typecheck-output.log",
+                "summary": "No type errors",
+                "metric_name": null,
+                "metric_value": null
+              }
+            ],
+            "failure_reason": null
+          }
+        ]
+      },
+      "result": {
+        "plan_id": "plan-deploy-117",
+        "run_id": "run-deploy-117",
+        "checks": [
+          {
+            "check_id": "chk-test",
+            "name": "Run tests",
+            "check_type": "test",
+            "blocking": true,
+            "command": "pytest tests/ -v",
+            "acceptance_rule": null,
+            "status": "failed",
+            "evidence": [
+              {
+                "evidence_id": "ev-test-fail",
+                "evidence_type": "log",
+                "path": "/workspace/test-output.log",
+                "summary": "158 passed, 4 failed",
+                "metric_name": null,
+                "metric_value": null
+              }
+            ],
+            "failure_reason": "4 tests failed: test_api_errors, test_db_connection, test_auth_timeout, test_rate_limiter"
+          },
+          {
+            "check_id": "chk-lint",
+            "name": "Lint check",
+            "check_type": "lint",
+            "blocking": false,
+            "command": "ruff check src/",
+            "acceptance_rule": null,
+            "status": "passed",
+            "evidence": [
+              {
+                "evidence_id": "ev-lint-pass",
+                "evidence_type": "log",
+                "path": "/workspace/lint-output.log",
+                "summary": "No lint errors",
+                "metric_name": null,
+                "metric_value": null
+              }
+            ],
+            "failure_reason": null
+          },
+          {
+            "check_id": "chk-typecheck",
+            "name": "Type check",
+            "check_type": "typecheck",
+            "blocking": true,
+            "command": "mypy src/",
+            "acceptance_rule": null,
+            "status": "passed",
+            "evidence": [
+              {
+                "evidence_id": "ev-typecheck-pass",
+                "evidence_type": "log",
+                "path": "/workspace/typecheck-output.log",
+                "summary": "No type errors",
+                "metric_name": null,
+                "metric_value": null
+              }
+            ],
+            "failure_reason": null
+          }
+        ],
+        "verdict": {
+          "status": "fail",
+          "blocking_failures": ["chk-test"],
+          "non_blocking_failures": [],
+          "summary": "Blocking failure: 4 tests failed. Lint and typecheck passed."
+        },
+        "started_at": "2025-03-15T16:00:00Z",
+        "finished_at": "2025-03-15T16:02:45Z"
+      }
+    }
+  ]
+}

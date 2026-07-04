@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P13: Evaluation and Benchmark Schema</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #34d399; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #34d399 50%, #059669 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p { font-size: 1.05rem; color: #9494a8; max-width: 640px; }
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-s { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-rec { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.icon-g { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.tree { padding-left: 1.2rem; border-left: 1px solid #1e1e2a; margin: 0.75rem 0; }
+
+.tree-item {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.3rem 0; font-size: 0.9rem;
+}
+
+.tree-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: #34d399; }
+.dot-yellow { background: #fbbf24; }
+.dot-red { background: #ef4444; }
+.dot-purple { background: #a78bfa; }
+.dot-blue { background: #38bdf8; }
+.dot-orange { background: #f97316; }
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #34d399; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+
+.model-tree { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 2; }
+.model-tree .cls { color: #34d399; font-weight: 600; }
+.model-tree .cls2 { color: #818cf8; font-weight: 600; }
+.model-tree .fld { color: #94a3b8; }
+.model-tree .typ { color: #818cf8; }
+.model-tree .def { color: #6b6b80; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 13 &mdash; Evaluation and Benchmark Schema</div>
+    <h1>Task-Grader-Run Benchmark Contract</h1>
+    <p>
+      The schema that defines how the harness itself is measured: benchmark tasks,
+      graders, metrics, run records, and aggregate summaries.
+    </p>
+  </div>
+
+  <!-- FILES -->
+  <div class="section-label">Files Created</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/benchmark.py                             <span class="dim">(7 BaseModels, 4 Enums)</span><br>
+    <span class="hl">CREATED</span>  tests/test_benchmark_schema.py                   <span class="dim">(71 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/benchmark_examples.json                   <span class="dim">(4 examples)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 456/456 tests pass across all 13 primitives
+  </div>
+
+  <!-- MODELS -->
+  <div class="section-label">Models &mdash; 7</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-s">&#9632;</div>
+        <div>
+          <div class="card-title">BenchmarkSuite</div>
+          <div class="card-subtitle">suite_id + name + tasks + summary</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">BenchmarkTask</div>
+          <div class="card-subtitle">task_id + name + type + prompt + inputs + reference + tags</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">GraderDefinition</div>
+          <div class="card-subtitle">type (deterministic, llm_judge, human) + pass_condition + rubric</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">BenchmarkRun</div>
+          <div class="card-subtitle">run_id + harness_version + model + graders + metrics + verdict</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">MetricResult</div>
+          <div class="card-subtitle">metric_name + value + unit + threshold + passed</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">BenchmarkSummary</div>
+          <div class="card-subtitle">pass_rate + average_latency + average_cost + total_safety_violations</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENUMS -->
+  <div class="section-label">Enums &mdash; 4</div>
+
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-title" style="color:#34d399;">TaskType (4)</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> coding</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> debugging</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> refactor</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> report</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#818cf8;">GraderType (3)</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> deterministic</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> llm_judge</div>
+        <div class="tree-item"><span class="tree-dot dot-orange"></span> human</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#fbbf24;">MetricName (7)</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> task_success</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> tool_success</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> latency_seconds</div>
+        <div class="tree-item"><span class="tree-dot dot-orange"></span> cost_usd</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> retry_count</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> safety_violations</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> verification_pass</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#a78bfa;">VerdictStatus (3)</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> pass</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> fail</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> partial</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRADER STRATEGY -->
+  <div class="section-label">Grader Strategy</div>
+  <div class="diagram">
+    <span class="hl">1. DETERMINISTIC</span>  <span class="dim">primary grader &mdash; output matching, exit code, file comparison</span><br>
+    <span class="hl2">2. HUMAN REVIEW</span>     <span class="dim">for calibration and ambiguous tasks</span><br>
+    <span class="hl" style="color:#fbbf24;">3. LLM JUDGE</span>       <span class="dim">only after calibration &mdash; known error rate needs validation</span>
+  </div>
+
+  <!-- VALIDATION -->
+  <div class="section-label">Validation Rules</div>
+  <div class="diagram">
+    <span class="hl">Non-empty ids</span>          <span class="dim">suite, task, run, grader, reference</span><br>
+    <span class="hl">At least one task per suite</span><br>
+    <span class="hl">At least one grader + metric per run</span><br>
+    <span class="hl">pass_rate between 0 and 1</span><br>
+    <span class="hl">Non-negative latency / cost / retries / safety violations</span><br>
+    <span class="hl">finished_at required for PASS or FAIL verdicts</span><br>
+    <span class="hl">Non-empty pass_condition on every grader</span>
+  </div>
+
+  <!-- DEFAULT METRICS -->
+  <div class="section-label">Default Metrics</div>
+  <div class="diagram">
+    <span class="hl">task_success</span>        <span class="dim">did the agent complete the task</span><br>
+    <span class="hl">verification_pass</span>     <span class="dim">did the verification gate pass</span><br>
+    <span class="hl">retry_count</span>           <span class="dim">how many retries were needed</span><br>
+    <span class="hl2">latency_seconds</span>       <span class="dim">p95 / average end-to-end time</span><br>
+    <span class="hl2">cost_usd</span>              <span class="dim">model inference cost per task</span><br>
+    <span class="hl" style="color:#ef4444;">safety_violations</span>   <span class="dim">how many safety policy blocks</span><br>
+    <span class="hl">tool_success</span>          <span class="dim">did all tool calls succeed</span>
+  </div>
+
+  <!-- EXAMPLES -->
+  <div class="section-label">Examples &mdash; 4</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">Coding benchmark suite</div>
+          <div class="card-subtitle">3 tasks: add, parse JSON, sort list</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">Debugging task + grader</div>
+          <div class="card-subtitle">Null pointer fix, deterministic grader</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">Benchmark run</div>
+          <div class="card-subtitle">harness 1.2.0, gpt-4, 7 metrics, 2 graders</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-rec">&#9632;</div>
+        <div>
+          <div class="card-title">Summary</div>
+          <div class="card-subtitle">50 runs, 86% pass, 14.2s avg latency, 2 safety violations</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOT IMPLEMENTED -->
+  <div class="section-label">Not Implemented Yet</div>
+  <div class="diagram">
+    <span class="dim">&#10007; Eval runner / exec engine</span><br>
+    <span class="dim">&#10007; Benchmark dashboard</span><br>
+    <span class="dim">&#10007; Pairwise regression visualizer</span><br>
+    <span class="dim">&#10007; LLM judge prompt templates</span><br>
+    <span class="dim">&#10007; Statistical significance testing</span><br>
+    <span class="dim">&#10007; Auto-generated benchmark datasets</span>
+  </div>
+
+  <!-- PRIMITIVES -->
+  <div class="section-label">Primitives So Far</div>
+  <div class="diagram">
+    <span class="hl2">P1  INSTRUCTION LAYERING</span>       <span class="dim">Global + Project + Task layers</span><br>
+    <span class="hl" style="color:#34d399;">P2  TASK CONTRACT SCHEMA</span>       <span class="dim">Nested Pydantic + 2-layer validation</span><br>
+    <span class="hl" style="color:#38bdf8;">P3  CONTEXT DELIVERY SCHEMA</span>     <span class="dim">Structured bundle + reason-annotated items</span><br>
+    <span class="hl" style="color:#fbbf24;">P4  CONTEXT SELECTION POLICY</span>   <span class="dim">Heuristic pipeline + exclusions + caps</span><br>
+    <span class="hl" style="color:#f87171;">P5  TOOL INTERFACE SCHEMA</span>      <span class="dim">Definition, Invocation, Result</span><br>
+    <span class="hl" style="color:#a78bfa;">P6  EXECUTION ENVIRONMENT</span>     <span class="dim">Provider-agnostic runtime contract</span><br>
+    <span class="hl" style="color:#fbbf24;">P7  DURABLE STATE SCHEMA</span>      <span class="dim">Run-centric execution persistence</span><br>
+    <span class="hl" style="color:#34d399;">P8  VERIFICATION SCHEMA</span>       <span class="dim">Multi-check quality gate contract</span><br>
+    <span class="hl" style="color:#38bdf8;">P9  PROMPT ASSEMBLY SCHEMA</span>    <span class="dim">Layered prompt assembly</span><br>
+    <span class="hl2">P10 RUN ORCHESTRATION STATE MACHINE</span> <span class="dim">Deterministic control-flow contract</span><br>
+    <span class="hl" style="color:#fbbf24;">P11 RETRY AND RECOVERY POLICY</span> <span class="dim">Failure-classified retry contract</span><br>
+    <span class="hl" style="color:#ef4444;">P12 APPROVAL AND SAFETY POLICY</span> <span class="dim">Risk-classified governance contract</span><br>
+    <span class="hl" style="color:#34d399;">P13 EVALUATION AND BENCHMARK SCHEMA</span> <span class="dim">Task-grader-run benchmark contract — <span style="color:#34d399;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P13 &bull; Evaluation and Benchmark Schema &bull; 456/456 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P6: Execution Environment Schema</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #a78bfa; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #a78bfa 50%, #7c3aed 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p { font-size: 1.05rem; color: #9494a8; max-width: 640px; }
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-env { background: rgba(168, 85, 247, 0.15); color: #a78bfa; }
+.icon-pol { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.icon-test { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-ex { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.tag {
+  display: inline-block; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 500;
+}
+
+.tag-env { background: rgba(168, 85, 247, 0.1); color: #a78bfa; border: 1px solid rgba(168, 85, 247, 0.15); }
+.tag-pass { background: rgba(52, 211, 153, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.2); }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.tree { padding-left: 1.2rem; border-left: 1px solid #1e1e2a; margin: 0.75rem 0; }
+
+.tree-item {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.3rem 0; font-size: 0.9rem;
+}
+
+.tree-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: #34d399; }
+.dot-yellow { background: #fbbf24; }
+.dot-red { background: #ef4444; }
+.dot-purple { background: #a78bfa; }
+.dot-blue { background: #38bdf8; }
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #a78bfa; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+}
+
+.model-tree { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 2; }
+.model-tree .cls { color: #a78bfa; font-weight: 600; }
+.model-tree .cls2 { color: #818cf8; font-weight: 600; }
+.model-tree .fld { color: #94a3b8; }
+.model-tree .typ { color: #818cf8; }
+.model-tree .def { color: #6b6b80; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 6 &mdash; Execution Environment Schema</div>
+    <h1>Provider-Agnostic Runtime Contract</h1>
+    <p>
+      Defines the bounded runtime where tools execute: filesystem, network, resources,
+      secrets, lifecycle, and audit. Provider-agnostic &mdash; same schema works for
+      Docker, E2B, Daytona, or local sandbox.
+    </p>
+  </div>
+
+  <!-- FILES -->
+  <div class="section-label">Files Created</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/execution_environment.py           <span class="dim">(7 BaseModels, 4 Enums)</span><br>
+    <span class="hl">CREATED</span>  tests/test_execution_environment.py        <span class="dim">(28 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/execution_environment_examples.json <span class="dim">(2 examples)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 115/115 tests pass across all 6 primitives
+  </div>
+
+  <!-- ARCHITECTURE -->
+  <div class="section-label">EnvironmentDefinition — 7 Policy Models</div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-env">&#9632;</div>
+      <div>
+        <div class="card-title">EnvironmentDefinition</div>
+        <div class="card-subtitle">environment_id + provider + 6 policy blocks</div>
+      </div>
+    </div>
+    <div class="model-tree">
+      <span class="cls">EnvironmentDefinition</span><br>
+      <span style="padding-left:1rem;display:block;">
+        <span class="fld">&#9500;&#9472; environment_id</span>: <span class="typ">str</span><br>
+        <span class="fld">&#9500;&#9472; provider</span>: <span class="typ">EnvironmentProvider</span><br>
+        <span class="fld">&#9500;&#9472; filesystem</span>: <span class="typ">FilesystemPolicy</span><br>
+        <span class="fld">&#9500;&#9472; network</span>: <span class="typ">NetworkPolicy</span><br>
+        <span class="fld">&#9500;&#9472; resources</span>: <span class="typ">ResourceLimits</span><br>
+        <span class="fld">&#9500;&#9472; secrets</span>: <span class="typ">SecretPolicy</span><br>
+        <span class="fld">&#9500;&#9472; lifecycle</span>: <span class="typ">LifecyclePolicy</span><br>
+        <span class="fld">&#9492;&#9472; audit</span>: <span class="typ">AuditPolicy</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- POLICIES -->
+  <div class="section-label">Six Policy Blocks</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-pol">&#9881;</div>
+        <div>
+          <div class="card-title">FilesystemPolicy</div>
+          <div class="card-subtitle">workspace_root, writable, read_only, blocked</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Empty root &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Overlap between any two sets &rarr; error</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-pol">&#9881;</div>
+        <div>
+          <div class="card-title">NetworkPolicy</div>
+          <div class="card-subtitle">mode (disabled/allowlist/full) + allowed_hosts</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> ALLOWLIST without hosts &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-red"></span> DISABLED with hosts &rarr; error</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-pol">&#9881;</div>
+        <div>
+          <div class="card-title">ResourceLimits</div>
+          <div class="card-subtitle">CPU, memory, disk, runtime, processes</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> Any limit ≤ 0 &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Default: 2 CPU, 2048 MB, 4096 MB, 600s, 20 procs</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-pol">&#9881;</div>
+        <div>
+          <div class="card-title">SecretPolicy</div>
+          <div class="card-subtitle">access_mode (none/explicit) + allowed_secret_names</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> NONE mode with secret names &rarr; error</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-pol">&#9881;</div>
+        <div>
+          <div class="card-title">LifecyclePolicy</div>
+          <div class="card-subtitle">mode (ephemeral/persistent) + TTL + preserve_on_failure</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-red"></span> EPHEMERAL with TTL ≤ 0 &rarr; error</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Default: 1800s TTL, preserve on failure</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-pol">&#9881;</div>
+        <div>
+          <div class="card-title">AuditPolicy</div>
+          <div class="card-subtitle">4 boolean flags for observability</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> log_tool_calls, log_resource_usage</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> capture_stdout_stderr, capture_fs_diff</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENUMS -->
+  <div class="section-label">Enums &mdash; 4</div>
+
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-title" style="color:#a78bfa;">EnvironmentProvider</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> docker</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> e2b</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> daytona</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> local</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#818cf8;">NetworkMode</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> disabled</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> allowlist</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> full</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#34d399;">SecretAccessMode</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> none</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> explicit</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#fbbf24;">LifecycleMode</div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> ephemeral</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> persistent</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEFAULTS -->
+  <div class="section-label">Safe Defaults</div>
+  <div class="diagram">
+    <span class="hl">Provider</span>      <span class="dim">docker</span><br>
+    <span class="hl">Network</span>       <span class="dim">disabled</span><br>
+    <span class="hl">Secrets</span>       <span class="dim">none</span><br>
+    <span class="hl">Lifecycle</span>     <span class="dim">ephemeral (1800s TTL, preserve on failure)</span><br>
+    <span class="hl">CPU</span>           <span class="dim">2 cores</span><br>
+    <span class="hl">Memory</span>        <span class="dim">2048 MB</span><br>
+    <span class="hl">Disk</span>          <span class="dim">4096 MB</span><br>
+    <span class="hl">Runtime</span>       <span class="dim">600 seconds</span>
+  </div>
+
+  <!-- EXAMPLES -->
+  <div class="section-label">Examples &mdash; 2</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-ex">&#9632;</div>
+        <div>
+          <div class="card-title">Safe Local Docker Sandbox</div>
+          <div class="card-subtitle">env-local-safe</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Network: disabled</div>
+        <div class="tree-item"><span class="tree-dot dot-green"></span> Secrets: none</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> Blocked: /workspace/secrets, .git</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> Provider: docker</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-ex">&#9632;</div>
+        <div>
+          <div class="card-title">Restricted E2B Sandbox</div>
+          <div class="card-subtitle">env-e2b-restricted</div>
+        </div>
+      </div>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> Network: allowlist (pypi.org, github.com)</div>
+        <div class="tree-item"><span class="tree-dot dot-blue"></span> Secrets: explicit (GH_TOKEN, PYPI_TOKEN)</div>
+        <div class="tree-item"><span class="tree-dot dot-purple"></span> Provider: e2b</div>
+        <div class="tree-item"><span class="tree-dot dot-yellow"></span> Resources: 4 CPU, 4096 MB, 8192 MB</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRIMITIVES -->
+  <div class="section-label">Primitives So Far</div>
+  <div class="diagram">
+    <span class="hl" style="color:#818cf8;">P1  INSTRUCTION LAYERING</span>       <span class="dim">Global + Project + Task layers</span><br>
+    <span class="hl" style="color:#34d399;">P2  TASK CONTRACT SCHEMA</span>       <span class="dim">Nested Pydantic + 2-layer validation</span><br>
+    <span class="hl" style="color:#38bdf8;">P3  CONTEXT DELIVERY SCHEMA</span>     <span class="dim">Structured bundle + reason-annotated items</span><br>
+    <span class="hl" style="color:#fbbf24;">P4  CONTEXT SELECTION POLICY</span>   <span class="dim">Heuristic pipeline + exclusions + caps</span><br>
+    <span class="hl" style="color:#f87171;">P5  TOOL INTERFACE SCHEMA</span>      <span class="dim">Definition, Invocation, Result</span><br>
+    <span class="hl" style="color:#a78bfa;">P6  EXECUTION ENVIRONMENT</span>     <span class="dim">Provider-agnostic runtime contract — <span style="color:#a78bfa;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P6 &bull; Execution Environment &bull; 115/115 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

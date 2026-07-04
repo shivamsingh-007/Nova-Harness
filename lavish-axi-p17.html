@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P17: Production Config &amp; Secrets Contract</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #fbbf24; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #fbbf24 50%, #d97706 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p { font-size: 1.05rem; color: #9494a8; max-width: 640px; }
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-g { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-y { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.icon-b { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.icon-r { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.icon-p { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #fbbf24; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+
+.warn-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #fbbf24;
+  margin-bottom: 1.25rem;
+}
+
+.flow { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; line-height: 2.2; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 17 &mdash; Production Config</div>
+    <h1>Config &amp; Secrets Contract</h1>
+    <p>
+      Defines how production configuration is loaded, validated, scoped, and kept
+      separate from secrets. Secrets are referenced without being exposed in logs,
+      traces, prompts, or serialized output.
+    </p>
+  </div>
+
+  <div class="section-label">Files</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/production_config.py              <span class="dim">(3 enums + 9 models)</span><br>
+    <span class="hl">CREATED</span>  tests/test_production_config.py         <span class="dim">(45 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/production_config_examples.json <span class="dim">(4 examples)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 646/646 tests pass across all primitives
+  </div>
+
+  <div class="section-label">Enums</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9881;</div>
+        <div>
+          <div class="card-title">DeploymentEnvironment</div>
+          <div class="card-subtitle">3 values</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        development<br>
+        staging<br>
+        production
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9881;</div>
+        <div>
+          <div class="card-title">SecretSource</div>
+          <div class="card-subtitle">3 values</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        env<br>
+        file<br>
+        vault
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Models</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">SecretReference</div>
+          <div class="card-subtitle">points to a secret without storing its value</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        secret_name     <span class="dim">str (non-empty)</span><br>
+        source          <span class="dim">SecretSource</span><br>
+        reference       <span class="dim">str (env var name | file path | vault path)</span><br>
+        required        <span class="dim">bool = True</span><br>
+        allow_in_env_only <span class="dim">bool = False</span><br>
+        description     <span class="dim">str | None</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9632;</div>
+        <div>
+          <div class="card-title">ProviderConfig</div>
+          <div class="card-subtitle">model provider connection</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        provider_name   <span class="dim">str (non-empty)</span><br>
+        model_name      <span class="dim">str (non-empty)</span><br>
+        api_base        <span class="dim">str | None</span><br>
+        api_key_secret  <span class="dim">SecretReference | None</span><br>
+        timeout_seconds <span class="dim">int &ge; 1 = 60</span><br>
+        max_retries     <span class="dim">int &ge; 0 = 2</span><br>
+        enabled         <span class="dim">bool = True</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">RuntimeBudgetConfig</div>
+          <div class="card-subtitle">per-run resource limits</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        max_steps_per_run       <span class="dim">int &ge; 1 = 12</span><br>
+        max_tool_calls_per_run  <span class="dim">int &ge; 1 = 8</span><br>
+        max_runtime_seconds     <span class="dim">int &ge; 1 = 120</span><br>
+        max_cost_usd_per_run    <span class="dim">float &ge; 0 = 1.0</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9632;</div>
+        <div>
+          <div class="card-title">TracingConfig</div>
+          <div class="card-subtitle">production-safe observability defaults</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        enabled                  <span class="dim">bool = True</span><br>
+        redact_sensitive_fields  <span class="dim">bool = True</span><br>
+        store_prompt_bodies      <span class="dim">bool = False (forced False in prod)</span><br>
+        store_tool_arguments     <span class="dim">bool = False (forced False in prod)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9632;</div>
+        <div>
+          <div class="card-title">SecurityConfig</div>
+          <div class="card-subtitle">egress, redaction, approval</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        allowed_egress_hosts           <span class="dim">List[str] = []</span><br>
+        secrets_redaction_enabled       <span class="dim">bool = True</span><br>
+        enforce_secret_scoping          <span class="dim">bool = True</span><br>
+        require_approval_for_secret_access <span class="dim">bool = True</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">AppConfig</div>
+          <div class="card-subtitle">top-level — environment + provider + budgets</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        environment     <span class="dim">DeploymentEnvironment</span><br>
+        app_name        <span class="dim">str (non-empty)</span><br>
+        provider        <span class="dim">ProviderConfig</span><br>
+        runtime_budget  <span class="dim">RuntimeBudgetConfig</span><br>
+        tracing         <span class="dim">TracingConfig</span><br>
+        security        <span class="dim">SecurityConfig</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9632;</div>
+        <div>
+          <div class="card-title">ResolvedSecret</div>
+          <div class="card-subtitle">metadata-only, no raw value</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        secret_name     <span class="dim">str</span><br>
+        resolved_from   <span class="dim">SecretSource</span><br>
+        value_present   <span class="dim">bool</span><br>
+        redacted_preview<span class="dim">str (at least 10 chars or ends with "...")</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">ResolvedRuntimeConfig</div>
+          <div class="card-subtitle">app config + resolved secrets list</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        app_config      <span class="dim">AppConfig</span><br>
+        resolved_secrets <span class="dim">List[ResolvedSecret] = []</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-r">&#9632;</div>
+      <div>
+        <div class="card-title">ConfigValidationResult</div>
+        <div class="card-subtitle">startup validation outcome</div>
+      </div>
+    </div>
+    <div class="diagram" style="border:none; padding:0.5rem 0;">
+      valid         <span class="dim">bool</span><br>
+      errors        <span class="dim">List[str] = []</span><br>
+      warnings      <span class="dim">List[str] = []</span>
+    </div>
+  </div>
+
+  <div class="section-label">Production Rules</div>
+
+  <div class="warn-banner">
+    &#9888; Production env &mdash;&gt; provider must have api_key_secret &bull; store_prompt_bodies forced False &bull; store_tool_arguments forced False
+  </div>
+
+  <div class="diagram">
+    <span class="hl">NON-EMPTY</span>  app_name, provider_name, model_name, secret_name, reference<br>
+    <span class="hl">POSITIVE</span>    timeout &ge; 1 &bull; steps &ge; 1 &bull; runtime &ge; 1 &bull; total_tokens &ge; 1<br>
+    <span class="hl">NON-NEG</span>     retries &ge; 0 &bull; cost &ge; 0 &bull; warn_cost_usd &ge; 0<br>
+    <span class="hl">CONSISTENT</span>  total_tokens &ge; max(input, output) &bull; warn_cost_usd &le; max_cost_usd<br>
+    <span class="hl">REDACTED</span>    redacted_preview must differ from raw value &bull; never serialize secrets<br>
+    <span class="dim">PRINCIPLES</span>  never in prompts &bull; never in traces &bull; never in durable state &bull; never in tool results
+  </div>
+
+  <div class="section-label">Test Coverage</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">45 tests</div>
+          <div class="card-subtitle">All passing</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">Validators</div>
+          <div class="card-subtitle">empty, negative, range, consistency</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#10003;</div>
+        <div>
+          <div class="card-title">Serialization</div>
+          <div class="card-subtitle">no secret values in dumps</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Not Implemented Yet</div>
+  <div class="diagram">
+    <span class="dim">&#10007; Real vault client (HashiCorp, AWS Secrets Manager, GCP Secret Manager)</span><br>
+    <span class="dim">&#10007; Automatic secret rotation engine</span><br>
+    <span class="dim">&#10007; KMS / cloud IAM workload identity</span><br>
+    <span class="dim">&#10007; Secret broker sidecar</span><br>
+    <span class="dim">&#10007; Full RBAC secret service</span>
+  </div>
+
+  <div class="section-label">Primitives So Far</div>
+  <div class="diagram">
+    <span class="hl2">P1&nbsp;&nbsp;INSTRUCTION LAYERING</span>        <span class="dim">Global + Project + Task layers</span><br>
+    <span style="color:#34d399;">P2&nbsp;&nbsp;TASK CONTRACT SCHEMA</span>        <span class="dim">Nested Pydantic + 2-layer validation</span><br>
+    <span style="color:#38bdf8;">P3&nbsp;&nbsp;CONTEXT DELIVERY SCHEMA</span>      <span class="dim">Structured bundle + reason-annotated items</span><br>
+    <span style="color:#fbbf24;">P4&nbsp;&nbsp;CONTEXT SELECTION POLICY</span>    <span class="dim">Heuristic pipeline + exclusions + caps</span><br>
+    <span style="color:#f87171;">P5&nbsp;&nbsp;TOOL INTERFACE SCHEMA</span>       <span class="dim">Definition, Invocation, Result</span><br>
+    <span style="color:#a78bfa;">P6&nbsp;&nbsp;EXECUTION ENVIRONMENT</span>      <span class="dim">Provider-agnostic runtime contract</span><br>
+    <span style="color:#fbbf24;">P7&nbsp;&nbsp;DURABLE STATE SCHEMA</span>       <span class="dim">Run-centric execution persistence</span><br>
+    <span style="color:#34d399;">P8&nbsp;&nbsp;VERIFICATION SCHEMA</span>        <span class="dim">Multi-check quality gate contract</span><br>
+    <span style="color:#38bdf8;">P9&nbsp;&nbsp;PROMPT ASSEMBLY SCHEMA</span>     <span class="dim">Layered prompt assembly</span><br>
+    <span class="hl2">P10 RUN ORCHESTRATION STATE MACHINE</span>  <span class="dim">Deterministic control-flow contract</span><br>
+    <span style="color:#fbbf24;">P11 RETRY AND RECOVERY POLICY</span>  <span class="dim">Failure-classified retry contract</span><br>
+    <span style="color:#ef4444;">P12 APPROVAL AND SAFETY POLICY</span>  <span class="dim">Risk-classified governance contract</span><br>
+    <span style="color:#34d399;">P13 EVALUATION AND BENCHMARK SCHEMA</span>  <span class="dim">Task-grader-run benchmark contract</span><br>
+    <span style="color:#a855f7;">P14 OBSERVABILITY AND TRACE SCHEMA</span>  <span class="dim">Step-level execution evidence contract</span><br>
+    <span style="color:#fbbf24;">P15 STATE MACHINE DRIVER</span>       <span class="dim">Trigger, guard, history runtime</span><br>
+    <span style="color:#34d399;">P16 PIPELINE EXECUTOR</span>         <span class="dim">Single-run orchestration pipeline</span><br>
+    <span class="hl" style="color:#fbbf24;">P17 PRODUCTION CONFIG &amp; SECRETS</span> <span class="dim">Typed config + secret references + startup validation + redaction — <span style="color:#fbbf24;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P17 &bull; Production Config &amp; Secrets &bull; 646/646 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

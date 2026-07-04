@@ -1,0 +1,220 @@
+{
+  "audit_event_examples": [
+    {
+      "label": "run_started_event",
+      "value": {
+        "event_id": "ev-run-start-001",
+        "event_type": "run_started",
+        "occurred_at": "2026-07-04T12:00:00Z",
+        "trace_context": {
+          "trace_id": "trace-add-42",
+          "run_id": "run-a1b2c3",
+          "session_id": "sess-001",
+          "environment": "staging"
+        },
+        "actor": {
+          "actor_id": "user-shiva",
+          "actor_type": "user",
+          "role": "developer"
+        },
+        "target_resource": {
+          "resource_id": "run-a1b2c3",
+          "resource_type": "run",
+          "label": "Run for task-add-42"
+        },
+        "action_summary": "Run started for task-add-42 with GPT-4o",
+        "outcome": "success"
+      }
+    },
+    {
+      "label": "tool_executed_with_lineage",
+      "value": {
+        "event_id": "ev-tool-exec-003",
+        "event_type": "tool_executed",
+        "occurred_at": "2026-07-04T12:02:30Z",
+        "trace_context": {
+          "trace_id": "trace-add-42",
+          "run_id": "run-a1b2c3",
+          "session_id": "sess-001",
+          "step_id": "step-2",
+          "parent_event_id": "ev-tool-req-002",
+          "environment": "staging"
+        },
+        "actor": {
+          "actor_id": "agent-codex",
+          "actor_type": "agent",
+          "role": "coding-agent"
+        },
+        "target_resource": {
+          "resource_id": "tool-write-file",
+          "resource_type": "tool",
+          "label": "write_file"
+        },
+        "action_summary": "Executed write_file on solution.py (44 bytes)",
+        "outcome": "success",
+        "decision_lineage": {
+          "lineage_id": "dl-exec-003",
+          "input_refs": [
+            {
+              "resource_id": "prompt-assembly-asm-abc",
+              "resource_type": "data_object",
+              "label": "Assembled prompt with task goal"
+            }
+          ],
+          "evidence_refs": [
+            {
+              "evidence_id": "ev-authz-001",
+              "source_type": "capability_matrix",
+              "source_ref": "authorization-decision-gd-001",
+              "digest": "sha256-authz-check"
+            }
+          ],
+          "policy_refs": [
+            {
+              "resource_id": "policy-write-v1",
+              "resource_type": "policy",
+              "label": "Write file approval policy"
+            }
+          ],
+          "output_refs": [
+            {
+              "resource_id": "output-solution-py",
+              "resource_type": "output",
+              "label": "solution.py written output"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "label": "approval_decision_event",
+      "value": {
+        "event_id": "ev-approval-007",
+        "event_type": "approval_decided",
+        "occurred_at": "2026-07-04T12:05:00Z",
+        "trace_context": {
+          "trace_id": "trace-add-42",
+          "run_id": "run-a1b2c3",
+          "session_id": "sess-001",
+          "step_id": "step-3",
+          "parent_event_id": "ev-approval-req-006",
+          "environment": "staging"
+        },
+        "actor": {
+          "actor_id": "user-shiva",
+          "actor_type": "reviewer",
+          "role": "senior-developer"
+        },
+        "target_resource": {
+          "resource_id": "approval-req-007",
+          "resource_type": "approval",
+          "label": "Approval for write_file on solution.py"
+        },
+        "action_summary": "Approved write_file on solution.py",
+        "outcome": "approved"
+      }
+    },
+    {
+      "label": "quality_gate_decision_event",
+      "value": {
+        "event_id": "ev-gate-012",
+        "event_type": "quality_gate_decided",
+        "occurred_at": "2026-07-04T12:06:00Z",
+        "trace_context": {
+          "trace_id": "trace-add-42",
+          "run_id": "run-a1b2c3",
+          "session_id": "sess-001",
+          "step_id": "step-4",
+          "environment": "staging"
+        },
+        "actor": {
+          "actor_id": "system-harness",
+          "actor_type": "system"
+        },
+        "target_resource": {
+          "resource_id": "eval-output-099",
+          "resource_type": "output",
+          "label": "Evaluation of generated output"
+        },
+        "action_summary": "Quality gate BLOCKED: faithfulness mandatory check failed",
+        "outcome": "blocked",
+        "decision_lineage": {
+          "lineage_id": "dl-gate-012",
+          "input_refs": [
+            {
+              "resource_id": "output-gen-001",
+              "resource_type": "data_object",
+              "label": "Generated solution.py content"
+            }
+          ],
+          "evidence_refs": [
+            {
+              "evidence_id": "ev-faith-001",
+              "source_type": "evaluation",
+              "source_ref": "eval-output-099/faithfulness"
+            }
+          ],
+          "policy_refs": [
+            {
+              "resource_id": "policy-output-v1",
+              "resource_type": "policy",
+              "label": "Output quality gate policy"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "envelope_examples": [
+    {
+      "label": "envelope_with_provenance_links",
+      "value": {
+        "envelope_id": "env-trace-add-42",
+        "event": {
+          "event_id": "ev-tool-exec-003",
+          "event_type": "tool_executed",
+          "occurred_at": "2026-07-04T12:02:30Z",
+          "trace_context": {
+            "trace_id": "trace-add-42",
+            "run_id": "run-a1b2c3",
+            "session_id": "sess-001",
+            "step_id": "step-2",
+            "environment": "staging"
+          },
+          "actor": {
+            "actor_id": "agent-codex",
+            "actor_type": "agent"
+          },
+          "target_resource": {
+            "resource_id": "tool-write-file",
+            "resource_type": "tool",
+            "label": "write_file"
+          },
+          "action_summary": "Executed write_file on solution.py",
+          "outcome": "success"
+        },
+        "provenance_links": [
+          {
+            "link_id": "pl-001",
+            "from_event_id": "ev-run-start-001",
+            "to_event_id": "ev-tool-req-002",
+            "relationship_type": "caused"
+          },
+          {
+            "link_id": "pl-002",
+            "from_event_id": "ev-tool-req-002",
+            "to_event_id": "ev-tool-exec-003",
+            "relationship_type": "preceded"
+          },
+          {
+            "link_id": "pl-003",
+            "from_event_id": "ev-tool-exec-003",
+            "to_event_id": "ev-verification-004",
+            "relationship_type": "produced"
+          }
+        ],
+        "integrity_hash": "sha256-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "examples": [
+    {
+      "name": "Coding benchmark suite",
+      "description": "A suite of 3 coding tasks for measuring harness correctness and latency.",
+      "suite": {
+        "suite_id": "code-bench-v1",
+        "name": "Code Generation Benchmarks v1",
+        "tasks": [
+          {
+            "task_id": "task-add",
+            "name": "Add two numbers",
+            "task_type": "coding",
+            "prompt": "Write a Python function that takes two integers and returns their sum.",
+            "inputs": {"a": 3, "b": 5},
+            "reference": {
+              "reference_id": "ref-add",
+              "description": "Function returns correct sum",
+              "expected_artifacts": ["solution.py"],
+              "reference_notes": "Handle negative numbers"
+            },
+            "tags": ["math", "basic"]
+          },
+          {
+            "task_id": "task-parse-json",
+            "name": "Parse JSON string",
+            "task_type": "coding",
+            "prompt": "Write a Python function that parses a JSON string and returns the 'name' field.",
+            "inputs": {"json_str": "{\"name\": \"Alice\", \"age\": 30}"},
+            "reference": {
+              "reference_id": "ref-parse",
+              "description": "Returns 'Alice' from the JSON",
+              "expected_artifacts": ["solution.py"]
+            },
+            "tags": ["json", "parsing"]
+          },
+          {
+            "task_id": "task-sort-list",
+            "name": "Sort a list",
+            "task_type": "coding",
+            "prompt": "Write a Python function that sorts a list of integers in ascending order.",
+            "inputs": {"items": [3, 1, 4, 1, 5]},
+            "reference": {
+              "reference_id": "ref-sort",
+              "description": "Returns sorted list [1, 1, 3, 4, 5]",
+              "expected_artifacts": ["solution.py"]
+            },
+            "tags": ["sorting", "basic"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Debugging benchmark task with deterministic grader",
+      "description": "A debugging task that asks the agent to fix a null pointer crash. Graded by deterministic output matching.",
+      "task": {
+        "task_id": "task-debug-null",
+        "name": "Fix null pointer crash",
+        "task_type": "debugging",
+        "prompt": "Fix the null pointer dereference in the following code:\n\n```python\ndef get_name(user):\n    return user['name']\n```",
+        "inputs": {"code": "def get_name(user):\n    return user['name']"},
+        "reference": {
+          "reference_id": "ref-debug-null",
+          "description": "Added None/fallback check before accessing key",
+          "expected_artifacts": ["fixed.py"],
+          "reference_notes": "Use .get() or check for None"
+        },
+        "tags": ["null-safety", "debugging"]
+      },
+      "graders": [
+        {
+          "grader_id": "grd-deterministic",
+          "name": "Output matches expected fix",
+          "grader_type": "deterministic",
+          "rubric": "Solution must handle None input without raising TypeError",
+          "pass_condition": "output == expected_fixed_output"
+        }
+      ]
+    },
+    {
+      "name": "Benchmark run comparing harness version and model",
+      "description": "A run that records what harness version and model were used, plus metrics across graders.",
+      "run": {
+        "run_id": "run-bench-v1-001",
+        "suite_id": "code-bench-v1",
+        "task_id": "task-add",
+        "harness_version": "1.2.0",
+        "model_name": "gpt-4",
+        "graders": [
+          {
+            "grader_id": "grd-output",
+            "name": "Correct output check",
+            "grader_type": "deterministic",
+            "pass_condition": "result == 8"
+          },
+          {
+            "grader_id": "grd-lint",
+            "name": "No lint errors",
+            "grader_type": "deterministic",
+            "pass_condition": "lint_exit_code == 0"
+          }
+        ],
+        "metrics": [
+          {
+            "metric_name": "task_success",
+            "value": 1.0,
+            "unit": "bool",
+            "passed": true
+          },
+          {
+            "metric_name": "verification_pass",
+            "value": 1.0,
+            "unit": "bool",
+            "passed": true
+          },
+          {
+            "metric_name": "latency_seconds",
+            "value": 12.5,
+            "unit": "s",
+            "threshold": 30.0,
+            "passed": true
+          },
+          {
+            "metric_name": "retry_count",
+            "value": 0.0,
+            "unit": "count"
+          },
+          {
+            "metric_name": "cost_usd",
+            "value": 0.042,
+            "unit": "usd"
+          },
+          {
+            "metric_name": "safety_violations",
+            "value": 0.0,
+            "unit": "count"
+          },
+          {
+            "metric_name": "tool_success",
+            "value": 1.0,
+            "unit": "bool",
+            "passed": true
+          }
+        ],
+        "verdict": "pass",
+        "notes": "All graders passed, latency within threshold",
+        "started_at": "2025-04-01T10:00:00Z",
+        "finished_at": "2025-04-01T10:00:12Z"
+      }
+    },
+    {
+      "name": "Benchmark summary with pass rate, latency, and safety stats",
+      "description": "Aggregate summary across 50 runs of the coding benchmark suite.",
+      "summary": {
+        "suite_id": "code-bench-v1",
+        "total_runs": 50,
+        "pass_rate": 0.86,
+        "average_latency_seconds": 14.2,
+        "average_cost_usd": 0.038,
+        "total_safety_violations": 2
+      }
+    }
+  ]
+}
