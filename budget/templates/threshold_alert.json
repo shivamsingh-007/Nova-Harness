@@ -1,0 +1,13 @@
+{
+  "alert_id": "string (required, non-blank)",
+  "budget_id": "string (required, non-blank)",
+  "budget_line_id": "string (required, non-blank)",
+  "limit_severity": "soft | hard",
+  "trigger_value": "float >= 0",
+  "remaining_amount": "float (can be negative in overrun)",
+  "recommended_action": "string (required, non-blank)",
+  "notification_targets": ["string ..."],
+  "triggered_at": "ISO 8601 timestamp",
+  "acknowledged_by": "string | null",
+  "acknowledged_at": "ISO 8601 timestamp | null"
+}

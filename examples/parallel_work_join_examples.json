@@ -1,0 +1,440 @@
+{
+  "description": "P54 Parallel Work & Join Contract examples — fan-out, branch assignments, join policies, merge outcomes, and conflict handling.",
+  "examples": [
+    {
+      "name": "fan_out_two_specialists_wait_for_all",
+      "description": "Manager fans out login and registration implementation to two coders with wait_for_all join policy.",
+      "envelope": {
+        "envelope_id": "env-par-001",
+        "parallel_request": {
+          "parallel_request_id": "pr-001",
+          "parent_run_id": "run-042",
+          "parent_step_id": "step-04",
+          "parent_graph_node_id": "node-par-001",
+          "parallelization_mode": "fan_out_all",
+          "objective": "Implement login and registration endpoints in parallel",
+          "branching_reason": "Independent scopes, no shared state between login and registration",
+          "requested_branch_count": 2,
+          "join_policy": "wait_for_all",
+          "created_at": "2026-07-05T10:00:00Z"
+        },
+        "branch_assignments": [
+          {
+            "branch_id": "branch-login-001",
+            "parallel_request_id": "pr-001",
+            "assigned_agent_id": "agent-coder-01",
+            "assigned_role_id": "coder",
+            "scope_summary": "Implement login endpoint with JWT token generation",
+            "input_refs": ["specs/auth/login.md"],
+            "expected_output_types": ["implementation", "unit_tests"],
+            "conflict_risk": "low",
+            "status": "completed",
+            "started_at": "2026-07-05T10:01:00Z",
+            "deadline_at": "2026-07-05T12:00:00Z"
+          },
+          {
+            "branch_id": "branch-reg-001",
+            "parallel_request_id": "pr-001",
+            "assigned_agent_id": "agent-coder-02",
+            "assigned_role_id": "coder",
+            "scope_summary": "Implement registration endpoint with email verification stub",
+            "input_refs": ["specs/auth/registration.md"],
+            "expected_output_types": ["implementation", "unit_tests"],
+            "conflict_risk": "low",
+            "status": "completed",
+            "started_at": "2026-07-05T10:01:00Z",
+            "deadline_at": "2026-07-05T12:00:00Z"
+          }
+        ],
+        "branch_outputs": [
+          {
+            "branch_output_id": "bo-login-001",
+            "branch_id": "branch-login-001",
+            "status": "completed",
+            "result_summary": "Login endpoint with JWT implemented, 3 tests passing",
+            "output_refs": ["src/auth/login.py", "tests/test_login.py"],
+            "evidence_refs": ["test_output/login_test_results.xml"],
+            "changed_artifact_refs": ["src/auth/login.py", "tests/test_login.py", "src/auth/jwt.py"],
+            "confidence": 0.95,
+            "submitted_at": "2026-07-05T11:30:00Z"
+          },
+          {
+            "branch_output_id": "bo-reg-001",
+            "branch_id": "branch-reg-001",
+            "status": "completed",
+            "result_summary": "Registration endpoint with email verification stub implemented",
+            "output_refs": ["src/auth/register.py", "tests/test_register.py"],
+            "evidence_refs": ["test_output/register_test_results.xml"],
+            "changed_artifact_refs": ["src/auth/register.py", "tests/test_register.py"],
+            "confidence": 0.9,
+            "submitted_at": "2026-07-05T11:45:00Z"
+          }
+        ],
+        "join_requirements": {
+          "join_requirement_id": "jr-001",
+          "parallel_request_id": "pr-001",
+          "required_branch_ids": ["branch-login-001", "branch-reg-001"],
+          "required_completion_count": 2,
+          "accept_partial_failures": false
+        },
+        "join_execution": {
+          "join_id": "join-001",
+          "parallel_request_id": "pr-001",
+          "join_policy": "wait_for_all",
+          "join_status": "merged",
+          "completed_branch_ids": ["branch-login-001", "branch-reg-001"],
+          "selected_output_refs": ["bo-login-001", "bo-reg-001"],
+          "join_notes": "Both branches completed successfully within deadline",
+          "executed_at": "2026-07-05T11:46:00Z"
+        },
+        "merge_result": {
+          "merge_id": "merge-001",
+          "join_id": "join-001",
+          "merge_outcome": "success",
+          "merged_output_refs": ["bo-login-001", "bo-reg-001"],
+          "final_summary": "Login and registration endpoints implemented and tested",
+          "next_action": "proceed_to_integration_test",
+          "merged_at": "2026-07-05T11:47:00Z"
+        }
+      }
+    },
+    {
+      "name": "verification_parallel_quorum_join",
+      "description": "Two reviewers verify the login module; at least one must approve (quorum).",
+      "envelope": {
+        "envelope_id": "env-par-002",
+        "parallel_request": {
+          "parallel_request_id": "pr-002",
+          "parallelization_mode": "verification_parallel",
+          "objective": "Verify login module implementation before merge",
+          "join_policy": "wait_for_quorum",
+          "created_at": "2026-07-05T14:00:00Z"
+        },
+        "branch_assignments": [
+          {
+            "branch_id": "branch-sec-001",
+            "parallel_request_id": "pr-002",
+            "assigned_agent_id": "agent-sec-reviewer",
+            "assigned_role_id": "security_reviewer",
+            "scope_summary": "Security review of login module",
+            "input_refs": ["src/auth/login.py"],
+            "expected_output_types": ["security_report"],
+            "conflict_risk": "low",
+            "status": "completed"
+          },
+          {
+            "branch_id": "branch-perf-001",
+            "parallel_request_id": "pr-002",
+            "assigned_agent_id": "agent-perf-reviewer",
+            "assigned_role_id": "performance_reviewer",
+            "scope_summary": "Performance review of login module",
+            "input_refs": ["src/auth/login.py"],
+            "expected_output_types": ["performance_report"],
+            "conflict_risk": "low",
+            "status": "completed"
+          }
+        ],
+        "branch_outputs": [
+          {
+            "branch_output_id": "bo-sec-001",
+            "branch_id": "branch-sec-001",
+            "status": "completed",
+            "result_summary": "Security review passed: no vulnerabilities found",
+            "output_refs": ["reports/security_login.md"],
+            "confidence": 0.95
+          },
+          {
+            "branch_output_id": "bo-perf-001",
+            "branch_id": "branch-perf-001",
+            "status": "completed",
+            "result_summary": "Performance review: acceptable latency profile",
+            "output_refs": ["reports/perf_login.md"],
+            "confidence": 0.85
+          }
+        ],
+        "join_requirements": {
+          "join_requirement_id": "jr-002",
+          "parallel_request_id": "pr-002",
+          "required_branch_ids": ["branch-sec-001", "branch-perf-001"],
+          "required_completion_count": 2,
+          "accept_partial_failures": false
+        },
+        "join_execution": {
+          "join_id": "join-002",
+          "parallel_request_id": "pr-002",
+          "join_policy": "wait_for_quorum",
+          "join_status": "merged",
+          "completed_branch_ids": ["branch-sec-001", "branch-perf-001"],
+          "selected_output_refs": ["bo-sec-001", "bo-perf-001"],
+          "executed_at": "2026-07-05T15:00:00Z"
+        },
+        "merge_result": {
+          "merge_id": "merge-002",
+          "join_id": "join-002",
+          "merge_outcome": "success",
+          "merged_output_refs": ["bo-sec-001", "bo-perf-001"],
+          "final_summary": "Both reviews passed, login module ready for merge",
+          "next_action": "merge_to_main",
+          "merged_at": "2026-07-05T15:01:00Z"
+        }
+      }
+    },
+    {
+      "name": "first_success_speculative_branch",
+      "description": "Three agents attempt the same optimization independently; join proceeds on first success.",
+      "envelope": {
+        "envelope_id": "env-par-003",
+        "parallel_request": {
+          "parallel_request_id": "pr-003",
+          "parallelization_mode": "speculative_parallel",
+          "objective": "Optimize database query for user dashboard",
+          "join_policy": "wait_for_first_success",
+          "created_at": "2026-07-05T16:00:00Z"
+        },
+        "branch_assignments": [
+          {
+            "branch_id": "branch-opt-a",
+            "parallel_request_id": "pr-003",
+            "assigned_agent_id": "agent-coder-01",
+            "scope_summary": "Optimize query using index hints",
+            "conflict_risk": "medium",
+            "status": "completed"
+          },
+          {
+            "branch_id": "branch-opt-b",
+            "parallel_request_id": "pr-003",
+            "assigned_agent_id": "agent-coder-02",
+            "scope_summary": "Optimize query using materialized view",
+            "conflict_risk": "medium",
+            "status": "running"
+          },
+          {
+            "branch_id": "branch-opt-c",
+            "parallel_request_id": "pr-003",
+            "assigned_agent_id": "agent-coder-03",
+            "scope_summary": "Optimize query using caching layer",
+            "conflict_risk": "medium",
+            "status": "running"
+          }
+        ],
+        "branch_outputs": [
+          {
+            "branch_output_id": "bo-opt-a",
+            "branch_id": "branch-opt-a",
+            "status": "completed",
+            "result_summary": "Index hint optimization: 40% query time reduction",
+            "output_refs": ["optimizations/idx_hints.sql"],
+            "confidence": 0.8
+          }
+        ],
+        "join_requirements": {
+          "join_requirement_id": "jr-003",
+          "parallel_request_id": "pr-003",
+          "required_branch_ids": ["branch-opt-a", "branch-opt-b", "branch-opt-c"],
+          "optional_branch_ids": [],
+          "required_completion_count": 1,
+          "accept_partial_failures": true
+        },
+        "join_execution": {
+          "join_id": "join-003",
+          "parallel_request_id": "pr-003",
+          "join_policy": "wait_for_first_success",
+          "join_status": "merged",
+          "completed_branch_ids": ["branch-opt-a"],
+          "late_branch_ids": ["branch-opt-b", "branch-opt-c"],
+          "selected_output_refs": ["bo-opt-a"],
+          "join_notes": "First success found (index hints), other branches cancelled",
+          "executed_at": "2026-07-05T16:30:00Z"
+        },
+        "merge_result": {
+          "merge_id": "merge-003",
+          "join_id": "join-003",
+          "merge_outcome": "success",
+          "merged_output_refs": ["bo-opt-a"],
+          "final_summary": "Index hint optimization selected, query time reduced by 40%",
+          "next_action": "apply_to_production",
+          "merged_at": "2026-07-05T16:31:00Z"
+        }
+      }
+    },
+    {
+      "name": "merge_conflict_between_two_branches",
+      "description": "Two refactoring branches edited the same file differently, producing a merge conflict.",
+      "envelope": {
+        "envelope_id": "env-par-004",
+        "parallel_request": {
+          "parallel_request_id": "pr-004",
+          "parallelization_mode": "fan_out_selected",
+          "objective": "Refactor auth module handlers",
+          "join_policy": "wait_for_all",
+          "created_at": "2026-07-05T09:00:00Z"
+        },
+        "branch_assignments": [
+          {
+            "branch_id": "branch-ref-handler-a",
+            "parallel_request_id": "pr-004",
+            "assigned_agent_id": "agent-coder-01",
+            "scope_summary": "Refactor login handler to new pattern",
+            "conflict_risk": "high",
+            "status": "completed"
+          },
+          {
+            "branch_id": "branch-ref-handler-b",
+            "parallel_request_id": "pr-004",
+            "assigned_agent_id": "agent-coder-02",
+            "scope_summary": "Refactor registration handler to new pattern",
+            "conflict_risk": "high",
+            "status": "completed"
+          }
+        ],
+        "branch_outputs": [
+          {
+            "branch_output_id": "bo-ref-a",
+            "branch_id": "branch-ref-handler-a",
+            "status": "completed",
+            "result_summary": "Login handler refactored",
+            "changed_artifact_refs": ["src/auth/handlers.py"],
+            "confidence": 0.9
+          },
+          {
+            "branch_output_id": "bo-ref-b",
+            "branch_id": "branch-ref-handler-b",
+            "status": "completed",
+            "result_summary": "Registration handler refactored",
+            "changed_artifact_refs": ["src/auth/handlers.py"],
+            "confidence": 0.85
+          }
+        ],
+        "conflicts": [
+          {
+            "conflict_id": "conf-001",
+            "branch_ids": ["branch-ref-handler-a", "branch-ref-handler-b"],
+            "conflict_type": "merge",
+            "conflict_summary": "Both branches modified different sections of src/auth/handlers.py - login handler refactored differently than registration handler",
+            "artifact_refs": ["src/auth/handlers.py"],
+            "proposed_resolution": "Keep both changes with manual merge of middleware registration order",
+            "requires_review": true
+          }
+        ],
+        "join_requirements": {
+          "join_requirement_id": "jr-004",
+          "parallel_request_id": "pr-004",
+          "required_branch_ids": ["branch-ref-handler-a", "branch-ref-handler-b"],
+          "required_completion_count": 2,
+          "accept_partial_failures": false
+        },
+        "join_execution": {
+          "join_id": "join-004",
+          "parallel_request_id": "pr-004",
+          "join_policy": "wait_for_all",
+          "join_status": "merged",
+          "completed_branch_ids": ["branch-ref-handler-a", "branch-ref-handler-b"],
+          "selected_output_refs": ["bo-ref-a", "bo-ref-b"],
+          "executed_at": "2026-07-05T11:00:00Z"
+        },
+        "merge_result": {
+          "merge_id": "merge-004",
+          "join_id": "join-004",
+          "merge_outcome": "conflict",
+          "merged_output_refs": ["bo-ref-a"],
+          "rejected_output_refs": ["bo-ref-b"],
+          "conflict_refs": ["conf-001"],
+          "review_required": true,
+          "final_summary": "Merge conflict in handlers.py; login refactor merged, registration needs manual resolution",
+          "next_action": "review_conflict_and_resolve_manually",
+          "merged_at": "2026-07-05T11:01:00Z"
+        }
+      }
+    },
+    {
+      "name": "blocked_branch_partial_join_requires_review",
+      "description": "Payment integration fans out to three providers; one is blocked, causing partial join with review.",
+      "envelope": {
+        "envelope_id": "env-par-005",
+        "parallel_request": {
+          "parallel_request_id": "pr-005",
+          "parent_run_id": "run-050",
+          "parallelization_mode": "fan_out_all",
+          "objective": "Implement payment provider integrations",
+          "branching_reason": "Each provider has independent API and scope",
+          "join_policy": "wait_for_all",
+          "created_at": "2026-07-05T08:00:00Z"
+        },
+        "branch_assignments": [
+          {
+            "branch_id": "branch-str-001",
+            "parallel_request_id": "pr-005",
+            "assigned_agent_id": "agent-coder-01",
+            "scope_summary": "Stripe payment integration",
+            "conflict_risk": "low",
+            "status": "completed"
+          },
+          {
+            "branch_id": "branch-pp-001",
+            "parallel_request_id": "pr-005",
+            "assigned_agent_id": "agent-coder-02",
+            "scope_summary": "PayPal payment integration",
+            "conflict_risk": "low",
+            "status": "completed"
+          },
+          {
+            "branch_id": "branch-rct-001",
+            "parallel_request_id": "pr-005",
+            "assigned_agent_id": "agent-coder-03",
+            "scope_summary": "Receipt generation service",
+            "conflict_risk": "low",
+            "status": "blocked"
+          }
+        ],
+        "branch_outputs": [
+          {
+            "branch_output_id": "bo-str-001",
+            "branch_id": "branch-str-001",
+            "status": "completed",
+            "result_summary": "Stripe integration complete with test mode",
+            "changed_artifact_refs": ["src/payments/stripe.py"],
+            "confidence": 0.95
+          },
+          {
+            "branch_output_id": "bo-pp-001",
+            "branch_id": "branch-pp-001",
+            "status": "completed",
+            "result_summary": "PayPal integration complete with sandbox",
+            "changed_artifact_refs": ["src/payments/paypal.py"],
+            "confidence": 0.9
+          }
+        ],
+        "conflicts": [],
+        "join_requirements": {
+          "join_requirement_id": "jr-005",
+          "parallel_request_id": "pr-005",
+          "required_branch_ids": ["branch-str-001", "branch-pp-001", "branch-rct-001"],
+          "required_completion_count": 3,
+          "accept_partial_failures": true,
+          "deadline_policy": "wait_for_blocked_max_1h"
+        },
+        "join_execution": {
+          "join_id": "join-005",
+          "parallel_request_id": "pr-005",
+          "join_policy": "wait_for_all",
+          "join_status": "partial_merge",
+          "completed_branch_ids": ["branch-str-001", "branch-pp-001"],
+          "failed_branch_ids": ["branch-rct-001"],
+          "join_notes": "Branch-rct-001 blocked on Stripe sandbox key provisioning; deadline exceeded",
+          "executed_at": "2026-07-05T14:00:00Z"
+        },
+        "merge_result": {
+          "merge_id": "merge-005",
+          "join_id": "join-005",
+          "merge_outcome": "needs_review",
+          "merged_output_refs": ["bo-str-001", "bo-pp-001"],
+          "rejected_output_refs": [],
+          "review_required": true,
+          "final_summary": "Stripe and PayPal done; receipt blocked on external dependency",
+          "next_action": "review_blocked_branch_and_decide_if_merge_without_receipt",
+          "merged_at": "2026-07-05T14:01:00Z"
+        }
+      }
+    }
+  ]
+}

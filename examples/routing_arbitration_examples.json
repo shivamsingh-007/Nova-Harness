@@ -1,0 +1,463 @@
+[
+  {
+    "id": "ex-01-direct-execution-rule-based",
+    "description": "Direct execution route selected by rule-based routing",
+    "envelope": {
+      "envelope_id": "env-rt-ex-001",
+      "routing_input": {
+        "routing_id": "rt-ex-001",
+        "run_id": "run-0050",
+        "step_id": "step-021",
+        "task_id": "task-login-endpoint",
+        "feature_id": "feature-auth",
+        "request_summary": "Implement login endpoint with JWT",
+        "task_type": "coding",
+        "risk_level": "low",
+        "requires_verification": true,
+        "requires_tooling": false,
+        "requires_specialization": false,
+        "budget_hint": "low",
+        "latency_hint": "fast",
+        "input_refs": ["specs/auth.md", "src/routes/auth.py"]
+      },
+      "candidates": [
+        {
+          "candidate_id": "c-ex-001",
+          "target_type": "direct_executor",
+          "target_id": "agent-main-001",
+          "target_role": "primary_coder",
+          "capability_tags": ["python", "fastapi", "jwt"],
+          "estimated_cost": 0.5,
+          "estimated_latency": 30.0,
+          "risk_fit": "high",
+          "supports_verification": true,
+          "requires_approval": false,
+          "availability_status": "available",
+          "notes": "Main coding agent with auth experience"
+        }
+      ],
+      "scores": [
+        {
+          "score_id": "sc-ex-001",
+          "candidate_id": "c-ex-001",
+          "strategy": "rule_based",
+          "capability_score": 1.0,
+          "policy_score": 1.0,
+          "cost_score": 1.0,
+          "latency_score": 1.0,
+          "risk_score": 1.0,
+          "overall_score": 1.0,
+          "threshold_passed": true,
+          "reason_summary": "Single candidate, rule match for coding tasks"
+        }
+      ],
+      "constraints": {
+        "constraint_id": "cst-ex-001",
+        "allowed_target_types": ["direct_executor"],
+        "max_cost": 1.0,
+        "must_verify": true,
+        "must_avoid_network": false,
+        "fallback_required": false,
+        "manual_override_allowed": true
+      },
+      "decision": {
+        "decision_id": "dec-ex-001",
+        "routing_id": "rt-ex-001",
+        "selected_candidate_id": "c-ex-001",
+        "selected_target_type": "direct_executor",
+        "selected_target_id": "agent-main-001",
+        "strategy_used": "rule_based",
+        "decision_status": "dispatched",
+        "decision_reason": "Rule match: coding task with auth requirement, primary agent available",
+        "confidence": 0.95,
+        "dispatched_at": "2026-07-05T09:00:00Z",
+        "expected_next_contract": "direct_execution"
+      }
+    }
+  },
+  {
+    "id": "ex-02-specialist-route-after-score-comparison",
+    "description": "Specialist agent route selected after score comparison with arbitration",
+    "envelope": {
+      "envelope_id": "env-rt-ex-002",
+      "routing_input": {
+        "routing_id": "rt-ex-002",
+        "run_id": "run-0051",
+        "step_id": "step-022",
+        "task_id": "task-query-optimization",
+        "feature_id": "feature-performance",
+        "request_summary": "Optimize PostgreSQL queries for reporting endpoint",
+        "task_type": "database",
+        "risk_level": "medium",
+        "requires_verification": true,
+        "requires_specialization": true,
+        "input_refs": ["src/db/queries/reporting.sql", "perf/benchmark.json"]
+      },
+      "candidates": [
+        {
+          "candidate_id": "c-ex-002a",
+          "target_type": "direct_executor",
+          "target_id": "agent-main-001",
+          "target_role": "primary_coder",
+          "capability_tags": ["python", "general"],
+          "estimated_cost": 0.3,
+          "estimated_latency": 60.0,
+          "risk_fit": "low",
+          "supports_verification": false,
+          "availability_status": "available"
+        },
+        {
+          "candidate_id": "c-ex-002b",
+          "target_type": "specialist_agent",
+          "target_id": "agent-db-specialist-001",
+          "target_role": "db_specialist",
+          "capability_tags": ["postgresql", "query_optimization", "indexing"],
+          "estimated_cost": 0.8,
+          "estimated_latency": 120.0,
+          "risk_fit": "high",
+          "supports_verification": true,
+          "availability_status": "available"
+        }
+      ],
+      "scores": [
+        {
+          "score_id": "sc-ex-002a",
+          "candidate_id": "c-ex-002a",
+          "strategy": "rule_based",
+          "capability_score": 0.3,
+          "policy_score": 0.6,
+          "cost_score": 1.0,
+          "latency_score": 0.8,
+          "risk_score": 0.3,
+          "overall_score": 0.5,
+          "threshold_passed": true,
+          "reason_summary": "Generalist available but lacks DB expertise"
+        },
+        {
+          "score_id": "sc-ex-002b",
+          "candidate_id": "c-ex-002b",
+          "strategy": "rule_based",
+          "capability_score": 1.0,
+          "policy_score": 1.0,
+          "cost_score": 0.5,
+          "latency_score": 0.4,
+          "risk_score": 1.0,
+          "overall_score": 0.9,
+          "threshold_passed": true,
+          "reason_summary": "DB specialist: highest capability and risk fit"
+        }
+      ],
+      "constraints": {
+        "constraint_id": "cst-ex-002",
+        "allowed_target_types": ["direct_executor", "specialist_agent"],
+        "must_use_specialist": true,
+        "must_verify": true,
+        "fallback_required": true
+      },
+      "arbitration": {
+        "arbitration_id": "arb-ex-002",
+        "routing_id": "rt-ex-002",
+        "policy": "highest_score",
+        "competing_candidate_ids": ["c-ex-002a", "c-ex-002b"],
+        "tie_break_reason": "Both candidates available; specialist selected by highest overall score (0.9 vs 0.5) and constraint must_use_specialist",
+        "selected_candidate_id": "c-ex-002b",
+        "review_required": false
+      },
+      "decision": {
+        "decision_id": "dec-ex-002",
+        "routing_id": "rt-ex-002",
+        "selected_candidate_id": "c-ex-002b",
+        "selected_target_type": "specialist_agent",
+        "selected_target_id": "agent-db-specialist-001",
+        "strategy_used": "hybrid",
+        "decision_status": "dispatched",
+        "decision_reason": "Specialist selected: highest capability score and policy mandates specialist for DB tasks",
+        "confidence": 0.9,
+        "dispatched_at": "2026-07-05T09:30:00Z",
+        "expected_next_contract": "delegation"
+      }
+    }
+  },
+  {
+    "id": "ex-03-verifier-first-high-risk",
+    "description": "Verifier-first route for high-risk task",
+    "envelope": {
+      "envelope_id": "env-rt-ex-003",
+      "routing_input": {
+        "routing_id": "rt-ex-003",
+        "run_id": "run-0052",
+        "step_id": "step-023",
+        "task_id": "task-security-audit",
+        "feature_id": "feature-security",
+        "request_summary": "Audit deployment pipeline for credential exposure",
+        "task_type": "security_audit",
+        "risk_level": "high",
+        "requires_verification": true,
+        "requires_specialization": true,
+        "input_refs": [".github/workflows/deploy.yml", "deploy/terraform/"]
+      },
+      "candidates": [
+        {
+          "candidate_id": "c-ex-003a",
+          "target_type": "direct_executor",
+          "target_id": "agent-main-001",
+          "target_role": "primary",
+          "capability_tags": ["general", "ci"],
+          "risk_fit": "low",
+          "supports_verification": false,
+          "availability_status": "available"
+        },
+        {
+          "candidate_id": "c-ex-003b",
+          "target_type": "verifier_agent",
+          "target_id": "agent-security-verifier-001",
+          "target_role": "security_verifier",
+          "capability_tags": ["security_audit", "secret_scanning", "static_analysis"],
+          "risk_fit": "high",
+          "supports_verification": true,
+          "availability_status": "available"
+        }
+      ],
+      "scores": [
+        {
+          "score_id": "sc-ex-003a",
+          "candidate_id": "c-ex-003a",
+          "capability_score": 0.4,
+          "risk_score": 0.2,
+          "overall_score": 0.3,
+          "threshold_passed": false,
+          "reason_summary": "Generalist: low risk fit for security audit"
+        },
+        {
+          "score_id": "sc-ex-003b",
+          "candidate_id": "c-ex-003b",
+          "capability_score": 1.0,
+          "risk_score": 1.0,
+          "overall_score": 0.95,
+          "threshold_passed": true,
+          "reason_summary": "Security verifier: perfect risk and capability match"
+        }
+      ],
+      "constraints": {
+        "constraint_id": "cst-ex-003",
+        "allowed_target_types": ["direct_executor", "verifier_agent", "human_approval_gate"],
+        "must_verify": true,
+        "must_require_approval_for_sensitive": true,
+        "fallback_required": true
+      },
+      "decision": {
+        "decision_id": "dec-ex-003",
+        "routing_id": "rt-ex-003",
+        "selected_candidate_id": "c-ex-003b",
+        "selected_target_type": "verifier_agent",
+        "selected_target_id": "agent-security-verifier-001",
+        "strategy_used": "rule_based",
+        "decision_status": "dispatched",
+        "decision_reason": "High-risk security audit: verifier-first policy. Generalist disqualified by risk fit.",
+        "confidence": 0.95,
+        "dispatched_at": "2026-07-05T10:00:00Z",
+        "expected_next_contract": "delegation"
+      }
+    }
+  },
+  {
+    "id": "ex-04-blocked-route-policy-constraints",
+    "description": "Blocked route due to policy constraints",
+    "envelope": {
+      "envelope_id": "env-rt-ex-004",
+      "routing_input": {
+        "routing_id": "rt-ex-004",
+        "run_id": "run-0053",
+        "step_id": "step-024",
+        "task_id": "task-delete-production",
+        "request_summary": "Delete production database records for stale users",
+        "task_type": "admin",
+        "risk_level": "high",
+        "requires_verification": true,
+        "requires_tooling": true,
+        "input_refs": ["ops/cleanup.sql"]
+      },
+      "candidates": [
+        {
+          "candidate_id": "c-ex-004a",
+          "target_type": "direct_executor",
+          "target_id": "agent-main-001",
+          "capability_tags": ["admin", "database"],
+          "risk_fit": "low",
+          "supports_verification": false,
+          "availability_status": "available"
+        },
+        {
+          "candidate_id": "c-ex-004b",
+          "target_type": "human_approval_gate",
+          "target_id": "human-approval-ops",
+          "target_role": "ops_approver",
+          "risk_fit": "high",
+          "supports_verification": true,
+          "requires_approval": true,
+          "availability_status": "available"
+        }
+      ],
+      "scores": [
+        {
+          "score_id": "sc-ex-004a",
+          "candidate_id": "c-ex-004a",
+          "capability_score": 0.8,
+          "risk_score": 0.2,
+          "overall_score": 0.4,
+          "threshold_passed": false,
+          "reason_summary": "Agent has capability but risk score too low for production delete"
+        },
+        {
+          "score_id": "sc-ex-004b",
+          "candidate_id": "c-ex-004b",
+          "capability_score": 1.0,
+          "risk_score": 1.0,
+          "overall_score": 0.9,
+          "threshold_passed": true,
+          "reason_summary": "Human approval gate: required for sensitive production operation"
+        }
+      ],
+      "constraints": {
+        "constraint_id": "cst-ex-004",
+        "allowed_target_types": ["direct_executor", "human_approval_gate"],
+        "must_require_approval_for_sensitive": true,
+        "must_verify": true,
+        "fallback_required": true
+      },
+      "arbitration": {
+        "arbitration_id": "arb-ex-004",
+        "routing_id": "rt-ex-004",
+        "policy": "safest_route",
+        "competing_candidate_ids": ["c-ex-004a", "c-ex-004b"],
+        "tie_break_reason": "safest_route policy: direct executor disqualified by risk fit. Only human_approval_gate meets safety threshold.",
+        "selected_candidate_id": "c-ex-004b",
+        "review_required": false
+      },
+      "decision": {
+        "decision_id": "dec-ex-004",
+        "routing_id": "rt-ex-004",
+        "selected_candidate_id": "c-ex-004b",
+        "selected_target_type": "human_approval_gate",
+        "selected_target_id": "human-approval-ops",
+        "strategy_used": "hybrid",
+        "decision_status": "blocked",
+        "decision_reason": "Blocked: production data deletion requires human approval. Rerouted to human_approval_gate.",
+        "confidence": 0.5,
+        "expected_next_contract": "approval_request"
+      }
+    }
+  },
+  {
+    "id": "ex-05-fallback-route-after-primary-rejection",
+    "description": "Fallback route used after primary route rejection",
+    "envelope": {
+      "envelope_id": "env-rt-ex-005",
+      "routing_input": {
+        "routing_id": "rt-ex-005",
+        "run_id": "run-0054",
+        "step_id": "step-025",
+        "task_id": "task-weekly-report",
+        "request_summary": "Generate weekly usage report for stakeholders",
+        "task_type": "reporting",
+        "risk_level": "low",
+        "requires_verification": false,
+        "input_refs": ["queries/weekly.sql", "templates/report.md"]
+      },
+      "candidates": [
+        {
+          "candidate_id": "c-ex-005a",
+          "target_type": "direct_executor",
+          "target_id": "agent-main-001",
+          "target_role": "primary",
+          "capability_tags": ["reporting", "python"],
+          "estimated_cost": 0.2,
+          "risk_fit": "high",
+          "supports_verification": false,
+          "availability_status": "busy"
+        },
+        {
+          "candidate_id": "c-ex-005b",
+          "target_type": "specialist_agent",
+          "target_id": "agent-reporting-001",
+          "target_role": "reporting_specialist",
+          "capability_tags": ["reporting", "charts", "sql"],
+          "estimated_cost": 0.3,
+          "risk_fit": "high",
+          "supports_verification": false,
+          "availability_status": "available"
+        },
+        {
+          "candidate_id": "c-ex-005c",
+          "target_type": "fallback_path",
+          "target_id": "agent-fallback-001",
+          "target_role": "fallback",
+          "capability_tags": ["general", "reporting"],
+          "risk_fit": "medium",
+          "supports_verification": false,
+          "availability_status": "available"
+        }
+      ],
+      "scores": [
+        {
+          "score_id": "sc-ex-005a",
+          "candidate_id": "c-ex-005a",
+          "overall_score": 0.95,
+          "threshold_passed": true,
+          "reason_summary": "Best match but currently busy"
+        },
+        {
+          "score_id": "sc-ex-005b",
+          "candidate_id": "c-ex-005b",
+          "overall_score": 0.9,
+          "threshold_passed": true,
+          "reason_summary": "Reporting specialist available, good match"
+        },
+        {
+          "score_id": "sc-ex-005c",
+          "candidate_id": "c-ex-005c",
+          "overall_score": 0.6,
+          "threshold_passed": true,
+          "reason_summary": "Fallback available"
+        }
+      ],
+      "constraints": {
+        "constraint_id": "cst-ex-005",
+        "allowed_target_types": ["direct_executor", "specialist_agent", "fallback_path"],
+        "fallback_required": true,
+        "manual_override_allowed": true
+      },
+      "arbitration": {
+        "arbitration_id": "arb-ex-005",
+        "routing_id": "rt-ex-005",
+        "policy": "highest_score",
+        "competing_candidate_ids": ["c-ex-005a", "c-ex-005b", "c-ex-005c"],
+        "tie_break_reason": "Primary (0.95) busy. Specialist (0.9) selected over fallback (0.6) by highest score.",
+        "selected_candidate_id": "c-ex-005b",
+        "review_required": false
+      },
+      "decision": {
+        "decision_id": "dec-ex-005",
+        "routing_id": "rt-ex-005",
+        "selected_candidate_id": "c-ex-005b",
+        "selected_target_type": "specialist_agent",
+        "selected_target_id": "agent-reporting-001",
+        "strategy_used": "hybrid",
+        "decision_status": "dispatched",
+        "decision_reason": "Primary busy. Fallback policy: specialist selected. Fallback agent queued if specialist unavailable.",
+        "confidence": 0.85,
+        "dispatched_at": "2026-07-05T11:00:00Z",
+        "expected_next_contract": "delegation"
+      },
+      "fallback": {
+        "fallback_id": "fb-ex-005",
+        "routing_id": "rt-ex-005",
+        "trigger_reason": "Primary candidate agent-main-001 is busy; secondary specialist selected as active route",
+        "fallback_candidate_id": "c-ex-005c",
+        "fallback_target_type": "fallback_path",
+        "fallback_notes": "If specialist unavailable or fails, route to fallback agent agent-fallback-001",
+        "manual_intervention_required": false
+      }
+    }
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "failure_id": "string (required, non-blank)",
+  "scope_ref": "string (required, non-blank)",
+  "scope_type": "string | null (optional)",
+  "failure_category": "transient_error | timeout | dependency_failure | validation_failure | policy_block | partial_side_effect | unknown_state | terminal_error",
+  "error_code": "string | null",
+  "failure_summary": "string (required, non-blank)",
+  "retryable": "boolean (default: false)",
+  "side_effects_present": "boolean (default: false)",
+  "unknown_state": "boolean (default: false)",
+  "evidence_refs": ["string ..."],
+  "occurred_at": "ISO 8601 timestamp"
+}

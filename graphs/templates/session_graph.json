@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "graph_id": "",
+    "session_id": "",
+    "root_run_id": null,
+    "supervisor_agent_id": null,
+    "graph_status": "draft",
+    "entry_node_id": "",
+    "terminal_node_ids": [],
+    "version": "1.0.0"
+  },
+  "nodes": [],
+  "edges": [],
+  "branches": [],
+  "joins": [],
+  "checkpoints": []
+}

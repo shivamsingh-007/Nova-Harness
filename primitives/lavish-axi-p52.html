@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P52: Multi-Agent Session Graph Contract</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(20, 184, 166, 0.12);
+  border: 1px solid rgba(20, 184, 166, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #14b8a6; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #14b8a6 50%, #0d9488 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p {
+  font-size: 1.05rem; color: #9494a8; max-width: 640px;
+}
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-r { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+.icon-b { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.icon-p { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+.icon-g { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-y { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.icon-s { background: rgba(148, 148, 168, 0.15); color: #9494a8; }
+.icon-i { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.icon-k { background: rgba(236, 72, 153, 0.15); color: #ec4899; }
+.icon-t { background: rgba(20, 184, 166, 0.15); color: #14b8a6; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #14b8a6; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 52</div>
+    <h1>Multi-Agent Session Graph Contract</h1>
+    <p>
+      Typed topology of a multi-agent session — nodes, edges, branches, joins,
+      and checkpoints for graph-based orchestration and recovery.
+    </p>
+  </div>
+
+  <div class="section-label">Files</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/multi_agent_session_graph_contract.py    <span class="dim">(5 enums + 8 models)</span><br>
+    <span class="hl">CREATED</span>  tests/test_multi_agent_session_graph_contract.py <span class="dim">(61 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/multi_agent_session_graph_examples.json  <span class="dim">(5 examples)</span><br>
+    <span class="hl">CREATED</span>  graphs/SESSION_GRAPH.md                           <span class="dim">(protocol)</span><br>
+    <span class="hl">CREATED</span>  graphs/templates/session_graph.json               <span class="dim">(graph template)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 2616/2616 tests pass &mdash; P52: 61 new, 100% coverage
+  </div>
+
+  <div class="section-label">Enums</div>
+
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-t">&#9881;</div>
+        <div>
+          <div class="card-title">SessionNodeType</div>
+          <div class="card-subtitle">11 types</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        parent_run &bull; child_run<br>agent_role &bull; step<br>handoff &bull; delegation<br>routing_decision<br>approval_gate<br>verification_step<br>join_node &bull; terminal_node
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-b">&#9881;</div>
+        <div>
+          <div class="card-title">SessionEdgeType</div>
+          <div class="card-subtitle">8 types</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        control_flow &bull; delegates_to<br>returns_to &bull; handoff_to<br>depends_on &bull; conditional_branch<br>joins_into &bull; blocked_by
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-y">&#9881;</div>
+        <div>
+          <div class="card-title">NodeStatus / EdgeStatus</div>
+          <div class="card-subtitle">8 + 5</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        <span class="dim">NODE:</span> pending &bull; ready &bull; running<br>waiting &bull; blocked &bull; completed<br>failed &bull; cancelled<br>
+        <span class="dim">EDGE:</span> inactive &bull; active<br>traversed &bull; blocked &bull; cancelled
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-r">&#9881;</div>
+        <div>
+          <div class="card-title">GraphStatus</div>
+          <div class="card-subtitle">7 states</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        draft &bull; active &bull; paused<br>recovering &bull; completed<br>failed &bull; cancelled
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Models — Graph Elements</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-t">&#9632;</div>
+        <div>
+          <div class="card-title">SessionGraphNode</div>
+          <div class="card-subtitle">graph vertex</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        node_id &bull; node_type &bull; label?<br>run_id? &bull; agent_id? &bull; role_id?<br>step_id? &bull; handoff_id? &bull; delegation_id?<br>status &bull; parent_node_id?<br>input_refs[] &bull; output_refs[]
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">SessionGraphEdge</div>
+          <div class="card-subtitle">control &amp; data flow</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        edge_id &bull; edge_type<br>from_node_id &bull; to_node_id<br>status &bull; condition_ref?<br>trigger_reason? &bull; traversed_at?
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9632;</div>
+        <div>
+          <div class="card-title">BranchStateRecord</div>
+          <div class="card-subtitle">subgraph branch</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        branch_id &bull; entry_node_id<br>branch_node_ids[] &bull; branch_reason?<br>expected_completion_policy?<br>active_node_ids[] &bull; completed_node_ids[]<br>failed_node_ids[] &bull; branch_status
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">JoinStateRecord</div>
+          <div class="card-subtitle">fan-in merge</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        join_id &bull; join_node_id<br>incoming_node_ids[]<br>required_completion_count<br>completed_incoming_ids[]<br>join_policy? &bull; join_status<br>merge_notes?
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Models — Graph Container</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-i">&#9632;</div>
+        <div>
+          <div class="card-title">GraphCheckpointRecord</div>
+          <div class="card-subtitle">recovery snapshot</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        checkpoint_id &bull; graph_id<br>graph_status &bull; active_node_ids[]<br>waiting_node_ids[]<br>blocked_node_ids[]<br>last_traversed_edge_ids[]<br>snapshot_ref? &bull; created_at
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9632;</div>
+        <div>
+          <div class="card-title">SessionGraphMetadata</div>
+          <div class="card-subtitle">graph identity</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        graph_id &bull; session_id<br>root_run_id? &bull; supervisor_agent_id?<br>graph_status &bull; entry_node_id<br>terminal_node_ids[] &bull; version
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-t">&#9632;</div>
+        <div>
+          <div class="card-title">MultiAgentSessionGraph</div>
+          <div class="card-subtitle">top-level graph object</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        metadata &bull; nodes[]<br>edges[] &bull; branches[]<br>joins[] &bull; checkpoints[]
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Top-Level Wrapper</div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-t">&#9632;</div>
+      <div>
+        <div class="card-title">SessionGraphEnvelope</div>
+        <div class="card-subtitle">envelope_id + graph</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Validation Rules</div>
+
+  <div class="diagram">
+    <span class="hl">NON-BLANK</span>  graph_id, session_id, entry_node_id, node/edge/branch/join/checkpoint IDs<br>
+    <span class="hl">UNIQUE</span>  node and edge IDs must be unique within the graph<br>
+    <span class="hl">TERMINAL</span>  at least one terminal_node must exist<br>
+    <span class="hl">ENTRY</span>  entry_node_id must reference an existing node<br>
+    <span class="hl">EDGE</span>  from_node_id and to_node_id must reference existing nodes<br>
+    <span class="hl">PARENT</span>  parent_node_id must reference an existing node<br>
+    <span class="hl">BRANCH</span>  branch entry_node_id and branch_node_ids must reference existing nodes<br>
+    <span class="hl">JOIN</span>  join_node_id and incoming_node_ids must reference existing nodes<br>
+    <span class="hl">JOIN COUNT</span>  required_completion_count must not exceed incoming_node_ids count<br>
+    <span class="hl">CHECKPOINT</span>  checkpoint graph_id must match metadata graph_id
+  </div>
+
+  <div class="section-label">Relationship to Previous Primitives</div>
+
+  <div class="diagram">
+    <span class="hl">P44/P45</span>  Loop/Step  <span class="dim">step atoms map to graph nodes</span><br>
+    <span class="hl">P46</span>  Supervisor/Delegate  <span class="dim">delegation edges between nodes</span><br>
+    <span class="hl">P47</span>  Routing &amp; Arbitration  <span class="dim">routing decisions as branching nodes</span><br>
+    <span class="hl">P48</span>  Skill Manifest  <span class="dim">skills attach to nodes</span><br>
+    <span class="hl">P49</span>  Hook Lifecycle  <span class="dim">hook points around graph movement</span><br>
+    <span class="hl">P50</span>  Role &amp; Specialization  <span class="dim">roles attached to agent nodes</span><br>
+    <span class="hl">P51</span>  Handoff &amp; Return  <span class="dim">payloads transferred over handoff/return edges</span>
+  </div>
+
+  <div class="section-label">Test Coverage</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">61 tests</div>
+          <div class="card-subtitle">All passing</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">8 models</div>
+          <div class="card-subtitle">5 enums + validators</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-t">&#10003;</div>
+        <div>
+          <div class="card-title">Graph lifecycle</div>
+          <div class="card-subtitle">11 node types, 8 edge types, 8 node statuses, 5 edge statuses, 7 graph statuses, duplicate ID detection, cross-model node/edge reference validation, terminal node enforcement, entry point validation, branch/join referencing, checkpoint graph ID matching, 5 integration scenarios (delegation, verification branch, blocked recovery, conditional branch, multi-child join)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">All 52 Primitives</div>
+  <div class="diagram">
+    <span style="color:#818cf8;">P1&nbsp;&nbsp;INSTRUCTION LAYERING</span><br>
+    <span style="color:#34d399;">P2&nbsp;&nbsp;TASK CONTRACT SCHEMA</span><br>
+    <span style="color:#38bdf8;">P3&nbsp;&nbsp;CONTEXT DELIVERY SCHEMA</span><br>
+    <span style="color:#fbbf24;">P4&nbsp;&nbsp;CONTEXT SELECTION POLICY</span><br>
+    <span style="color:#f87171;">P5&nbsp;&nbsp;TOOL INTERFACE SCHEMA</span><br>
+    <span style="color:#a78bfa;">P6&nbsp;&nbsp;EXECUTION ENVIRONMENT</span><br>
+    <span style="color:#fbbf24;">P7&nbsp;&nbsp;DURABLE STATE SCHEMA</span><br>
+    <span style="color:#34d399;">P8&nbsp;&nbsp;VERIFICATION SCHEMA</span><br>
+    <span style="color:#38bdf8;">P9&nbsp;&nbsp;PROMPT ASSEMBLY SCHEMA</span><br>
+    <span style="color:#818cf8;">P10 RUN ORCHESTRATION STATE MACHINE</span><br>
+    <span style="color:#fbbf24;">P11 RETRY AND RECOVERY POLICY</span><br>
+    <span style="color:#ef4444;">P12 APPROVAL AND SAFETY POLICY</span><br>
+    <span style="color:#34d399;">P13 EVALUATION AND BENCHMARK SCHEMA</span><br>
+    <span style="color:#a855f7;">P14 OBSERVABILITY AND TRACE SCHEMA</span><br>
+    <span style="color:#fbbf24;">P15 STATE MACHINE DRIVER</span><br>
+    <span style="color:#34d399;">P16 PIPELINE EXECUTOR</span><br>
+    <span style="color:#fbbf24;">P17 PRODUCTION CONFIG &amp; SECRETS</span><br>
+    <span style="color:#a855f7;">P18 BUDGET &amp; RATE LIMIT POLICY</span><br>
+    <span style="color:#ef4444;">P19 FAILURE TAXONOMY &amp; ERROR ENVELOPE</span><br>
+    <span style="color:#38bdf8;">P20 INPUT &amp; OUTPUT GUARDRAILS</span><br>
+    <span style="color:#34d399;">P21 APPROVAL &amp; ESCALATION</span><br>
+    <span style="color:#a855f7;">P22 CAPABILITY MATRIX</span><br>
+    <span style="color:#818cf8;">P23 SESSION STATE &amp; CHECKPOINT</span><br>
+    <span style="color:#34d399;">P24 EVALUATION &amp; QUALITY GATE</span><br>
+    <span style="color:#38bdf8;">P25 TRACE, AUDIT &amp; PROVENANCE</span><br>
+    <span style="color:#a855f7;">P26 AGENT IDENTITY &amp; OWNERSHIP</span><br>
+    <span style="color:#a855f7;">P27 MEMORY BOUNDARY</span><br>
+    <span style="color:#ef4444;">P28 TOOL CAPABILITY &amp; PERMISSION</span><br>
+    <span style="color:#ef4444;">P29 POLICY EVALUATION &amp; GUARDRAIL</span><br>
+    <span style="color:#ef4444;">P30 HUMAN APPROVAL &amp; ESCALATION</span><br>
+    <span style="color:#38bdf8;">P31 TASK CONTRACT &amp; UNIT-OF-WORK</span><br>
+    <span style="color:#a855f7;">P32 TOOL INVOCATION RECEIPT</span><br>
+    <span style="color:#fbbf24;">P33 MODEL CALL &amp; PROMPT PROVENANCE</span><br>
+    <span style="color:#34d399;">P34 CHECKPOINT &amp; SESSION RECOVERY</span><br>
+    <span style="color:#ef4444;">P35 POLICY DECISION &amp; APPROVAL GATE</span><br>
+    <span style="color:#38bdf8;">P36 AUDIT TRAIL &amp; EVENT LOG CONTRACT</span><br>
+    <span style="color:#a855f7;">P37 MEMORY, CONTEXT &amp; RETRIEVAL SNAPSHOT</span><br>
+    <span style="color:#fbbf24;">P38 ARTIFACT, FILE &amp; GENERATED OUTPUT CONTRACT</span><br>
+    <span style="color:#34d399;">P39 FEEDBACK, EVALUATION &amp; QUALITY SIGNAL CONTRACT</span><br>
+    <span style="color:#f87171;">P40 RUN ORCHESTRATION &amp; EXECUTION STATE CONTRACT</span><br>
+    <span style="color:#f87171;">P41 FAILURE, EXCEPTION &amp; RECOVERY DECISION CONTRACT</span><br>
+    <span style="color:#fbbf24;">P42 CONFIGURATION, SECRETS &amp; ENVIRONMENT CONTRACT</span><br>
+    <span style="color:#38bdf8;">P43 LOGGING, TRACE &amp; OBSERVABILITY EVENT CONTRACT</span><br>
+    <span style="color:#34d399;">P44 RUNNING LOOP CONTRACT</span><br>
+    <span style="color:#a855f7;">P45 STEP / TURN LIFECYCLE CONTRACT</span><br>
+    <span style="color:#fbbf24;">P46 SUPERVISOR &amp; DELEGATE CONTRACT</span><br>
+    <span style="color:#34d399;">P47 ROUTING &amp; ARBITRATION CONTRACT</span><br>
+    <span style="color:#a855f7;">P48 SKILL MANIFEST &amp; ACTIVATION CONTRACT</span><br>
+    <span style="color:#f97316;">P49 HOOK LIFECYCLE &amp; EXTENSION CONTRACT</span><br>
+    <span style="color:#818cf8;">P50 AGENT ROLE &amp; SPECIALIZATION CONTRACT</span><br>
+    <span style="color:#ec4899;">P51 HANDOFF &amp; RETURN ENVELOPE CONTRACT</span><br>
+    <span class="hl" style="color:#14b8a6;">P52 MULTI-AGENT SESSION GRAPH CONTRACT</span>  <span class="dim">— <span style="color:#14b8a6;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P52 &bull; Multi-Agent Session Graph Contract &bull; 2616/2616 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

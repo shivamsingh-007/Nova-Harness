@@ -1,0 +1,39 @@
+{
+  "envelope": {
+    "envelope_id": "env-fail-<seq>",
+    "message": {
+      "header": {
+        "message_id": "msg-<failed_msg_id>",
+        "schema_version": "1.0",
+        "intent_type": "request_action",
+        "transport_mode": "asynchronous",
+        "sender_agent_id": "agent-<role>-<id>",
+        "created_at": "<iso_timestamp>"
+      },
+      "audience": {
+        "audience_id": "aud-<seq>",
+        "audience_type": "single_agent",
+        "target_agent_ids": ["agent-<target>-<id>"]
+      },
+      "payload": {
+        "payload_id": "pl-fail-<seq>",
+        "summary": "<original message summary>"
+      },
+      "delivery_policy": {
+        "delivery_policy_id": "dp-fail-<seq>",
+        "requires_ack": false,
+        "timeout_ms": 5000,
+        "max_retries": 0
+      },
+      "failure_record": {
+        "failure_id": "fail-msg-<seq>",
+        "message_id": "msg-<failed_msg_id>",
+        "failure_stage": "<validation|delivery|processing>",
+        "failure_reason": "<machine_readable_reason>: <human_readable_detail>",
+        "retryable": false,
+        "rejected_by": "<component>",
+        "diagnostic_refs": []
+      }
+    }
+  }
+}

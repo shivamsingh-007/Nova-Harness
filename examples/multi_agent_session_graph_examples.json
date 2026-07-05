@@ -1,0 +1,147 @@
+{
+  "description": "P52 Multi-Agent Session Graph Contract examples — graph topologies for delegation, branching, blocking, conditional routing, and joins.",
+  "examples": [
+    {
+      "name": "simple_parent_child_delegation_graph",
+      "description": "Manager delegates to a child coder run, child returns to terminal.",
+      "graph": {
+        "metadata": {
+          "graph_id": "graph-simple-001",
+          "session_id": "session-alpha",
+          "root_run_id": "run-001",
+          "supervisor_agent_id": "agent-mgr-01",
+          "graph_status": "active",
+          "entry_node_id": "node-manager",
+          "terminal_node_ids": ["node-terminal"]
+        },
+        "nodes": [
+          {"node_id": "node-manager", "node_type": "parent_run", "label": "Manager", "run_id": "run-001", "agent_id": "agent-mgr-01", "status": "running"},
+          {"node_id": "node-coder", "node_type": "child_run", "label": "Coder", "run_id": "run-002", "agent_id": "agent-coder-01", "status": "running", "parent_node_id": "node-manager"},
+          {"node_id": "node-terminal", "node_type": "terminal_node", "label": "Done", "status": "pending"}
+        ],
+        "edges": [
+          {"edge_id": "e-manager-to-coder", "edge_type": "delegates_to", "from_node_id": "node-manager", "to_node_id": "node-coder", "status": "traversed"},
+          {"edge_id": "e-coder-terminal", "edge_type": "returns_to", "from_node_id": "node-coder", "to_node_id": "node-terminal", "status": "active"}
+        ]
+      }
+    },
+    {
+      "name": "verification_branch_returning_to_supervisor",
+      "description": "Supervisor sends work to verifier, verifier returns through a join node.",
+      "graph": {
+        "metadata": {
+          "graph_id": "graph-verify-001",
+          "session_id": "session-beta",
+          "root_run_id": "run-010",
+          "supervisor_agent_id": "agent-sup-01",
+          "graph_status": "active",
+          "entry_node_id": "node-supervisor",
+          "terminal_node_ids": ["node-terminal"]
+        },
+        "nodes": [
+          {"node_id": "node-supervisor", "node_type": "parent_run", "label": "Supervisor", "status": "running"},
+          {"node_id": "node-coder", "node_type": "child_run", "label": "Coder", "status": "completed"},
+          {"node_id": "node-verifier", "node_type": "verification_step", "label": "Verifier", "status": "running"},
+          {"node_id": "node-join", "node_type": "join_node", "label": "Join Point", "status": "waiting"},
+          {"node_id": "node-terminal", "node_type": "terminal_node", "label": "Done", "status": "pending"}
+        ],
+        "edges": [
+          {"edge_id": "e-sup-coder", "edge_type": "delegates_to", "from_node_id": "node-supervisor", "to_node_id": "node-coder", "status": "traversed"},
+          {"edge_id": "e-coder-verify", "edge_type": "control_flow", "from_node_id": "node-coder", "to_node_id": "node-verifier", "status": "traversed"},
+          {"edge_id": "e-verify-join", "edge_type": "joins_into", "from_node_id": "node-verifier", "to_node_id": "node-join", "status": "active"},
+          {"edge_id": "e-join-term", "edge_type": "control_flow", "from_node_id": "node-join", "to_node_id": "node-terminal", "status": "inactive"}
+        ],
+        "joins": [
+          {"join_id": "join-verify", "join_node_id": "node-join", "incoming_node_ids": ["node-verifier"], "required_completion_count": 1, "join_status": "waiting"}
+        ]
+      }
+    },
+    {
+      "name": "blocked_node_with_recovery_checkpoint",
+      "description": "A step node is blocked by an unavailable dependency; graph has a recovery checkpoint.",
+      "graph": {
+        "metadata": {
+          "graph_id": "graph-blocked-001",
+          "session_id": "session-gamma",
+          "root_run_id": "run-020",
+          "graph_status": "paused",
+          "entry_node_id": "node-entry",
+          "terminal_node_ids": ["node-terminal"]
+        },
+        "nodes": [
+          {"node_id": "node-entry", "node_type": "parent_run", "label": "Orchestrator", "status": "completed"},
+          {"node_id": "node-fetch", "node_type": "step", "label": "Fetch API Key", "status": "blocked", "input_refs": ["config/secrets.json"]},
+          {"node_id": "node-coder", "node_type": "child_run", "label": "Coder", "status": "waiting"},
+          {"node_id": "node-terminal", "node_type": "terminal_node", "label": "Done", "status": "pending"}
+        ],
+        "edges": [
+          {"edge_id": "e-entry-fetch", "edge_type": "control_flow", "from_node_id": "node-entry", "to_node_id": "node-fetch", "status": "traversed"},
+          {"edge_id": "e-fetch-coder", "edge_type": "depends_on", "from_node_id": "node-fetch", "to_node_id": "node-coder", "status": "blocked"},
+          {"edge_id": "e-coder-term", "edge_type": "control_flow", "from_node_id": "node-coder", "to_node_id": "node-terminal", "status": "inactive"}
+        ],
+        "checkpoints": [
+          {"checkpoint_id": "cp-blocked", "graph_id": "graph-blocked-001", "graph_status": "paused", "active_node_ids": ["node-entry"], "blocked_node_ids": ["node-fetch"], "waiting_node_ids": ["node-coder"], "snapshot_ref": "snapshots/blocked-gamma.json"}
+        ]
+      }
+    },
+    {
+      "name": "conditional_branch_graph",
+      "description": "Routing decision splits into two conditional branches based on task complexity.",
+      "graph": {
+        "metadata": {
+          "graph_id": "graph-cond-001",
+          "session_id": "session-delta",
+          "graph_status": "active",
+          "entry_node_id": "node-router",
+          "terminal_node_ids": ["node-terminal"]
+        },
+        "nodes": [
+          {"node_id": "node-router", "node_type": "routing_decision", "label": "Complexity Router", "status": "running"},
+          {"node_id": "node-simple", "node_type": "child_run", "label": "Simple Handler", "status": "ready"},
+          {"node_id": "node-complex", "node_type": "child_run", "label": "Complex Handler", "status": "ready"},
+          {"node_id": "node-terminal", "node_type": "terminal_node", "label": "Done", "status": "pending"}
+        ],
+        "edges": [
+          {"edge_id": "e-router-simple", "edge_type": "conditional_branch", "from_node_id": "node-router", "to_node_id": "node-simple", "condition_ref": "complexity=simple", "status": "active"},
+          {"edge_id": "e-router-complex", "edge_type": "conditional_branch", "from_node_id": "node-router", "to_node_id": "node-complex", "condition_ref": "complexity=complex", "status": "inactive"},
+          {"edge_id": "e-simple-term", "edge_type": "control_flow", "from_node_id": "node-simple", "to_node_id": "node-terminal", "status": "inactive"},
+          {"edge_id": "e-complex-term", "edge_type": "control_flow", "from_node_id": "node-complex", "to_node_id": "node-terminal", "status": "inactive"}
+        ],
+        "branches": [
+          {"branch_id": "br-simple", "entry_node_id": "node-simple", "branch_node_ids": ["node-simple"], "branch_reason": "Simple task detected", "branch_status": "active"},
+          {"branch_id": "br-complex", "entry_node_id": "node-complex", "branch_node_ids": ["node-complex"], "branch_reason": "Complex task detected", "branch_status": "inactive"}
+        ]
+      }
+    },
+    {
+      "name": "join_node_waiting_on_multiple_child_returns",
+      "description": "Parent delegates to two children; join node waits for both before proceeding to terminal.",
+      "graph": {
+        "metadata": {
+          "graph_id": "graph-join-001",
+          "session_id": "session-epsilon",
+          "graph_status": "active",
+          "entry_node_id": "node-parent",
+          "terminal_node_ids": ["node-terminal"]
+        },
+        "nodes": [
+          {"node_id": "node-parent", "node_type": "parent_run", "label": "Coordinator", "status": "running"},
+          {"node_id": "node-scraper", "node_type": "child_run", "label": "Data Scraper", "status": "completed"},
+          {"node_id": "node-analyzer", "node_type": "child_run", "label": "Data Analyzer", "status": "running"},
+          {"node_id": "node-join", "node_type": "join_node", "label": "Merge Results", "status": "waiting"},
+          {"node_id": "node-terminal", "node_type": "terminal_node", "label": "Done", "status": "pending"}
+        ],
+        "edges": [
+          {"edge_id": "e-to-scraper", "edge_type": "delegates_to", "from_node_id": "node-parent", "to_node_id": "node-scraper", "status": "traversed"},
+          {"edge_id": "e-to-analyzer", "edge_type": "delegates_to", "from_node_id": "node-parent", "to_node_id": "node-analyzer", "status": "active"},
+          {"edge_id": "e-scraper-join", "edge_type": "joins_into", "from_node_id": "node-scraper", "to_node_id": "node-join", "status": "traversed"},
+          {"edge_id": "e-analyzer-join", "edge_type": "joins_into", "from_node_id": "node-analyzer", "to_node_id": "node-join", "status": "active"},
+          {"edge_id": "e-join-term", "edge_type": "control_flow", "from_node_id": "node-join", "to_node_id": "node-terminal", "status": "inactive"}
+        ],
+        "joins": [
+          {"join_id": "join-main", "join_node_id": "node-join", "incoming_node_ids": ["node-scraper", "node-analyzer"], "required_completion_count": 2, "completed_incoming_ids": ["node-scraper"], "join_policy": "all", "join_status": "waiting"}
+        ]
+      }
+    }
+  ]
+}

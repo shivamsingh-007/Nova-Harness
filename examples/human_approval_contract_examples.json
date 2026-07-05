@@ -1,0 +1,177 @@
+{
+  "examples": [
+    {
+      "label": "high_risk_tool_action_approval_request",
+      "description": "Critical-risk delete action submitted for human approval with context, evidence, and rollback plan",
+      "approval_envelope": {
+        "envelope_id": "env-hr-001",
+        "request": {
+          "approval_request_id": "ar-hr-001",
+          "run_id": "run-101",
+          "requested_by": "agent-admin",
+          "reason_type": "high_risk_action",
+          "status": "pending",
+          "context": {
+            "subject_ref": "tool://td-storage/delete",
+            "summary": "Delete production backup container prod-backup-2025",
+            "policy_ref": "pol-dlp",
+            "risk_tier": "critical",
+            "evidence_refs": ["sig-del-001", "sig-del-002"],
+            "rollback_plan": "Restore container from snapshot snap-042 within 30-minute RTO"
+          },
+          "eligible_approvers": [
+            {"approver_id": "u-42", "approver_role": "security_lead", "display_name": "Alice Chen"},
+            {"approver_id": "u-7", "approver_role": "admin", "display_name": "Bob Kumar"}
+          ],
+          "expires_at": "2026-07-04T18:00:00Z"
+        },
+        "decision": null,
+        "escalation_steps": []
+      }
+    },
+    {
+      "label": "approved_request_by_eligible_reviewer",
+      "description": "Search tool read access approved by eligible admin reviewer with justification",
+      "approval_envelope": {
+        "envelope_id": "env-ap-001",
+        "request": {
+          "approval_request_id": "ar-ap-001",
+          "run_id": "run-102",
+          "requested_by": "agent-reader",
+          "reason_type": "policy_trigger",
+          "status": "approved",
+          "context": {
+            "subject_ref": "tool://td-search/read",
+            "summary": "Full-text search across documentation index",
+            "policy_ref": "pol-search",
+            "risk_tier": "low",
+            "evidence_refs": [],
+            "rollback_plan": null
+          },
+          "eligible_approvers": [
+            {"approver_id": "u-7", "approver_role": "admin", "display_name": "Bob Kumar"}
+          ],
+          "expires_at": null
+        },
+        "decision": {
+          "approval_decision_id": "ad-ap-001",
+          "approval_request_id": "ar-ap-001",
+          "decided_by": {"approver_id": "u-7", "approver_role": "admin", "display_name": "Bob Kumar"},
+          "decision": "approve",
+          "justification": "Search tool read actions on documentation index are allowlisted; no sensitive data exposure risk",
+          "decided_at": "2026-07-04T14:30:00Z"
+        },
+        "escalation_steps": []
+      }
+    },
+    {
+      "label": "denied_sensitive_data_access_request",
+      "description": "Cross-tenant memory access denied by security lead due to missing data sharing agreement",
+      "approval_envelope": {
+        "envelope_id": "env-de-001",
+        "request": {
+          "approval_request_id": "ar-de-001",
+          "run_id": "run-103",
+          "requested_by": "agent-fetcher",
+          "reason_type": "sensitive_data_access",
+          "status": "denied",
+          "context": {
+            "subject_ref": "memory://mem-042",
+            "summary": "Cross-tenant memory access: agent-fetcher requesting mem-042 owned by tenant acme-ops",
+            "policy_ref": "pol-mem",
+            "risk_tier": "high",
+            "evidence_refs": ["sig-mem-001", "sig-mem-002"],
+            "rollback_plan": null
+          },
+          "eligible_approvers": [
+            {"approver_id": "u-42", "approver_role": "security_lead", "display_name": "Alice Chen"}
+          ],
+          "expires_at": "2026-07-04T20:00:00Z"
+        },
+        "decision": {
+          "approval_decision_id": "ad-de-001",
+          "approval_request_id": "ar-de-001",
+          "decided_by": {"approver_id": "u-42", "approver_role": "security_lead", "display_name": "Alice Chen"},
+          "decision": "deny",
+          "justification": "Cross-tenant memory access denied: no data sharing agreement exists between acme-ops and acme-marketing per policy pol-mem v1.2",
+          "decided_at": "2026-07-04T15:00:00Z"
+        },
+        "escalation_steps": []
+      }
+    },
+    {
+      "label": "escalated_critical_request_to_higher_authority",
+      "description": "Production code execution escalation from admin to security lead with structured step record",
+      "approval_envelope": {
+        "envelope_id": "env-es-001",
+        "request": {
+          "approval_request_id": "ar-es-001",
+          "run_id": "run-104",
+          "requested_by": "agent-coder",
+          "reason_type": "high_risk_action",
+          "status": "escalated",
+          "context": {
+            "subject_ref": "tool://td-codex/execute",
+            "summary": "Execute untrusted Python script in production sandbox",
+            "policy_ref": "pol-codex",
+            "risk_tier": "critical",
+            "evidence_refs": ["sig-codex-001", "sig-codex-002"],
+            "rollback_plan": "Sandbox is ephemeral; discard on failure"
+          },
+          "eligible_approvers": [
+            {"approver_id": "u-42", "approver_role": "security_lead", "display_name": "Alice Chen"},
+            {"approver_id": "u-7", "approver_role": "admin", "display_name": "Bob Kumar"},
+            {"approver_id": "u-99", "approver_role": "security_override", "display_name": "Carol Davis"}
+          ],
+          "expires_at": "2026-07-05T12:00:00Z"
+        },
+        "decision": {
+          "approval_decision_id": "ad-es-001",
+          "approval_request_id": "ar-es-001",
+          "decided_by": {"approver_id": "u-7", "approver_role": "admin", "display_name": "Bob Kumar"},
+          "decision": "escalate",
+          "justification": "Admin role lacks authority for production code execution at critical risk tier; escalating to security_lead",
+          "decided_at": "2026-07-04T16:00:00Z"
+        },
+        "escalation_steps": [
+          {
+            "escalation_step_id": "es-es-001",
+            "approval_request_id": "ar-es-001",
+            "from_role": "admin",
+            "to_role": "security_lead",
+            "escalation_status": "in_progress",
+            "note": "Escalated by Bob Kumar (admin) due to critical risk tier exceeding admin authority"
+          }
+        ]
+      }
+    },
+    {
+      "label": "expired_request_blocks_execution",
+      "description": "Approval request expired without decision, preventing execution from continuing",
+      "approval_envelope": {
+        "envelope_id": "env-ex-001",
+        "request": {
+          "approval_request_id": "ar-ex-001",
+          "run_id": "run-105",
+          "requested_by": "agent-admin",
+          "reason_type": "high_risk_action",
+          "status": "expired",
+          "context": {
+            "subject_ref": "tool://td-storage/delete",
+            "summary": "Delete old backup container backup-2024",
+            "policy_ref": "pol-dlp",
+            "risk_tier": "high",
+            "evidence_refs": ["sig-del-001"],
+            "rollback_plan": null
+          },
+          "eligible_approvers": [
+            {"approver_id": "u-42", "approver_role": "security_lead", "display_name": "Alice Chen"}
+          ],
+          "expires_at": "2026-07-04T12:00:00Z"
+        },
+        "decision": null,
+        "escalation_steps": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P58: Acceptance Criteria & Definition-of-Done Contract</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a0f; color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif; line-height: 1.6;
+  min-height: 100vh; display: flex; justify-content: center; padding: 2rem 1rem;
+}
+.container { max-width: 1000px; width: 100%; }
+.hero { margin-bottom: 2.5rem; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #a855f7; margin-bottom: 1rem;
+}
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #a855f7 50%, #7c3aed 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+.hero p { font-size: 1.05rem; color: #9494a8; max-width: 640px; }
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+.icon-r { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+.icon-b { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.icon-p { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+.icon-g { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-y { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.icon-s { background: rgba(148, 148, 168, 0.15); color: #9494a8; }
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-5 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 0.75rem; }
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-5 { grid-template-columns: 1fr; } }
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+.diagram .hl { color: #a855f7; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .hl3 { color: #34d399; }
+.diagram .dim { color: #52525b; }
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 58 &mdash; Acceptance Criteria &amp; Definition-of-Done</div>
+    <h1>Acceptance Criteria &amp; Definition-of-Done Contract</h1>
+    <p>
+      Typed contract for task-specific acceptance criteria and reusable
+      definition-of-done profiles, with evidence collection, assessment
+      summaries, and completion decisions.
+    </p>
+  </div>
+
+  <div class="section-label">Files</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/acceptance_done_contract.py                   <span class="dim">(5 enums + 8 models)</span><br>
+    <span class="hl">CREATED</span>  tests/test_acceptance_done_contract.py                <span class="dim">(84 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/acceptance_done_examples.json                 <span class="dim">(5 examples)</span><br>
+    <span class="hl">CREATED</span>  completion/COMPLETION.md &bull; templates/                 <span class="dim">(protocol doc + 3 templates)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 3034/3034 tests pass &mdash; P58: 297 lines, 84 tests
+  </div>
+
+  <div class="section-label">Enums</div>
+
+  <div class="grid-5">
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-b">&#9881;</div>
+        <div>
+          <div class="card-title">CriterionType</div>
+          <div class="card-subtitle">6 types</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        functional &bull; output<br>quality &bull; constraint<br>approval &bull; evidence
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-p">&#9881;</div>
+        <div>
+          <div class="card-title">CriterionStatus</div>
+          <div class="card-subtitle">5 states</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        not_started &bull; in_progress<br>met &bull; failed<br><span style="color:#fbbf24;">waived</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-y">&#9881;</div>
+        <div>
+          <div class="card-title">DoneCheckType</div>
+          <div class="card-subtitle">5 gates</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        quality_gate<br>verification_gate<br>documentation_gate<br>policy_gate<br><span style="color:#f87171;">release_gate</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-g">&#9881;</div>
+        <div>
+          <div class="card-title">DoneStatus</div>
+          <div class="card-subtitle">4 states</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        not_checked &bull; passed<br>failed &bull; waived
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-r">&#9881;</div>
+        <div>
+          <div class="card-title">CompletionDisposition</div>
+          <div class="card-subtitle">5 dispositions</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        accepted<br>accepted_with_caveats<br>needs_rework<br>rejected &bull; deferred
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Models</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">AcceptanceCriterionRecord</div>
+          <div class="card-subtitle">one task-specific criterion</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        criterion_id &bull; task_id<br>criterion_type &bull; description<br>priority &bull; required<br>test_method? &bull; expected_result?<br>status &bull; owner? &bull; notes?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9632;</div>
+        <div>
+          <div class="card-title">AcceptanceCriteriaSet</div>
+          <div class="card-subtitle">grouped criteria</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        criteria_set_id &bull; task_id<br>title? &bull; criteria[]<br>created_by? &bull; created_at<br>version
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9632;</div>
+        <div>
+          <div class="card-title">DefinitionOfDoneCheck</div>
+          <div class="card-subtitle">one reusable gate</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        done_check_id &bull; done_check_type<br>description &bull; required<br>validation_method?<br>status<br>applies_to_task_types[]<br>notes?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9632;</div>
+        <div>
+          <div class="card-title">DefinitionOfDoneProfile</div>
+          <div class="card-subtitle">shared baseline</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        dod_profile_id &bull; name<br>description? &bull; checks[]<br>version &bull; owner?<br>active
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">CompletionEvidenceRecord</div>
+          <div class="card-subtitle">supporting proof</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        evidence_id &bull; task_id<br>criterion_or_check_ref?<br>evidence_type<br>artifact_refs[]<br>validation_refs[]<br>summary &bull; collected_at
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-s">&#9632;</div>
+        <div>
+          <div class="card-title">CompletionAssessmentRecord</div>
+          <div class="card-subtitle">pass/fail summary</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        assessment_id &bull; task_id<br>criteria_met_count<br>criteria_failed_count<br>dod_passed_count<br>dod_failed_count<br>waived_items[]<br>open_items[]<br>assessment_summary?
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">CompletionDecisionRecord</div>
+          <div class="card-subtitle">final verdict</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        decision_id &bull; task_id<br>completion_disposition<br>approved_by?<br>decision_reason?<br>release_ready<br>followup_actions[]<br>decided_at
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9632;</div>
+        <div>
+          <div class="card-title">AcceptanceDoneEnvelope</div>
+          <div class="card-subtitle">top-level wrapper</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        envelope_id<br>acceptance_criteria_set<br>definition_of_done_profile<br>evidence_records[]<br>assessment &bull; decision
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Completion Pipeline</div>
+
+  <div class="diagram">
+    <span class="hl">DEFINE</span> &rarr; <span class="hl">COLLECT</span> &rarr; <span class="hl">ASSESS</span> &rarr; <span class="hl">DECIDE</span><br>
+    <span class="dim">criteria + DoD</span> &nbsp;&nbsp; <span class="dim">evidence per item</span> &nbsp;&nbsp; <span class="dim"><span style="color:#34d399;">met</span>/<span style="color:#f87171;">failed</span>/<span style="color:#fbbf24;">waived</span></span> &nbsp;&nbsp; <span class="dim"><span style="color:#34d399;">accept</span>/<span style="color:#fbbf24;">caveat</span>/<span style="color:#f87171;">rework</span></span>
+  </div>
+
+  <div class="section-label">Validation Rules</div>
+
+  <div class="diagram">
+    <span class="hl">NON-BLANK</span>  criterion_id, task_id, description, criteria_set_id, done_check_id, dod_profile_id, name, evidence_id, evidence_type, summary, assessment_id, decision_id, envelope_id<br>
+    <span class="hl">WAIVER</span>  required criteria/checks waived without notes rejected at model and envelope level<br>
+    <span class="hl">ACCEPT</span>  accepted requires all required criteria met/waived and required DoD checks passed/waived<br>
+    <span class="hl">CAVEATS</span>  accepted_with_caveats must include followup_actions<br>
+    <span class="hl">REJECT</span>  rejected/needs_rework must include decision_reason<br>
+    <span class="hl">RELEASE</span>  release_ready=true requires passed release-gate checks<br>
+    <span class="hl">EVIDENCE</span>  evidence criterion_or_check_ref must reference valid criterion or check ID<br>
+    <span class="hl">COUNTS</span>  assessment counts must be &ge; 0
+  </div>
+
+  <div class="section-label">Test Coverage</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">84 tests</div>
+          <div class="card-subtitle">All passing</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">8 models</div>
+          <div class="card-subtitle">5 enums + validators</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#10003;</div>
+        <div>
+          <div class="card-title">Completion integrity</div>
+          <div class="card-subtitle">criteria + DoD separation, evidence linking, waiver policy, release gates, disposition rules</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">All 58 Primitives</div>
+  <div class="diagram">
+    <span style="color:#818cf8;">P1&nbsp;&nbsp;INSTRUCTION LAYERING</span><br>
+    <span style="color:#34d399;">P2&nbsp;&nbsp;TASK CONTRACT SCHEMA</span><br>
+    <span style="color:#38bdf8;">P3&nbsp;&nbsp;CONTEXT DELIVERY SCHEMA</span><br>
+    <span style="color:#fbbf24;">P4&nbsp;&nbsp;CONTEXT SELECTION POLICY</span><br>
+    <span style="color:#f87171;">P5&nbsp;&nbsp;TOOL INTERFACE SCHEMA</span><br>
+    <span style="color:#a78bfa;">P6&nbsp;&nbsp;EXECUTION ENVIRONMENT</span><br>
+    <span style="color:#fbbf24;">P7&nbsp;&nbsp;DURABLE STATE SCHEMA</span><br>
+    <span style="color:#34d399;">P8&nbsp;&nbsp;VERIFICATION SCHEMA</span><br>
+    <span style="color:#38bdf8;">P9&nbsp;&nbsp;PROMPT ASSEMBLY SCHEMA</span><br>
+    <span style="color:#818cf8;">P10 RUN ORCHESTRATION STATE MACHINE</span><br>
+    <span style="color:#fbbf24;">P11 RETRY AND RECOVERY POLICY</span><br>
+    <span style="color:#ef4444;">P12 APPROVAL AND SAFETY POLICY</span><br>
+    <span style="color:#34d399;">P13 EVALUATION AND BENCHMARK SCHEMA</span><br>
+    <span style="color:#a855f7;">P14 OBSERVABILITY AND TRACE SCHEMA</span><br>
+    <span style="color:#fbbf24;">P15 STATE MACHINE DRIVER</span><br>
+    <span style="color:#34d399;">P16 PIPELINE EXECUTOR</span><br>
+    <span style="color:#fbbf24;">P17 PRODUCTION CONFIG &amp; SECRETS</span><br>
+    <span style="color:#a855f7;">P18 BUDGET &amp; RATE LIMIT POLICY</span><br>
+    <span style="color:#ef4444;">P19 FAILURE TAXONOMY &amp; ERROR ENVELOPE</span><br>
+    <span style="color:#38bdf8;">P20 INPUT &amp; OUTPUT GUARDRAILS</span><br>
+    <span style="color:#34d399;">P21 APPROVAL &amp; ESCALATION</span><br>
+    <span style="color:#a855f7;">P22 CAPABILITY MATRIX</span><br>
+    <span style="color:#818cf8;">P23 SESSION STATE &amp; CHECKPOINT</span><br>
+    <span style="color:#34d399;">P24 EVALUATION &amp; QUALITY GATE</span><br>
+    <span style="color:#38bdf8;">P25 TRACE, AUDIT &amp; PROVENANCE</span><br>
+    <span style="color:#a855f7;">P26 AGENT IDENTITY &amp; OWNERSHIP</span><br>
+    <span style="color:#a855f7;">P27 MEMORY BOUNDARY</span><br>
+    <span style="color:#ef4444;">P28 TOOL CAPABILITY &amp; PERMISSION</span><br>
+    <span style="color:#ef4444;">P29 POLICY EVALUATION &amp; GUARDRAIL</span><br>
+    <span style="color:#ef4444;">P30 HUMAN APPROVAL &amp; ESCALATION</span><br>
+    <span style="color:#38bdf8;">P31 TASK CONTRACT &amp; UNIT-OF-WORK</span><br>
+    <span style="color:#a855f7;">P32 TOOL INVOCATION RECEIPT</span><br>
+    <span style="color:#fbbf24;">P33 MODEL CALL &amp; PROMPT PROVENANCE</span><br>
+    <span style="color:#34d399;">P34 CHECKPOINT &amp; SESSION RECOVERY</span><br>
+    <span style="color:#ef4444;">P35 POLICY DECISION &amp; APPROVAL GATE</span><br>
+    <span style="color:#38bdf8;">P36 AUDIT TRAIL &amp; EVENT LOG CONTRACT</span><br>
+    <span style="color:#a855f7;">P37 MEMORY, CONTEXT &amp; RETRIEVAL SNAPSHOT</span><br>
+    <span style="color:#fbbf24;">P38 ARTIFACT, FILE &amp; GENERATED OUTPUT CONTRACT</span><br>
+    <span style="color:#34d399;">P39 FEEDBACK, EVALUATION &amp; QUALITY SIGNAL CONTRACT</span><br>
+    <span style="color:#f87171;">P40 RUN ORCHESTRATION &amp; EXECUTION STATE CONTRACT</span><br>
+    <span style="color:#f87171;">P41 FAILURE, EXCEPTION &amp; RECOVERY DECISION CONTRACT</span><br>
+    <span style="color:#fbbf24;">P42 CONFIGURATION, SECRETS &amp; ENVIRONMENT CONTRACT</span><br>
+    <span style="color:#38bdf8;">P43 LOGGING, TRACE &amp; OBSERVABILITY EVENT CONTRACT</span><br>
+    <span style="color:#34d399;">P44 RUNNING LOOP CONTRACT</span><br>
+    <span style="color:#a855f7;">P45 STEP / TURN LIFECYCLE CONTRACT</span><br>
+    <span style="color:#818cf8;">P46 SUPERVISION &amp; DELEGATION CONTRACT</span><br>
+    <span style="color:#38bdf8;">P47 ROUTING &amp; DISPATCH CONTRACT</span><br>
+    <span style="color:#34d399;">P48 INPUT VALIDATION CONTRACT</span><br>
+    <span style="color:#fbbf24;">P49 HOOK LIFECYCLE CONTRACT</span><br>
+    <span style="color:#a855f7;">P50 AGENT ROLE &amp; SPECIALIZATION CONTRACT</span><br>
+    <span style="color:#38bdf8;">P51 HANDOFF &amp; RETURN ENVELOPE CONTRACT</span><br>
+    <span style="color:#34d399;">P52 MULTI-AGENT SESSION GRAPH CONTRACT</span><br>
+    <span style="color:#a855f7;">P53 CROSS-AGENT MESSAGING CONTRACT</span><br>
+    <span style="color:#38bdf8;">P54 PARALLEL WORK &amp; JOIN CONTRACT</span><br>
+    <span style="color:#34d399;">P55 SYNTHESIS &amp; FINALIZATION CONTRACT</span><br>
+    <span style="color:#a855f7;">P56 HYBRID TASK INTAKE CONTRACT</span><br>
+    <span style="color:#38bdf8;">P57 CLARIFICATION &amp; MISSING-INFO RESOLUTION CONTRACT</span><br>
+    <span class="hl" style="color:#34d399;">P58 ACCEPTANCE CRITERIA &amp; DEFINITION-OF-DONE CONTRACT</span>  <span class="dim">— <span style="color:#34d399;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P58 &bull; Acceptance Criteria &amp; Definition-of-Done Contract &bull; 3034/3034 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "decision_id": "string (required, non-blank)",
+  "task_id": "string (required, non-blank)",
+  "completion_disposition": "accepted | accepted_with_caveats | needs_rework | rejected | deferred",
+  "approved_by": "string | null",
+  "decision_reason": "string | null (required for rejected/needs_rework)",
+  "release_ready": "boolean (default: false)",
+  "followup_actions": ["string ... (required for accepted_with_caveats)"],
+  "decided_at": "ISO datetime (default: now)"
+}

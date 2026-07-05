@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P50: Agent Role &amp; Specialization Contract</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #818cf8; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #818cf8 50%, #6366f1 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p {
+  font-size: 1.05rem; color: #9494a8; max-width: 640px;
+}
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-r { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+.icon-b { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.icon-p { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+.icon-g { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-y { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.icon-s { background: rgba(148, 148, 168, 0.15); color: #9494a8; }
+.icon-i { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #818cf8; }
+.diagram .hl2 { color: #34d399; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+
+.arrow { color: #52525b; margin: 0 0.5rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 50</div>
+    <h1>Agent Role &amp; Specialization Contract</h1>
+    <p>
+      Typed contract for reusable agent roles with specialization, capability
+      boundaries, constraints, prompt profiles, evaluation criteria, and
+      runtime role assignment.
+    </p>
+  </div>
+
+  <div class="section-label">Files</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/agent_role_specialization_contract.py    <span class="dim">(5 enums + 8 models)</span><br>
+    <span class="hl">CREATED</span>  tests/test_agent_role_specialization_contract.py <span class="dim">(75 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/agent_role_specialization_examples.json  <span class="dim">(5 examples)</span><br>
+    <span class="hl">CREATED</span>  roles/example_role/ROLE.md                        <span class="dim">(coding specialist role)</span><br>
+    <span class="hl">CREATED</span>  roles/example_role/prompts/coder_system_v1.md     <span class="dim">(role-specific prompt)</span><br>
+    <span class="hl">CREATED</span>  roles/registry.json                               <span class="dim">(role index)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 2482/2482 tests pass &mdash; P50: 75 new, 100% coverage
+  </div>
+
+  <div class="section-label">Agent Role Types (10)</div>
+
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-y" style="font-size:0.75rem;">&#9672;</div>
+        <div>
+          <div class="card-title">Manager</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        Coordinates &amp; delegates<br><span class="dim">supervisory autonomy</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-r" style="font-size:0.75rem;">&#9672;</div>
+        <div>
+          <div class="card-title">Specialist</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        Deep domain expertise<br><span class="dim">bounded execution</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-b" style="font-size:0.75rem;">&#9672;</div>
+        <div>
+          <div class="card-title">Planner</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        Task decomposition<br><span class="dim">advisory / bounded</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-g" style="font-size:0.75rem;">&#9672;</div>
+        <div>
+          <div class="card-title">Executor</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        Runs planned tasks<br><span class="dim">bounded execution</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-p" style="font-size:0.75rem;">&#9672;</div>
+        <div>
+          <div class="card-title">Reviewer</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        Reviews outputs<br><span class="dim">read-only, annotate</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-r" style="font-size:0.75rem;">&#9672;</div>
+        <div>
+          <div class="card-title">Verifier</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        Evidence validation<br><span class="dim">strict quality gates</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-y" style="font-size:0.75rem;">&#9672;</div>
+        <div>
+          <div class="card-title">Retriever</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        Knowledge lookup<br><span class="dim">read-only, search</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-s" style="font-size:0.75rem;">&#9672;</div>
+        <div>
+          <div class="card-title">Summarizer</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        Condenses context<br><span class="dim">read-only</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top: 0;">
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-b" style="font-size:0.75rem;">&#9672;</div>
+        <div>
+          <div class="card-title">Coder</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        Code generation &amp; refactoring<br><span class="dim">bounded, verify-gated writes</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-i" style="font-size:0.75rem;">&#9672;</div>
+        <div>
+          <div class="card-title">Tool Operator</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        Specific tool execution<br><span class="dim">tool_operator</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Enums</div>
+
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-g">&#9881;</div>
+        <div>
+          <div class="card-title">RoleStatus</div>
+          <div class="card-subtitle">4 states</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        draft &bull; active<br>deprecated &bull; disabled
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-p">&#9881;</div>
+        <div>
+          <div class="card-title">SpecializationType</div>
+          <div class="card-subtitle">7 types</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        generalist &bull; domain_specific<br>tool_specific &bull; verification_specific<br>retrieval_specific &bull; coding_specific<br>coordination_specific
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-y">&#9881;</div>
+        <div>
+          <div class="card-title">AutonomyLevel</div>
+          <div class="card-subtitle">4 levels</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        advisory_only<br>bounded_execution<br>delegation_allowed<br>supervisory
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-b">&#9881;</div>
+        <div>
+          <div class="card-title">RoleOutputType</div>
+          <div class="card-subtitle">8 types</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        plan &bull; analysis &bull; implementation<br>review &bull; verification_report<br>retrieval_bundle &bull; summary<br>tool_result
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Models — Role Template</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-i">&#9632;</div>
+        <div>
+          <div class="card-title">AgentRoleDefinition</div>
+          <div class="card-subtitle">top-level role template</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        role_id &bull; role_type &bull; name<br>description? &bull; status<br>specialization_type &bull; autonomy_level<br>expected_output_types[]<br>owner? &bull; version
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">RoleSpecializationProfile</div>
+          <div class="card-subtitle">strengths &amp; weaknesses</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        profile_id &bull; role_id<br>domain_tags[] &bull; task_types[]<br>strengths[] &bull; weaknesses[]<br>preferred_problem_shapes[]<br>avoid_problem_shapes[]<br>quality_focus? &bull; risk_notes?
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Models — Capability &amp; Constraints</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">RoleCapabilityProfile</div>
+          <div class="card-subtitle">what the role may use</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        capability_profile_id &bull; role_id<br>allowed_tools[] &bull; allowed_skill_ids[]<br>allowed_model_classes[]<br>allowed_context_types[]<br>can_delegate &bull; can_verify<br>can_modify_artifacts<br>can_request_approval<br>max_budget_scope?<br>delegation_boundaries?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9632;</div>
+        <div>
+          <div class="card-title">RoleConstraintProfile</div>
+          <div class="card-subtitle">what it must not do</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        constraint_profile_id &bull; role_id<br>forbidden_tools[] &bull; forbidden_actions[]<br>approval_required_actions[]<br>must_not_write_without_verification<br>must_not_delegate_further<br>sensitive_data_restrictions?<br>environment_restrictions?
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Models — Prompt, Evaluation, Assignment</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9632;</div>
+        <div>
+          <div class="card-title">RolePromptProfile</div>
+          <div class="card-subtitle">modular prompting</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        prompt_profile_id &bull; role_id<br>system_prompt_ref?<br>prompt_fragments[]<br>instruction_pack_refs[]<br>style_notes?<br>reasoning_constraints?<br>handoff_template_ref?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9632;</div>
+        <div>
+          <div class="card-title">RoleEvaluationProfile</div>
+          <div class="card-subtitle">role-specific scoring</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        evaluation_profile_id &bull; role_id<br>success_criteria[]<br>failure_modes[]<br>required_evidence_types[]<br>quality_metrics[]<br>review_policy?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-s">&#9632;</div>
+        <div>
+          <div class="card-title">RoleAssignmentRecord</div>
+          <div class="card-subtitle">template to instance</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        assignment_id &bull; role_id &bull; agent_id<br>run_id? &bull; session_id?<br>assigned_by?<br>assignment_reason?<br>active_from &bull; active_until?<br>override_refs[]
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Top-Level Wrapper</div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-i">&#9632;</div>
+      <div>
+        <div class="card-title">AgentRoleEnvelope</div>
+        <div class="card-subtitle">complete role + assignment boundary</div>
+      </div>
+    </div>
+    <div class="diagram" style="border:none; padding:0.5rem 0;">
+      envelope_id &bull; role_definition<br>specialization_profile? &bull; capability_profile? &bull; constraint_profile?<br>prompt_profile? &bull; evaluation_profile? &bull; assignment_record?
+    </div>
+  </div>
+
+  <div class="section-label">Validation Rules</div>
+
+  <div class="diagram">
+    <span class="hl">NON-BLANK</span>  role_id, name, profile_ids, assignment_id, agent_id, envelope_id<br>
+    <span class="hl">SUPERVISORY</span>  supervisory autonomy only for manager-like roles<br>
+    <span class="hl">ACTIVE</span>  active roles must have capability and constraint profiles<br>
+    <span class="hl">DELEGATE</span>  can_delegate roles require explicit delegation boundaries<br>
+    <span class="hl">MODIFY</span>  can_modify_artifacts requires verification or approval boundary<br>
+    <span class="hl">CONFLICT</span>  forbidden tools cannot appear in allowed_tools<br>
+    <span class="hl">ASSIGN</span>  assignment records must reference an active role
+  </div>
+
+  <div class="section-label">Relationship to Previous Primitives</div>
+
+  <div class="diagram">
+    <span class="hl">P46</span>  Supervisor/Delegate  <span class="dim">uses roles to choose delegates</span><br>
+    <span class="hl">P47</span>  Routing &amp; Arbitration  <span class="dim">routes tasks to roles or role-bearing agents</span><br>
+    <span class="hl">P48</span>  Skill Manifest &amp; Activation  <span class="dim">limits which skills a role may activate</span><br>
+    <span class="hl">P49</span>  Hook Lifecycle &amp; Extension  <span class="dim">exposes hook permissions based on role</span><br>
+    <span class="hl">P28</span>  Tool Capability &amp; Permission  <span class="dim">feeds role-specific tool access</span><br>
+    <span class="hl">P42</span>  Configuration &amp; Secrets  <span class="dim">role-scoped config boundaries</span>
+  </div>
+
+  <div class="section-label">Test Coverage</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">75 tests</div>
+          <div class="card-subtitle">All passing</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">8 models</div>
+          <div class="card-subtitle">5 enums + validators</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-i">&#10003;</div>
+        <div>
+          <div class="card-title">Role lifecycle</div>
+          <div class="card-subtitle">10 role types, 4 statuses, 7 specialization types, 4 autonomy levels, supervisor-only rules, capability/constraint profiles, forbidden-vs-allowed conflict detection, assignment gating, serialization roundtrip, 5 integration scenarios</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">All 50 Primitives</div>
+  <div class="diagram">
+    <span style="color:#818cf8;">P1&nbsp;&nbsp;INSTRUCTION LAYERING</span><br>
+    <span style="color:#34d399;">P2&nbsp;&nbsp;TASK CONTRACT SCHEMA</span><br>
+    <span style="color:#38bdf8;">P3&nbsp;&nbsp;CONTEXT DELIVERY SCHEMA</span><br>
+    <span style="color:#fbbf24;">P4&nbsp;&nbsp;CONTEXT SELECTION POLICY</span><br>
+    <span style="color:#f87171;">P5&nbsp;&nbsp;TOOL INTERFACE SCHEMA</span><br>
+    <span style="color:#a78bfa;">P6&nbsp;&nbsp;EXECUTION ENVIRONMENT</span><br>
+    <span style="color:#fbbf24;">P7&nbsp;&nbsp;DURABLE STATE SCHEMA</span><br>
+    <span style="color:#34d399;">P8&nbsp;&nbsp;VERIFICATION SCHEMA</span><br>
+    <span style="color:#38bdf8;">P9&nbsp;&nbsp;PROMPT ASSEMBLY SCHEMA</span><br>
+    <span style="color:#818cf8;">P10 RUN ORCHESTRATION STATE MACHINE</span><br>
+    <span style="color:#fbbf24;">P11 RETRY AND RECOVERY POLICY</span><br>
+    <span style="color:#ef4444;">P12 APPROVAL AND SAFETY POLICY</span><br>
+    <span style="color:#34d399;">P13 EVALUATION AND BENCHMARK SCHEMA</span><br>
+    <span style="color:#a855f7;">P14 OBSERVABILITY AND TRACE SCHEMA</span><br>
+    <span style="color:#fbbf24;">P15 STATE MACHINE DRIVER</span><br>
+    <span style="color:#34d399;">P16 PIPELINE EXECUTOR</span><br>
+    <span style="color:#fbbf24;">P17 PRODUCTION CONFIG &amp; SECRETS</span><br>
+    <span style="color:#a855f7;">P18 BUDGET &amp; RATE LIMIT POLICY</span><br>
+    <span style="color:#ef4444;">P19 FAILURE TAXONOMY &amp; ERROR ENVELOPE</span><br>
+    <span style="color:#38bdf8;">P20 INPUT &amp; OUTPUT GUARDRAILS</span><br>
+    <span style="color:#34d399;">P21 APPROVAL &amp; ESCALATION</span><br>
+    <span style="color:#a855f7;">P22 CAPABILITY MATRIX</span><br>
+    <span style="color:#818cf8;">P23 SESSION STATE &amp; CHECKPOINT</span><br>
+    <span style="color:#34d399;">P24 EVALUATION &amp; QUALITY GATE</span><br>
+    <span style="color:#38bdf8;">P25 TRACE, AUDIT &amp; PROVENANCE</span><br>
+    <span style="color:#a855f7;">P26 AGENT IDENTITY &amp; OWNERSHIP</span><br>
+    <span style="color:#a855f7;">P27 MEMORY BOUNDARY</span><br>
+    <span style="color:#ef4444;">P28 TOOL CAPABILITY &amp; PERMISSION</span><br>
+    <span style="color:#ef4444;">P29 POLICY EVALUATION &amp; GUARDRAIL</span><br>
+    <span style="color:#ef4444;">P30 HUMAN APPROVAL &amp; ESCALATION</span><br>
+    <span style="color:#38bdf8;">P31 TASK CONTRACT &amp; UNIT-OF-WORK</span><br>
+    <span style="color:#a855f7;">P32 TOOL INVOCATION RECEIPT</span><br>
+    <span style="color:#fbbf24;">P33 MODEL CALL &amp; PROMPT PROVENANCE</span><br>
+    <span style="color:#34d399;">P34 CHECKPOINT &amp; SESSION RECOVERY</span><br>
+    <span style="color:#ef4444;">P35 POLICY DECISION &amp; APPROVAL GATE</span><br>
+    <span style="color:#38bdf8;">P36 AUDIT TRAIL &amp; EVENT LOG CONTRACT</span><br>
+    <span style="color:#a855f7;">P37 MEMORY, CONTEXT &amp; RETRIEVAL SNAPSHOT</span><br>
+    <span style="color:#fbbf24;">P38 ARTIFACT, FILE &amp; GENERATED OUTPUT CONTRACT</span><br>
+    <span style="color:#34d399;">P39 FEEDBACK, EVALUATION &amp; QUALITY SIGNAL CONTRACT</span><br>
+    <span style="color:#f87171;">P40 RUN ORCHESTRATION &amp; EXECUTION STATE CONTRACT</span><br>
+    <span style="color:#f87171;">P41 FAILURE, EXCEPTION &amp; RECOVERY DECISION CONTRACT</span><br>
+    <span style="color:#fbbf24;">P42 CONFIGURATION, SECRETS &amp; ENVIRONMENT CONTRACT</span><br>
+    <span style="color:#38bdf8;">P43 LOGGING, TRACE &amp; OBSERVABILITY EVENT CONTRACT</span><br>
+    <span style="color:#34d399;">P44 RUNNING LOOP CONTRACT</span><br>
+    <span style="color:#a855f7;">P45 STEP / TURN LIFECYCLE CONTRACT</span><br>
+    <span style="color:#fbbf24;">P46 SUPERVISOR &amp; DELEGATE CONTRACT</span><br>
+    <span style="color:#34d399;">P47 ROUTING &amp; ARBITRATION CONTRACT</span><br>
+    <span style="color:#a855f7;">P48 SKILL MANIFEST &amp; ACTIVATION CONTRACT</span><br>
+    <span style="color:#f97316;">P49 HOOK LIFECYCLE &amp; EXTENSION CONTRACT</span><br>
+    <span class="hl" style="color:#818cf8;">P50 AGENT ROLE &amp; SPECIALIZATION CONTRACT</span>  <span class="dim">— <span style="color:#818cf8;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P50 &bull; Agent Role &amp; Specialization Contract &bull; 2482/2482 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "handoff_id": "",
+  "parent_run_id": null,
+  "parent_step_id": null,
+  "from_agent_id": "",
+  "to_agent_id": null,
+  "target_role": null,
+  "handoff_type": "delegate_work",
+  "objective": "",
+  "summary": null,
+  "acceptance_criteria": [],
+  "priority": null,
+  "issued_at": "2026-07-05T12:00:00Z"
+}

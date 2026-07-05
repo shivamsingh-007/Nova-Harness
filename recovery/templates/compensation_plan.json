@@ -1,0 +1,19 @@
+{
+  "compensation_plan_id": "string (required, non-blank)",
+  "failure_id": "string (required, non-blank)",
+  "actions": [
+    {
+      "compensation_action_id": "string (required, non-blank)",
+      "failure_id": "string (required, non-blank)",
+      "action_ref": "string (required, non-blank)",
+      "target_side_effect_ref": "string | null",
+      "execution_order": "int >= 0 (must be unique per plan)",
+      "retry_policy_ref": "string | null",
+      "status": "not_required | planned | in_progress | completed | failed | escalated",
+      "action_notes": "string | null (required if in_progress or failed)"
+    }
+  ],
+  "plan_status": "not_required | planned | in_progress | completed | failed | escalated",
+  "escalation_on_failure": "boolean (default: false)",
+  "completed_at": "ISO 8601 timestamp | null"
+}

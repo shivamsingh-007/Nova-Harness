@@ -1,0 +1,344 @@
+[
+  {
+    "title": "Bounded code implementation task",
+    "description": "Implementation task with explicit scope, inputs, outputs, and acceptance criteria",
+    "envelope": {
+      "envelope_id": "uow-001",
+      "run_id": "run-20260704-001",
+      "task": {
+        "task_id": "t-001",
+        "title": "Implement null-safe file iterator",
+        "task_kind": "implementation",
+        "objective": "Add a null-safe recursive file iterator that skips unreadable directories and logs warnings instead of crashing.",
+        "in_scope": [
+          "src/file_utils.py",
+          "tests/test_file_utils.py"
+        ],
+        "out_of_scope": [
+          "network file access",
+          "database integration"
+        ],
+        "inputs": [
+          {
+            "input_id": "in-repo",
+            "input_type": "git_repository",
+            "source_ref": "main",
+            "required": true
+          },
+          {
+            "input_id": "in-spec",
+            "input_type": "design_doc",
+            "source_ref": "docs/designs/file-iterator-v2.md",
+            "required": true
+          }
+        ],
+        "expected_outputs": [
+          {
+            "output_id": "out-code",
+            "output_type": "source_code",
+            "description": "Implementation of SafeFileIterator class with error handling",
+            "required": true
+          },
+          {
+            "output_id": "out-tests",
+            "output_type": "test_suite",
+            "description": "Test coverage for unreadable dirs, symlink cycles, empty trees",
+            "required": true
+          }
+        ],
+        "constraints": [
+          {
+            "constraint_id": "c-001",
+            "category": "time",
+            "description": "Must complete within 30 minutes wall-clock time",
+            "severity": "hard"
+          },
+          {
+            "constraint_id": "c-002",
+            "category": "files",
+            "description": "Maximum 3 files changed",
+            "severity": "hard"
+          }
+        ],
+        "acceptance_criteria": [
+          {
+            "criterion_id": "ac-001",
+            "description": "All tests in tests/test_file_utils.py pass",
+            "required": true
+          },
+          {
+            "criterion_id": "ac-002",
+            "description": "No new lint errors in src/file_utils.py",
+            "required": true
+          }
+        ],
+        "failure_mode": "retry",
+        "priority": "high"
+      },
+      "status": "ready",
+      "assigned_agent_id": "agent-code-01",
+      "parent_task_id": null
+    }
+  },
+  {
+    "title": "Research task with explicit out-of-scope items",
+    "description": "Research task that clearly defines what not to investigate",
+    "envelope": {
+      "envelope_id": "uow-002",
+      "run_id": "run-20260704-002",
+      "task": {
+        "task_id": "t-002",
+        "title": "Evaluate vector database options for semantic search",
+        "task_kind": "research",
+        "objective": "Compare Chroma, Pinecone, and Qdrant on latency, cost, and ease of integration for a 10k-document corpus.",
+        "in_scope": [
+          "latency benchmarks under 10k vectors",
+          "pricing analysis for small-scale deployment",
+          "Python SDK integration complexity"
+        ],
+        "out_of_scope": [
+          "production deployment beyond single node",
+          "sharding or replication strategies",
+          "alternative to vector search (e.g., BM25)"
+        ],
+        "inputs": [
+          {
+            "input_id": "in-reqs",
+            "input_type": "requirements_doc",
+            "source_ref": "docs/requirements/semantic-search-v1.md",
+            "required": true
+          }
+        ],
+        "expected_outputs": [
+          {
+            "output_id": "out-report",
+            "output_type": "comparison_report",
+            "description": "Tabular comparison of latency, cost, integration effort for each option with recommendation",
+            "required": true
+          }
+        ],
+        "constraints": [
+          {
+            "constraint_id": "c-001",
+            "category": "time",
+            "description": "Must complete within 2 hours",
+            "severity": "hard"
+          },
+          {
+            "constraint_id": "c-002",
+            "category": "scope",
+            "description": "Do not run any external benchmarks; use published data only",
+            "severity": "soft"
+          }
+        ],
+        "acceptance_criteria": [
+          {
+            "criterion_id": "ac-001",
+            "description": "All three databases compared on same 5 metrics",
+            "required": true
+          },
+          {
+            "criterion_id": "ac-002",
+            "description": "Recommendation includes a rationale paragraph",
+            "required": true
+          }
+        ],
+        "failure_mode": "escalate",
+        "priority": "normal"
+      },
+      "status": "running",
+      "assigned_agent_id": "agent-research-02"
+    }
+  },
+  {
+    "title": "Task blocked pending approval",
+    "description": "Task waiting for human approval before execution can proceed",
+    "envelope": {
+      "envelope_id": "uow-003",
+      "run_id": "run-20260704-003",
+      "task": {
+        "task_id": "t-003",
+        "title": "Delete deprecated API v1 endpoints",
+        "task_kind": "transformation",
+        "objective": "Remove all v1 API endpoints that have been deprecated for 6 months and are no longer serving traffic.",
+        "in_scope": [
+          "src/api/v1/",
+          "tests/api/v1/"
+        ],
+        "out_of_scope": [
+          "v2 API changes",
+          "database schema migrations"
+        ],
+        "inputs": [
+          {
+            "input_id": "in-traffic",
+            "input_type": "observability_report",
+            "source_ref": "internal/dashboards/api-v1-traffic",
+            "required": true
+          }
+        ],
+        "expected_outputs": [
+          {
+            "output_id": "out-removed",
+            "output_type": "deleted_files_report",
+            "description": "List of all deleted endpoint files and routes",
+            "required": true
+          }
+        ],
+        "constraints": [
+          {
+            "constraint_id": "c-001",
+            "category": "permission",
+            "description": "Requires explicit approval from API team lead",
+            "severity": "hard"
+          }
+        ],
+        "acceptance_criteria": [
+          {
+            "criterion_id": "ac-001",
+            "description": "No v1 routes remain registered in the router",
+            "required": true
+          },
+          {
+            "criterion_id": "ac-002",
+            "description": "All existing v2 integration tests still pass",
+            "required": true
+          }
+        ],
+        "failure_mode": "stop",
+        "priority": "critical"
+      },
+      "status": "needs_approval",
+      "assigned_agent_id": "agent-code-01"
+    }
+  },
+  {
+    "title": "Task needing additional input",
+    "description": "Task paused awaiting missing required input",
+    "envelope": {
+      "envelope_id": "uow-004",
+      "run_id": "run-20260704-004",
+      "task": {
+        "task_id": "t-004",
+        "title": "Fix integration test flakiness in checkout flow",
+        "task_kind": "implementation",
+        "objective": "Identify and fix flaky integration tests in the checkout flow that fail intermittently.",
+        "in_scope": [
+          "tests/integration/checkout/"
+        ],
+        "out_of_scope": [
+          "unit tests outside checkout",
+          "stripe API changes"
+        ],
+        "inputs": [
+          {
+            "input_id": "in-logs",
+            "input_type": "test_logs",
+            "source_ref": "ci/run-9876/test-output.log",
+            "required": true
+          },
+          {
+            "input_id": "in-repro",
+            "input_type": "reproduction_script",
+            "source_ref": "",
+            "required": true
+          }
+        ],
+        "expected_outputs": [
+          {
+            "output_id": "out-fix",
+            "output_type": "source_code",
+            "description": "Patches for flaky test code or underlying race conditions",
+            "required": true
+          }
+        ],
+        "constraints": [],
+        "acceptance_criteria": [
+          {
+            "criterion_id": "ac-001",
+            "description": "Flaky test passes 10/10 consecutive runs in CI",
+            "required": true
+          }
+        ],
+        "failure_mode": "request_input",
+        "priority": "high"
+      },
+      "status": "needs_input",
+      "assigned_agent_id": "agent-code-03"
+    }
+  },
+  {
+    "title": "Completed task with defined outputs and acceptance criteria",
+    "description": "Task that has been completed successfully with verified acceptance criteria",
+    "envelope": {
+      "envelope_id": "uow-005",
+      "run_id": "run-20260704-005",
+      "task": {
+        "task_id": "t-005",
+        "title": "Add rate limiting middleware to public API",
+        "task_kind": "implementation",
+        "objective": "Implement a token-bucket rate limiter middleware for the public API to prevent abuse.",
+        "in_scope": [
+          "src/middleware/rate_limiter.py",
+          "src/config/rate_limits.py",
+          "tests/test_rate_limiter.py"
+        ],
+        "out_of_scope": [
+          "API key management dashboard",
+          "per-user rate limit tiers"
+        ],
+        "inputs": [
+          {
+            "input_id": "in-spec",
+            "input_type": "design_doc",
+            "source_ref": "docs/designs/rate-limiting-v2.md",
+            "required": true
+          }
+        ],
+        "expected_outputs": [
+          {
+            "output_id": "out-code",
+            "output_type": "source_code",
+            "description": "TokenBucketRateLimiter middleware class with configurable limits",
+            "required": true
+          },
+          {
+            "output_id": "out-tests",
+            "output_type": "test_suite",
+            "description": "Unit and integration tests for rate limiter behavior",
+            "required": true
+          }
+        ],
+        "constraints": [
+          {
+            "constraint_id": "c-001",
+            "category": "performance",
+            "description": "Middleware must add less than 1ms p99 latency overhead",
+            "severity": "hard"
+          }
+        ],
+        "acceptance_criteria": [
+          {
+            "criterion_id": "ac-001",
+            "description": "All 24 rate limiter tests pass",
+            "required": true
+          },
+          {
+            "criterion_id": "ac-002",
+            "description": "p99 latency overhead measured below 1ms in staging",
+            "required": true
+          },
+          {
+            "criterion_id": "ac-003",
+            "description": "Lint and typecheck pass on new files",
+            "required": true
+          }
+        ],
+        "failure_mode": "stop",
+        "priority": "high"
+      },
+      "status": "completed",
+      "assigned_agent_id": "agent-code-02"
+    }
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "finalization": {
+    "finalization_id": "fin-<seq>",
+    "finalization_status": "<approved|rejected|needs_rework|released>",
+    "final_disposition": "<accept|accept_with_caveats|return_for_rework|reject|escalate>",
+    "approved_by": "<agent_id>",
+    "approval_reason": "<rationale for disposition>",
+    "release_ready": true,
+    "followup_required": false
+  },
+  "output": {
+    "output_id": "out-<seq>",
+    "output_type": "<type of output>",
+    "result_summary": "<summary of finalized output>",
+    "final_output_refs": ["<artifact_path_1>"],
+    "supporting_evidence_refs": ["<evidence_path_1>"],
+    "residual_uncertainties": ["<open question 1>"],
+    "consumer_notes": "<guidance for consumer>"
+  }
+}

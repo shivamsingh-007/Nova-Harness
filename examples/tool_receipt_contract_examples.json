@@ -1,0 +1,220 @@
+[
+  {
+    "title": "Read-only search tool receipt",
+    "description": "Receipt for a code search query with result references, read-only side effect, and full timing",
+    "envelope": {
+      "envelope_id": "env-srch",
+      "receipt": {
+        "receipt_id": "rcpt-srch",
+        "invocation": {
+          "request_id": "req-srch-001",
+          "run_id": "run-042",
+          "task_id": "t-001",
+          "trace_id": "trace-srch",
+          "agent_id": "agent-code",
+          "tool_id": "search_code",
+          "action": "search"
+        },
+        "timing": {
+          "requested_at": "2026-07-04T10:00:00Z",
+          "started_at": "2026-07-04T10:00:01Z",
+          "completed_at": "2026-07-04T10:00:03Z",
+          "duration_ms": 2000
+        },
+        "execution_result": {
+          "status": "executed",
+          "outcome_summary": "Found 12 matching files",
+          "result_references": [
+            {
+              "result_ref_id": "rr-srch-001",
+              "result_type": "file_list",
+              "content_ref": "search/run-042/results.json",
+              "content_hash": "sha256-f1d2d3f4",
+              "item_count": 12
+            }
+          ],
+          "side_effects": [
+            {
+              "side_effect_type": "read_only",
+              "target_refs": ["search_index"],
+              "summary": "Queried the code search index"
+            }
+          ]
+        },
+        "integrity": {
+          "integrity_mode": "none"
+        }
+      }
+    }
+  },
+  {
+    "title": "File write tool receipt with side effects",
+    "description": "Receipt for a file mutation with FILE_WRITE side effect and hash-only integrity",
+    "envelope": {
+      "envelope_id": "env-write",
+      "receipt": {
+        "receipt_id": "rcpt-write",
+        "invocation": {
+          "request_id": "req-write-001",
+          "run_id": "run-043",
+          "task_id": "t-001",
+          "agent_id": "agent-code",
+          "tool_id": "edit_file",
+          "action": "write"
+        },
+        "timing": {
+          "requested_at": "2026-07-04T10:01:00Z",
+          "started_at": "2026-07-04T10:01:01Z",
+          "completed_at": "2026-07-04T10:01:03Z",
+          "duration_ms": 2000
+        },
+        "execution_result": {
+          "status": "executed",
+          "outcome_summary": "Wrote 150 lines to src/handler.py",
+          "result_references": [
+            {
+              "result_ref_id": "rr-write-001",
+              "result_type": "diff",
+              "content_ref": "diff/run-043/handler.patch",
+              "content_hash": "sha256-a1b2c3d4"
+            }
+          ],
+          "side_effects": [
+            {
+              "side_effect_type": "file_write",
+              "target_refs": ["src/handler.py"],
+              "summary": "Updated file with new rate limiter implementation"
+            }
+          ]
+        },
+        "integrity": {
+          "integrity_mode": "hash_only",
+          "canonical_hash": "sha256-e5f6g7h8"
+        }
+      }
+    }
+  },
+  {
+    "title": "Blocked tool call with policy reference",
+    "description": "Receipt for a tool call that was blocked by policy, with policy_decision_ref linkage",
+    "envelope": {
+      "envelope_id": "env-block",
+      "receipt": {
+        "receipt_id": "rcpt-block",
+        "invocation": {
+          "request_id": "req-block-001",
+          "run_id": "run-044",
+          "task_id": "t-003",
+          "agent_id": "agent-code",
+          "tool_id": "delete_file",
+          "action": "delete"
+        },
+        "timing": {
+          "requested_at": "2026-07-04T10:02:00Z",
+          "started_at": null,
+          "completed_at": null,
+          "duration_ms": null
+        },
+        "execution_result": {
+          "status": "blocked",
+          "outcome_summary": "Blocked by deletion policy",
+          "result_references": [],
+          "side_effects": [],
+          "error_code": "ERR_PROTECTED_PATH",
+          "error_summary": "File path src/deployment/secrets.json matches protected paths list"
+        },
+        "policy_decision_ref": "pd-099",
+        "integrity": {
+          "integrity_mode": "none"
+        }
+      }
+    }
+  },
+  {
+    "title": "Failed external API tool receipt",
+    "description": "Receipt for a GitHub API call that failed with HTTP 403 rate limit error",
+    "envelope": {
+      "envelope_id": "env-fail",
+      "receipt": {
+        "receipt_id": "rcpt-fail",
+        "invocation": {
+          "request_id": "req-api-001",
+          "run_id": "run-045",
+          "task_id": "t-002",
+          "agent_id": "agent-code",
+          "tool_id": "github_api",
+          "action": "create_issue"
+        },
+        "timing": {
+          "requested_at": "2026-07-04T10:03:00Z",
+          "started_at": "2026-07-04T10:03:01Z",
+          "completed_at": "2026-07-04T10:03:30Z",
+          "duration_ms": 29000
+        },
+        "execution_result": {
+          "status": "failed",
+          "outcome_summary": "GitHub API returned 403",
+          "result_references": [],
+          "side_effects": [],
+          "error_code": "HTTP_403",
+          "error_summary": "Rate limit exceeded for authenticated user"
+        },
+        "integrity": {
+          "integrity_mode": "none"
+        }
+      }
+    }
+  },
+  {
+    "title": "Hash-only integrity receipt",
+    "description": "Receipt showing hash-only integrity mode with canonical_hash for replay verification",
+    "envelope": {
+      "envelope_id": "env-hash",
+      "receipt": {
+        "receipt_id": "rcpt-hash",
+        "invocation": {
+          "request_id": "req-hash-001",
+          "run_id": "run-046",
+          "task_id": "t-001",
+          "trace_id": "trace-replay",
+          "agent_id": "agent-code",
+          "tool_id": "read_file",
+          "action": "read"
+        },
+        "timing": {
+          "requested_at": "2026-07-04T10:04:00Z",
+          "started_at": "2026-07-04T10:04:00Z",
+          "completed_at": "2026-07-04T10:04:01Z",
+          "duration_ms": 150
+        },
+        "execution_result": {
+          "status": "executed",
+          "outcome_summary": "Read 200 lines from config.yaml",
+          "result_references": [
+            {
+              "result_ref_id": "rr-hash-001",
+              "result_type": "file_content",
+              "content_ref": "files/config.yaml",
+              "content_hash": "sha256-content-hash"
+            }
+          ],
+          "side_effects": [
+            {
+              "side_effect_type": "read_only",
+              "target_refs": ["config.yaml"],
+              "summary": "Read configuration file from disk"
+            }
+          ]
+        },
+        "policy_decision_ref": null,
+        "approval_ref": null,
+        "integrity": {
+          "integrity_mode": "hash_only",
+          "canonical_hash": "sha256-receipt-hash-abc123",
+          "signature_ref": null,
+          "previous_receipt_hash": null
+        }
+      }
+    }
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "envelope": {
+    "envelope_id": "env-par-<seq>",
+    "parallel_request": {
+      "parallel_request_id": "pr-<seq>",
+      "parallelization_mode": "<fan_out_all|fan_out_selected|conditional_parallel|verification_parallel|speculative_parallel>",
+      "objective": "<why parallelize>",
+      "join_policy": "<wait_for_all|wait_for_quorum|wait_for_first_success|wait_for_required_set|manual_join>"
+    },
+    "branch_assignments": [
+      {
+        "branch_id": "branch-<name>-<seq>",
+        "parallel_request_id": "pr-<seq>",
+        "assigned_agent_id": "agent-<role>-<id>",
+        "scope_summary": "<branch work description>",
+        "status": "planned"
+      }
+    ],
+    "join_requirements": {
+      "join_requirement_id": "jr-<seq>",
+      "parallel_request_id": "pr-<seq>",
+      "required_branch_ids": ["<branch_id_1>", "<branch_id_2>"],
+      "required_completion_count": 2,
+      "accept_partial_failures": false
+    }
+  }
+}

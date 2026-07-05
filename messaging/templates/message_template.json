@@ -1,0 +1,33 @@
+{
+  "envelope": {
+    "envelope_id": "env-<message_type>-<seq>",
+    "message": {
+      "header": {
+        "message_id": "msg-<seq>",
+        "schema_version": "1.0",
+        "intent_type": "request_action",
+        "transport_mode": "asynchronous",
+        "priority": "normal",
+        "sender_agent_id": "agent-<role>-<id>",
+        "trace_id": "trace-<seq>",
+        "created_at": "<iso_timestamp>"
+      },
+      "audience": {
+        "audience_id": "aud-<seq>",
+        "audience_type": "single_agent",
+        "target_agent_ids": ["agent-<target_role>-<target_id>"]
+      },
+      "payload": {
+        "payload_id": "pl-<seq>",
+        "summary": "<description of task or information>",
+        "constraints": []
+      },
+      "delivery_policy": {
+        "delivery_policy_id": "dp-<seq>",
+        "requires_ack": true,
+        "timeout_ms": 60000,
+        "max_retries": 3
+      }
+    }
+  }
+}

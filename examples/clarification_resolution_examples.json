@@ -1,0 +1,391 @@
+{
+  "description": "P57 Clarification & Resolution Contract examples — gap detection, targeted questions, resolution attempts, and closure decisions.",
+  "examples": [
+    {
+      "name": "missing_required_deadline_resolved_by_user_answer",
+      "description": "A missing required deadline is detected as a blocking gap, a targeted question is issued, the user answers, and the session closes as ready_to_proceed.",
+      "envelope": {
+        "envelope_id": "env-clar-001",
+        "gaps": [
+          {
+            "gap_id": "gap-001",
+            "intake_id": "intake-001",
+            "field_name": "deadline",
+            "gap_type": "missing_required",
+            "gap_severity": "blocking",
+            "blocking": true,
+            "gap_summary": "Deadline is missing from the request",
+            "candidate_values": [],
+            "detected_at": "2026-07-05T09:00:00Z"
+          }
+        ],
+        "questions": [
+          {
+            "question_id": "q-001",
+            "gap_id": "gap-001",
+            "field_name": "deadline",
+            "question_text": "By when does this task need to be completed?",
+            "question_order": 0,
+            "response_type": "date",
+            "recommended_examples": ["2026-07-10", "end_of_sprint"],
+            "issued_at": "2026-07-05T09:00:05Z"
+          }
+        ],
+        "attempts": [
+          {
+            "attempt_id": "att-001",
+            "gap_id": "gap-001",
+            "resolution_method": "ask_user",
+            "proposed_value_ref": "2026-07-10",
+            "confidence": 0.95,
+            "attempt_reason": "User answered deadline question",
+            "attempted_at": "2026-07-05T09:00:30Z"
+          }
+        ],
+        "field_resolutions": [
+          {
+            "field_resolution_id": "fr-001",
+            "gap_id": "gap-001",
+            "resolved_value_ref": "2026-07-10",
+            "resolution_method": "ask_user",
+            "resolution_status": "resolved",
+            "notes": "User explicitly provided deadline",
+            "resolved_at": "2026-07-05T09:00:30Z"
+          }
+        ],
+        "policies": [
+          {
+            "policy_id": "pol-001",
+            "field_name": "deadline",
+            "required": true,
+            "allow_default": true,
+            "allow_inference": false,
+            "allow_defer": false
+          }
+        ],
+        "session": {
+          "clarification_session_id": "cs-001",
+          "intake_id": "intake-001",
+          "related_gap_ids": ["gap-001"],
+          "active_question_ids": [],
+          "completed_question_ids": ["q-001"],
+          "session_status": "completed",
+          "started_at": "2026-07-05T09:00:00Z",
+          "updated_at": "2026-07-05T09:00:30Z"
+        },
+        "decision": {
+          "decision_id": "dec-001",
+          "clarification_session_id": "cs-001",
+          "clarification_disposition": "ready_to_proceed",
+          "remaining_open_gap_ids": [],
+          "decision_reason": "All gaps resolved via user clarification",
+          "proceeding_constraints": [],
+          "decided_at": "2026-07-05T09:00:35Z"
+        }
+      }
+    },
+    {
+      "name": "ambiguous_output_format_requiring_clarification",
+      "description": "An ambiguous output format field has multiple candidate values, the user is asked to pick one, and the gap is resolved.",
+      "envelope": {
+        "envelope_id": "env-clar-002",
+        "gaps": [
+          {
+            "gap_id": "gap-002",
+            "intake_id": "intake-002",
+            "field_name": "output_format",
+            "gap_type": "ambiguous_value",
+            "gap_severity": "medium",
+            "blocking": false,
+            "gap_summary": "Output format not specified — could be JSON, YAML, or plain text",
+            "candidate_values": ["JSON", "YAML", "plain_text"],
+            "detected_at": "2026-07-05T10:00:00Z"
+          }
+        ],
+        "questions": [
+          {
+            "question_id": "q-002",
+            "gap_id": "gap-002",
+            "field_name": "output_format",
+            "question_text": "Which output format do you prefer?",
+            "question_order": 0,
+            "response_type": "choice",
+            "recommended_examples": ["JSON", "YAML", "plain_text"],
+            "issued_at": "2026-07-05T10:00:05Z"
+          }
+        ],
+        "attempts": [
+          {
+            "attempt_id": "att-002",
+            "gap_id": "gap-002",
+            "resolution_method": "ask_user",
+            "proposed_value_ref": "JSON",
+            "confidence": 0.98,
+            "attempt_reason": "User selected JSON from options",
+            "attempted_at": "2026-07-05T10:00:20Z"
+          }
+        ],
+        "field_resolutions": [
+          {
+            "field_resolution_id": "fr-002",
+            "gap_id": "gap-002",
+            "resolved_value_ref": "JSON",
+            "resolution_method": "ask_user",
+            "resolution_status": "resolved",
+            "resolved_at": "2026-07-05T10:00:20Z"
+          }
+        ],
+        "policies": [
+          {
+            "policy_id": "pol-002",
+            "field_name": "output_format",
+            "required": false,
+            "allow_default": true,
+            "allow_inference": false,
+            "allow_defer": false
+          }
+        ],
+        "session": {
+          "clarification_session_id": "cs-002",
+          "intake_id": "intake-002",
+          "related_gap_ids": ["gap-002"],
+          "active_question_ids": [],
+          "completed_question_ids": ["q-002"],
+          "session_status": "completed",
+          "started_at": "2026-07-05T10:00:00Z",
+          "updated_at": "2026-07-05T10:00:20Z"
+        },
+        "decision": {
+          "decision_id": "dec-002",
+          "clarification_session_id": "cs-002",
+          "clarification_disposition": "ready_to_proceed",
+          "remaining_open_gap_ids": [],
+          "decision_reason": "Output format clarified to JSON",
+          "proceeding_constraints": [],
+          "decided_at": "2026-07-05T10:00:25Z"
+        }
+      }
+    },
+    {
+      "name": "optional_field_deferred_with_proceed_with_gaps",
+      "description": "An optional field is missing and the runtime defers resolution, proceeding with the gap tracked.",
+      "envelope": {
+        "envelope_id": "env-clar-003",
+        "gaps": [
+          {
+            "gap_id": "gap-003",
+            "intake_id": "intake-003",
+            "field_name": "deadline",
+            "gap_type": "missing_optional",
+            "gap_severity": "low",
+            "blocking": false,
+            "gap_summary": "Deadline is optional but not provided",
+            "candidate_values": [],
+            "detected_at": "2026-07-05T11:00:00Z"
+          }
+        ],
+        "questions": [],
+        "attempts": [],
+        "field_resolutions": [
+          {
+            "field_resolution_id": "fr-003",
+            "gap_id": "gap-003",
+            "resolution_method": "defer",
+            "resolution_status": "deferred",
+            "notes": "Optional deadline — proceeding without one",
+            "resolved_at": "2026-07-05T11:00:10Z"
+          }
+        ],
+        "policies": [
+          {
+            "policy_id": "pol-003",
+            "field_name": "deadline",
+            "required": false,
+            "allow_default": true,
+            "allow_defer": true,
+            "escalation_threshold": 3
+          }
+        ],
+        "session": {
+          "clarification_session_id": "cs-003",
+          "intake_id": "intake-003",
+          "related_gap_ids": ["gap-003"],
+          "active_question_ids": [],
+          "completed_question_ids": [],
+          "session_status": "completed",
+          "started_at": "2026-07-05T11:00:00Z",
+          "updated_at": "2026-07-05T11:00:10Z"
+        },
+        "decision": {
+          "decision_id": "dec-003",
+          "clarification_session_id": "cs-003",
+          "clarification_disposition": "proceed_with_gaps",
+          "remaining_open_gap_ids": ["gap-003"],
+          "decision_reason": "Optional deadline deferred — proceeding with gaps",
+          "proceeding_constraints": ["deadline will be set when available"],
+          "decided_at": "2026-07-05T11:00:15Z"
+        }
+      }
+    },
+    {
+      "name": "conflicting_values_escalated",
+      "description": "A priority field has conflicting values (high vs low) and after a clarification attempt fails, the conflict is escalated.",
+      "envelope": {
+        "envelope_id": "env-clar-004",
+        "gaps": [
+          {
+            "gap_id": "gap-004",
+            "intake_id": "intake-004",
+            "field_name": "priority",
+            "gap_type": "conflicting_values",
+            "gap_severity": "blocking",
+            "blocking": true,
+            "gap_summary": "Priority specified as both 'high' and 'low' in different sources",
+            "candidate_values": ["high", "low"],
+            "detected_at": "2026-07-05T12:00:00Z"
+          }
+        ],
+        "questions": [
+          {
+            "question_id": "q-004",
+            "gap_id": "gap-004",
+            "field_name": "priority",
+            "question_text": "Priority is both 'high' and 'low'. Which is correct?",
+            "question_order": 0,
+            "response_type": "choice",
+            "recommended_examples": ["high", "low"],
+            "issued_at": "2026-07-05T12:00:05Z"
+          }
+        ],
+        "attempts": [
+          {
+            "attempt_id": "att-004",
+            "gap_id": "gap-004",
+            "resolution_method": "escalate",
+            "attempt_reason": "Question issued, escalated after no timely response",
+            "attempted_at": "2026-07-05T12:00:05Z"
+          }
+        ],
+        "field_resolutions": [
+          {
+            "field_resolution_id": "fr-004",
+            "gap_id": "gap-004",
+            "resolution_method": "escalate",
+            "resolution_status": "escalated",
+            "notes": "Escalated to manager — conflicting priority values unresolved",
+            "resolved_at": "2026-07-05T12:05:00Z"
+          }
+        ],
+        "policies": [
+          {
+            "policy_id": "pol-004",
+            "field_name": "priority",
+            "required": true,
+            "allow_default": false,
+            "allow_inference": false,
+            "allow_defer": false
+          }
+        ],
+        "session": {
+          "clarification_session_id": "cs-004",
+          "intake_id": "intake-004",
+          "related_gap_ids": ["gap-004"],
+          "active_question_ids": [],
+          "completed_question_ids": ["q-004"],
+          "session_status": "escalated",
+          "started_at": "2026-07-05T12:00:00Z",
+          "updated_at": "2026-07-05T12:05:00Z"
+        },
+        "decision": {
+          "decision_id": "dec-004",
+          "clarification_session_id": "cs-004",
+          "clarification_disposition": "escalated",
+          "remaining_open_gap_ids": ["gap-004"],
+          "decision_reason": "Conflicting priority values could not be resolved",
+          "proceeding_constraints": [],
+          "decided_at": "2026-07-05T12:05:05Z"
+        }
+      }
+    },
+    {
+      "name": "unsupported_request_rejected_after_clarification",
+      "description": "A request for out-of-scope infrastructure access is identified as unsupported, the user is asked to rephrase, and the task is rejected.",
+      "envelope": {
+        "envelope_id": "env-clar-005",
+        "gaps": [
+          {
+            "gap_id": "gap-005",
+            "intake_id": "intake-005",
+            "field_name": "request_type",
+            "gap_type": "unsupported_request",
+            "gap_severity": "blocking",
+            "blocking": true,
+            "gap_summary": "Request for network infrastructure access is outside agent scope",
+            "candidate_values": [],
+            "detected_at": "2026-07-05T14:00:00Z"
+          }
+        ],
+        "questions": [
+          {
+            "question_id": "q-005",
+            "gap_id": "gap-005",
+            "field_name": "request_type",
+            "question_text": "This request requires infrastructure access that is outside my scope. Can you rephrase as a code-level task?",
+            "question_order": 0,
+            "response_type": "free_text",
+            "recommended_examples": ["Deploy application code", "Write configuration script"],
+            "issued_at": "2026-07-05T14:00:05Z"
+          }
+        ],
+        "attempts": [
+          {
+            "attempt_id": "att-005",
+            "gap_id": "gap-005",
+            "resolution_method": "escalate",
+            "attempt_reason": "Asked user to rephrase, user confirmed cannot — escalating",
+            "attempted_at": "2026-07-05T14:00:05Z"
+          }
+        ],
+        "field_resolutions": [
+          {
+            "field_resolution_id": "fr-005",
+            "gap_id": "gap-005",
+            "resolution_method": "ask_user",
+            "resolution_status": "closed_unresolved",
+            "notes": "User confirmed request cannot be rephrased — rejected",
+            "resolved_at": "2026-07-05T14:05:00Z"
+          }
+        ],
+        "policies": [
+          {
+            "policy_id": "pol-005",
+            "field_name": "request_type",
+            "required": true,
+            "allow_default": false,
+            "allow_inference": false,
+            "allow_defer": false
+          }
+        ],
+        "session": {
+          "clarification_session_id": "cs-005",
+          "intake_id": "intake-005",
+          "related_gap_ids": ["gap-005"],
+          "active_question_ids": [],
+          "completed_question_ids": ["q-005"],
+          "session_status": "closed",
+          "started_at": "2026-07-05T14:00:00Z",
+          "updated_at": "2026-07-05T14:05:00Z"
+        },
+        "decision": {
+          "decision_id": "dec-005",
+          "clarification_session_id": "cs-005",
+          "clarification_disposition": "rejected",
+          "remaining_open_gap_ids": ["gap-005"],
+          "decision_reason": "Unsupported request type — rejected after clarification attempt",
+          "proceeding_constraints": [],
+          "decided_at": "2026-07-05T14:05:05Z"
+        }
+      }
+    }
+  ]
+}

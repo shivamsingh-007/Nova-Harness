@@ -1,0 +1,155 @@
+[
+  {
+    "title": "Human review pass with rubric refs",
+    "description": "A human reviewer approved the output with full rubric criteria scoring",
+    "envelope": {
+      "envelope_id": "env-human-pass",
+      "signals": [
+        {
+          "evaluation_id": "eval-human-pass",
+          "run_id": "run-001",
+          "task_id": "t-001",
+          "artifact_id": "art-001",
+          "method": "manual_review",
+          "feedback": {
+            "feedback_id": "fb-human-pass",
+            "source_type": "human",
+            "verdict": "pass",
+            "summary": "Code review approved",
+            "comments": "All checks passed, code is clean and well-tested",
+            "score": 0.95,
+            "severity": "low",
+            "criteria": [
+              { "criterion_id": "c-1", "description": "Code compiles", "score": 1.0, "passed": true },
+              { "criterion_id": "c-2", "description": "Tests pass", "score": 0.95, "passed": true },
+              { "criterion_id": "c-3", "description": "No lint errors", "score": 0.9, "passed": true }
+            ],
+            "rubric_ref": {
+              "rubric_id": "rubric-001",
+              "rubric_name": "code_quality",
+              "version": "1.0"
+            }
+          },
+          "evaluator_ref": "human://reviewer-alice"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Model judge partial evaluation",
+    "description": "A model judge evaluated the output and found it partially complete",
+    "envelope": {
+      "envelope_id": "env-model-partial",
+      "signals": [
+        {
+          "evaluation_id": "eval-model-partial",
+          "run_id": "run-001",
+          "task_id": "t-001",
+          "model_call_id": "mc-001",
+          "method": "model_judge",
+          "feedback": {
+            "feedback_id": "fb-model-partial",
+            "source_type": "model",
+            "verdict": "partial",
+            "summary": "Partially answered query; missing implementation details",
+            "score": 0.73,
+            "severity": "medium",
+            "criteria": [
+              { "criterion_id": "c-1", "description": "Relevant to query", "score": 0.8, "passed": true },
+              { "criterion_id": "c-2", "description": "Complete answer", "score": 0.5, "passed": false },
+              { "criterion_id": "c-3", "description": "No hallucinations", "score": 0.9, "passed": true }
+            ]
+          },
+          "evaluator_ref": "model://judge-v2"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Automated fail with evidence refs",
+    "description": "Automated heuristic checks failed with evidence from file validation and secret scanning",
+    "envelope": {
+      "envelope_id": "env-auto-fail",
+      "signals": [
+        {
+          "evaluation_id": "eval-auto-fail",
+          "run_id": "run-001",
+          "task_id": "t-001",
+          "artifact_id": "art-001",
+          "tool_call_id": "tc-001",
+          "method": "heuristic",
+          "feedback": {
+            "feedback_id": "fb-auto-fail",
+            "source_type": "automated",
+            "verdict": "fail",
+            "summary": "Automated quality checks failed",
+            "score": 0.33,
+            "severity": "high",
+            "criteria": [
+              { "criterion_id": "c-1", "description": "File exists", "score": 1.0, "passed": true },
+              { "criterion_id": "c-2", "description": "Size within limit", "score": 0.0, "passed": false },
+              { "criterion_id": "c-3", "description": "No sensitive content", "score": 0.0, "passed": false }
+            ],
+            "evidence_refs": [
+              { "evidence_id": "ev-size", "evidence_type": "file_check", "source_ref": "check://size-limit", "evidence_hash": "sha256:s1" },
+              { "evidence_id": "ev-sensitive", "evidence_type": "scan_result", "source_ref": "scan://secret-detection", "evidence_hash": "sha256:s2" }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "title": "Hybrid review with mixed criteria outcomes",
+    "description": "A hybrid automated-plus-human review with mixed pass/fail criteria across different dimensions",
+    "envelope": {
+      "envelope_id": "env-hybrid",
+      "signals": [
+        {
+          "evaluation_id": "eval-hybrid",
+          "run_id": "run-001",
+          "task_id": "t-001",
+          "artifact_id": "art-001",
+          "method": "rubric",
+          "feedback": {
+            "feedback_id": "fb-hybrid",
+            "source_type": "hybrid",
+            "verdict": "partial",
+            "summary": "Mixed results: functional but needs style and performance improvements",
+            "score": 0.65,
+            "severity": "medium",
+            "criteria": [
+              { "criterion_id": "c-1", "description": "Functional correctness", "score": 0.9, "passed": true },
+              { "criterion_id": "c-2", "description": "Code style", "score": 0.6, "passed": false },
+              { "criterion_id": "c-3", "description": "Documentation", "score": 0.7, "passed": true },
+              { "criterion_id": "c-4", "description": "Performance", "score": 0.4, "passed": false }
+            ]
+          },
+          "evaluator_ref": "hybrid://auto+human"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Unknown verdict needing more information",
+    "description": "An automated system could not determine quality due to insufficient data",
+    "envelope": {
+      "envelope_id": "env-unknown",
+      "signals": [
+        {
+          "evaluation_id": "eval-unknown",
+          "run_id": "run-001",
+          "task_id": "t-001",
+          "method": "heuristic",
+          "feedback": {
+            "feedback_id": "fb-unknown",
+            "source_type": "automated",
+            "verdict": "unknown",
+            "summary": "Insufficient data to evaluate output quality",
+            "severity": "low"
+          }
+        }
+      ]
+    }
+  }
+]

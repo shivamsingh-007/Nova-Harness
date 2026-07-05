@@ -1,0 +1,22 @@
+{
+  "registry_version": "1.0.0",
+  "updated_at": "2026-07-05T12:42:00Z",
+  "hook_points": [
+    {
+      "hook_point_type": "pre_tool_call",
+      "execution_mode": "ordered_chain",
+      "allowed_effects": ["observe", "block"],
+      "handlers": [
+        {
+          "handler_id": "hook-example-prod-guard",
+          "name": "Production Safety Guard",
+          "version": "1.0.0",
+          "effect_type": "block",
+          "enabled": true,
+          "failure_policy": "fail_closed",
+          "implementation": "hooks/example_hook/HOOK.md"
+        }
+      ]
+    }
+  ]
+}

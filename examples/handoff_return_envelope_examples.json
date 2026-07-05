@@ -1,0 +1,239 @@
+{
+  "description": "P51 Handoff & Return Envelope Contract examples — handoff requests, context packets, ownership records, action lists, returns, and reviews across role interactions.",
+  "examples": [
+    {
+      "name": "coding_task_handed_from_manager_to_specialist_and_returned",
+      "description": "Manager delegates a coding task to a coder specialist with context, constraints, and ownership; specialist returns with evidence and confidence.",
+      "envelope": {
+        "envelope_id": "env-hf-code-001",
+        "handoff_request": {
+          "handoff_id": "hf-code-001",
+          "parent_run_id": "run-042",
+          "parent_step_id": "step-03",
+          "from_agent_id": "agent-mgr-01",
+          "to_agent_id": "agent-coder-01",
+          "handoff_type": "delegate_work",
+          "objective": "Implement API rate limiter middleware",
+          "summary": "Token bucket rate limiter for /api/v1/* endpoints",
+          "acceptance_criteria": ["rate limiting works per-IP", "configurable limits", "tests pass", "no performance regression"],
+          "priority": "high"
+        },
+        "context_packet": {
+          "context_packet_id": "ctx-code-001",
+          "task_ref": "task-rate-limiter",
+          "feature_ref": "feature-api-rate-limit",
+          "state_refs": ["state/run-042.json"],
+          "artifact_refs": ["specs/rate_limit_spec.md", "docs/middleware_patterns.md"],
+          "memory_refs": ["memory/arch_decision_003.md"],
+          "excluded_context_refs": ["secrets/prod.env"],
+          "context_summary": "Rate limiter for public API endpoints using token bucket algorithm with per-IP tracking"
+        },
+        "constraint_packet": {
+          "constraint_packet_id": "con-code-001",
+          "time_budget": "30 minutes",
+          "cost_budget": "5000 tokens",
+          "tool_constraints": ["sandbox execution only"],
+          "must_verify": true,
+          "must_not_delegate_further": true,
+          "required_output_types": ["implementation", "test_output"],
+          "approval_requirements": ["peer review required"],
+          "deadline": "2026-07-06T12:00:00Z"
+        },
+        "ownership_record": {
+          "ownership_id": "own-code-001",
+          "ownership_mode": "temporary_execution",
+          "current_owner_agent_id": "agent-coder-01",
+          "writer_agent_id": "agent-coder-01",
+          "read_only_agent_ids": ["agent-mgr-01"],
+          "ownership_reason": "Coding specialist has write access for implementation",
+          "ownership_effective_from": "2026-07-05T10:00:00Z",
+          "ownership_effective_until": "2026-07-06T12:00:00Z"
+        },
+        "action_list": {
+          "action_list_id": "al-code-001",
+          "actions": ["implement token bucket logic", "add configurable limits", "write unit tests", "run benchmarks", "update docs"],
+          "pending_questions": ["Should burst limits be configurable per-endpoint?"],
+          "contingency_plans": ["If redis unavailable, fall back to in-memory store"],
+          "next_required_decision": "Choose default rate limit values",
+          "completion_checklist": ["all tests pass", "benchmark shows <1% overhead", "lint clean", "type check passes"]
+        },
+        "return_payload": {
+          "return_id": "ret-code-001",
+          "handoff_id": "hf-code-001",
+          "from_agent_id": "agent-coder-01",
+          "to_agent_id": "agent-mgr-01",
+          "return_status": "submitted",
+          "return_outcome": "success",
+          "result_summary": "Rate limiter implemented with token bucket, per-IP tracking, and configurable limits",
+          "output_refs": ["src/middleware/rate_limiter.py", "tests/test_rate_limiter.py", "docs/rate_limiter_config.md"],
+          "evidence_refs": ["test_output.json", "benchmark_results.json", "lint_report.json"],
+          "completed_actions": ["implement token bucket logic", "add configurable limits", "write unit tests", "run benchmarks"],
+          "unresolved_items": [],
+          "confidence": 0.92,
+          "recommended_next_action": "Review and merge to staging"
+        }
+      }
+    },
+    {
+      "name": "review_handoff_with_read_only_ownership",
+      "description": "Manager requests review of completed work with read-only ownership for the reviewer.",
+      "envelope": {
+        "envelope_id": "env-hf-review-001",
+        "handoff_request": {
+          "handoff_id": "hf-review-001",
+          "from_agent_id": "agent-mgr-01",
+          "to_agent_id": "agent-reviewer-01",
+          "handoff_type": "request_review",
+          "objective": "Review rate limiter implementation for correctness and style",
+          "summary": "Code review of token bucket rate limiter PR",
+          "acceptance_criteria": ["no logic errors", "style guidelines followed", "test coverage adequate"],
+          "priority": "normal"
+        },
+        "ownership_record": {
+          "ownership_id": "own-review-001",
+          "ownership_mode": "review_only",
+          "current_owner_agent_id": "agent-mgr-01",
+          "read_only_agent_ids": ["agent-reviewer-01"],
+          "ownership_reason": "Reviewer has read-only access; manager retains write ownership"
+        },
+        "action_list": {
+          "action_list_id": "al-review-001",
+          "actions": ["review src/middleware/rate_limiter.py", "review tests", "check benchmark results", "verify docs accuracy"]
+        },
+        "return_payload": {
+          "return_id": "ret-review-001",
+          "handoff_id": "hf-review-001",
+          "from_agent_id": "agent-reviewer-01",
+          "to_agent_id": "agent-mgr-01",
+          "return_status": "submitted",
+          "return_outcome": "success",
+          "result_summary": "Review complete: implementation is sound, minor style recommendations noted",
+          "output_refs": ["review/review_report.md"],
+          "evidence_refs": ["review/diff_annotations.md"],
+          "completed_actions": ["review implementation", "review tests", "verify docs"],
+          "confidence": 0.88,
+          "recommended_next_action": "Address style notes and merge"
+        },
+        "return_review": {
+          "review_id": "rev-review-001",
+          "return_id": "ret-review-001",
+          "reviewer_agent_id": "agent-mgr-01",
+          "decision": "accepted",
+          "decision_reason": "All criteria met; style notes are non-blocking",
+          "accepted_output_refs": ["review/review_report.md"],
+          "followup_required": false
+        }
+      }
+    },
+    {
+      "name": "verification_handoff_with_evidence_and_unresolved_issue",
+      "description": "Verification handoff that returns evidence but flags one unresolved security concern.",
+      "envelope": {
+        "envelope_id": "env-hf-verify-001",
+        "handoff_request": {
+          "handoff_id": "hf-verify-001",
+          "from_agent_id": "agent-mgr-01",
+          "to_agent_id": "agent-verifier-01",
+          "handoff_type": "request_verification",
+          "objective": "Verify rate limiter meets security and performance standards",
+          "acceptance_criteria": ["OWASP compliance", "no known vulnerabilities", "performance < 2% overhead"],
+          "priority": "high"
+        },
+        "return_payload": {
+          "return_id": "ret-verify-001",
+          "handoff_id": "hf-verify-001",
+          "from_agent_id": "agent-verifier-01",
+          "to_agent_id": "agent-mgr-01",
+          "return_status": "submitted",
+          "return_outcome": "partial",
+          "result_summary": "3 of 4 checks passed: security scan OK, dependency audit OK, performance OK. JWT secret rotation not implemented.",
+          "evidence_refs": ["verification/security_scan.json", "verification/dependency_audit.json", "verification/benchmark_verify.json"],
+          "completed_actions": ["security scan", "dependency audit", "performance verification"],
+          "unresolved_items": ["JWT secret rotation is required but not implemented"],
+          "confidence": 0.72,
+          "recommended_next_action": "Implement secret rotation before production deploy"
+        }
+      }
+    },
+    {
+      "name": "blocked_handoff_return_with_contingency",
+      "description": "Coder returns a blocked handoff because a required API key is unavailable, with contingency notes.",
+      "envelope": {
+        "envelope_id": "env-hf-blocked-001",
+        "handoff_request": {
+          "handoff_id": "hf-blocked-001",
+          "from_agent_id": "agent-mgr-01",
+          "to_agent_id": "agent-coder-01",
+          "handoff_type": "delegate_work",
+          "objective": "Integrate payment gateway API",
+          "acceptance_criteria": ["payment flow works", "test mode passes", "error handling complete"]
+        },
+        "action_list": {
+          "action_list_id": "al-blocked-001",
+          "actions": ["implement stripe integration", "test in sandbox", "handle error cases"],
+          "contingency_plans": ["If sandbox unavailable, use mock responses for dev testing"]
+        },
+        "return_payload": {
+          "return_id": "ret-blocked-001",
+          "handoff_id": "hf-blocked-001",
+          "from_agent_id": "agent-coder-01",
+          "to_agent_id": "agent-mgr-01",
+          "return_status": "submitted",
+          "return_outcome": "blocked",
+          "result_summary": "Cannot complete: Stripe sandbox API key not provisioned",
+          "completed_actions": ["implement stripe integration (partial)"],
+          "blockers": ["Stripe sandbox API key not available in vault", "Awaiting finance team approval"],
+          "confidence": 0.25,
+          "recommended_next_action": "Provision Stripe sandbox key via vault admin"
+        }
+      }
+    },
+    {
+      "name": "full_ownership_transfer_with_accepted_return_review",
+      "description": "Full control transfer of a refactoring task, with the receiving agent returning completion and receiving acceptance.",
+      "envelope": {
+        "envelope_id": "env-hf-transfer-001",
+        "handoff_request": {
+          "handoff_id": "hf-transfer-001",
+          "from_agent_id": "agent-mgr-01",
+          "to_agent_id": "agent-coder-02",
+          "handoff_type": "transfer_control",
+          "objective": "Refactor auth module to use async/await patterns",
+          "summary": "Full ownership transfer for auth module refactoring",
+          "acceptance_criteria": ["all endpoints migrated to async", "regression tests pass", "performance improves"]
+        },
+        "ownership_record": {
+          "ownership_id": "own-transfer-001",
+          "ownership_mode": "full_transfer",
+          "current_owner_agent_id": "agent-coder-02",
+          "writer_agent_id": "agent-coder-02",
+          "read_only_agent_ids": ["agent-mgr-01"],
+          "ownership_reason": "Full transfer: coder-02 owns this until completion"
+        },
+        "return_payload": {
+          "return_id": "ret-transfer-001",
+          "handoff_id": "hf-transfer-001",
+          "from_agent_id": "agent-coder-02",
+          "to_agent_id": "agent-mgr-01",
+          "return_status": "submitted",
+          "return_outcome": "success",
+          "result_summary": "Auth module fully refactored to async/await, all tests pass, 15% performance improvement",
+          "output_refs": ["src/auth/"],
+          "evidence_refs": ["regression_test_output.json", "performance_comparison.json"],
+          "completed_actions": ["migrate login endpoint", "migrate register endpoint", "migrate token refresh", "update tests"],
+          "confidence": 0.97,
+          "recommended_next_action": "Deploy to staging for integration testing"
+        },
+        "return_review": {
+          "review_id": "rev-transfer-001",
+          "return_id": "ret-transfer-001",
+          "reviewer_agent_id": "agent-mgr-01",
+          "decision": "accepted",
+          "decision_reason": "All criteria satisfied, performance improvement confirmed",
+          "accepted_output_refs": ["src/auth/"],
+          "followup_required": false
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,372 @@
+{
+  "description": "P55 Synthesis & Finalization Contract examples — source selection, normalization, conflict resolution, merge policy, validation, and final disposition.",
+  "examples": [
+    {
+      "name": "two_accepted_branch_outputs_merged",
+      "description": "Two branch outputs from P54 fan-out are selected, normalized, and merged into one final answer with approved disposition.",
+      "envelope": {
+        "envelope_id": "env-syn-001",
+        "sources": [
+          {
+            "source_id": "src-login-001",
+            "source_type": "branch_output",
+            "source_ref": "bo-login-001",
+            "origin_agent_id": "agent-coder-01",
+            "origin_role_id": "coder",
+            "eligibility_status": "accepted",
+            "selection_reason": "Login endpoint implementation completed all tests",
+            "confidence": 0.95,
+            "priority": "high",
+            "evidence_refs": ["tests/test_login.py", "test_output/login_results.xml"]
+          },
+          {
+            "source_id": "src-reg-001",
+            "source_type": "branch_output",
+            "source_ref": "bo-reg-001",
+            "origin_agent_id": "agent-coder-02",
+            "origin_role_id": "coder",
+            "eligibility_status": "accepted",
+            "selection_reason": "Registration endpoint implementation completed all tests",
+            "confidence": 0.9,
+            "priority": "high",
+            "evidence_refs": ["tests/test_register.py", "test_output/register_results.xml"]
+          }
+        ],
+        "normalizations": [
+          {
+            "normalization_id": "norm-login-001",
+            "source_id": "src-login-001",
+            "normalization_mode": "schema_map",
+            "input_ref": "bo-login-001",
+            "normalized_ref": "norm/login_canonical.json",
+            "schema_version": "auth-module-v1",
+            "notes": "Mapped login branch output to canonical auth module schema"
+          },
+          {
+            "normalization_id": "norm-reg-001",
+            "source_id": "src-reg-001",
+            "normalization_mode": "schema_map",
+            "input_ref": "bo-reg-001",
+            "normalized_ref": "norm/register_canonical.json",
+            "schema_version": "auth-module-v1",
+            "notes": "Mapped registration branch output to canonical auth module schema"
+          }
+        ],
+        "decision": {
+          "decision_id": "dec-001",
+          "synthesis_policy": "merge_all_accepted",
+          "selected_source_ids": ["src-login-001", "src-reg-001"],
+          "rejected_source_ids": [],
+          "decision_reason": "Both outputs are consistent and complementary — login and registration endpoints do not overlap",
+          "editorial_notes": "Combined into single auth module with shared middleware",
+          "decision_made_at": "2026-07-05T12:00:00Z"
+        },
+        "validation_summary": {
+          "validation_summary_id": "vs-001",
+          "validation_refs": ["norm/login_canonical.json", "norm/register_canonical.json"],
+          "checks_passed": ["schema_compatibility", "confidence_check", "consistency_check", "no_overlap_check"],
+          "checks_failed": [],
+          "evidence_gaps": [],
+          "quality_score": 0.93,
+          "review_required": false,
+          "summary": "Both endpoints validated: consistent schemas, no overlap, high confidence"
+        },
+        "finalization": {
+          "finalization_id": "fin-001",
+          "finalization_status": "approved",
+          "final_disposition": "accept",
+          "approved_by": "agent-mgr-01",
+          "approval_reason": "Both branches completed successfully with consistent outputs",
+          "release_ready": true,
+          "followup_required": false,
+          "finalized_at": "2026-07-05T12:05:00Z"
+        },
+        "output": {
+          "output_id": "out-001",
+          "output_type": "merged_implementation",
+          "result_summary": "Login and registration endpoints merged into single auth module",
+          "final_output_refs": ["src/auth/login.py", "src/auth/register.py", "src/auth/middleware.py"],
+          "supporting_evidence_refs": ["tests/test_login.py", "tests/test_register.py", "test_output/full_suite.xml"],
+          "residual_uncertainties": [],
+          "consumer_notes": "Auth module ready for integration testing"
+        }
+      }
+    },
+    {
+      "name": "ranked_subset_synthesis_with_rejected_source",
+      "description": "Three optimization proposals are ranked; the lowest-confidence one is rejected before synthesis.",
+      "envelope": {
+        "envelope_id": "env-syn-002",
+        "sources": [
+          {
+            "source_id": "src-opt-a",
+            "source_type": "branch_output",
+            "source_ref": "bo-opt-a",
+            "origin_agent_id": "agent-coder-01",
+            "eligibility_status": "accepted",
+            "confidence": 0.85,
+            "priority": "medium"
+          },
+          {
+            "source_id": "src-opt-b",
+            "source_type": "branch_output",
+            "source_ref": "bo-opt-b",
+            "origin_agent_id": "agent-coder-02",
+            "eligibility_status": "accepted",
+            "confidence": 0.9,
+            "priority": "high"
+          },
+          {
+            "source_id": "src-opt-c",
+            "source_type": "branch_output",
+            "source_ref": "bo-opt-c",
+            "origin_agent_id": "agent-coder-03",
+            "eligibility_status": "accepted",
+            "confidence": 0.4,
+            "priority": "low"
+          }
+        ],
+        "normalizations": [
+          {
+            "normalization_id": "norm-opt-a",
+            "source_id": "src-opt-a",
+            "normalization_mode": "rank_and_filter",
+            "input_ref": "bo-opt-a",
+            "normalized_ref": "norm/opt-a.json"
+          },
+          {
+            "normalization_id": "norm-opt-b",
+            "source_id": "src-opt-b",
+            "normalization_mode": "rank_and_filter",
+            "input_ref": "bo-opt-b",
+            "normalized_ref": "norm/opt-b.json"
+          }
+        ],
+        "decision": {
+          "decision_id": "dec-002",
+          "synthesis_policy": "merge_ranked_subset",
+          "selected_source_ids": ["src-opt-a", "src-opt-b"],
+          "rejected_source_ids": ["src-opt-c"],
+          "conflict_ids": [],
+          "decision_reason": "src-opt-c confidence 0.4 below minimum 0.5 threshold; using opt-a and opt-b",
+          "decision_made_at": "2026-07-05T14:00:00Z"
+        },
+        "validation_summary": {
+          "validation_summary_id": "vs-002",
+          "quality_score": 0.88,
+          "review_required": false,
+          "summary": "Two high-confidence optimizations selected and merged"
+        },
+        "finalization": {
+          "finalization_id": "fin-002",
+          "finalization_status": "approved",
+          "final_disposition": "accept",
+          "approved_by": "agent-mgr-01",
+          "approval_reason": "Top two optimizations selected, low-confidence source rejected",
+          "release_ready": true,
+          "finalized_at": "2026-07-05T14:05:00Z"
+        },
+        "output": {
+          "output_id": "out-002",
+          "output_type": "merged_optimization",
+          "result_summary": "Index hint and materialized view optimizations merged",
+          "final_output_refs": ["optimizations/idx_hints.sql", "optimizations/mv_user_dashboard.sql"],
+          "residual_uncertainties": ["Caching optimization deferred — needs separate performance testing"]
+        }
+      }
+    },
+    {
+      "name": "unresolved_conflict_causing_needs_rework",
+      "description": "Two verification reports disagree on a security finding, causing a needs_rework disposition.",
+      "envelope": {
+        "envelope_id": "env-syn-003",
+        "sources": [
+          {
+            "source_id": "src-sec-001",
+            "source_type": "verification_report",
+            "source_ref": "report-sec-internal.md",
+            "origin_agent_id": "agent-sec-internal",
+            "eligibility_status": "accepted",
+            "confidence": 0.8,
+            "evidence_refs": ["scans/internal_scan.xml"]
+          },
+          {
+            "source_id": "src-sec-002",
+            "source_type": "verification_report",
+            "source_ref": "report-sec-external.md",
+            "origin_agent_id": "agent-sec-external",
+            "eligibility_status": "accepted",
+            "confidence": 0.85,
+            "evidence_refs": ["scans/external_scan.xml"]
+          }
+        ],
+        "conflicts": [
+          {
+            "conflict_id": "conf-sec-001",
+            "source_ids": ["src-sec-001", "src-sec-002"],
+            "conflict_type": "contradictory_finding",
+            "conflict_summary": "Internal scan found SQL injection risk in login endpoint; external scan marked it as mitigated",
+            "resolution_strategy": "request_appeal",
+            "resolved": false,
+            "review_required": true
+          }
+        ],
+        "decision": {
+          "decision_id": "dec-003",
+          "synthesis_policy": "verification_first",
+          "selected_source_ids": [],
+          "rejected_source_ids": [],
+          "conflict_ids": ["conf-sec-001"],
+          "decision_reason": "Cannot merge contradictory security findings without resolution"
+        },
+        "validation_summary": {
+          "validation_summary_id": "vs-003",
+          "checks_passed": [],
+          "checks_failed": ["consistency_check"],
+          "quality_score": 0.4,
+          "review_required": true,
+          "summary": "Unresolved conflict: contradictory security findings require human review"
+        },
+        "finalization": {
+          "finalization_id": "fin-003",
+          "finalization_status": "needs_rework",
+          "final_disposition": "return_for_rework",
+          "approval_reason": "Security findings contradictory — must be resolved before finalization",
+          "release_ready": false,
+          "followup_required": true,
+          "finalized_at": "2026-07-05T16:00:00Z"
+        },
+        "output": {
+          "output_id": "out-003",
+          "output_type": "security_review",
+          "result_summary": "Security review incomplete — contradictory findings unresolved",
+          "final_output_refs": [],
+          "residual_uncertainties": ["SQL injection risk status unresolved"],
+          "consumer_notes": "Awaiting security team review"
+        }
+      }
+    },
+    {
+      "name": "verification_first_synthesis_approved",
+      "description": "Two verification reports are synthesized with verification_first policy and both pass, producing approved output.",
+      "envelope": {
+        "envelope_id": "env-syn-004",
+        "sources": [
+          {
+            "source_id": "src-sec-review",
+            "source_type": "verification_report",
+            "source_ref": "report-security.md",
+            "origin_agent_id": "agent-sec-reviewer",
+            "eligibility_status": "accepted",
+            "confidence": 0.95,
+            "evidence_refs": ["scans/vuln_scan.xml", "scans/dep_check.json"]
+          },
+          {
+            "source_id": "src-perf-review",
+            "source_type": "verification_report",
+            "source_ref": "report-performance.md",
+            "origin_agent_id": "agent-perf-reviewer",
+            "eligibility_status": "accepted",
+            "confidence": 0.88,
+            "evidence_refs": ["benchmarks/perf_results.json"]
+          }
+        ],
+        "decision": {
+          "decision_id": "dec-004",
+          "synthesis_policy": "verification_first",
+          "selected_source_ids": ["src-sec-review", "src-perf-review"],
+          "decision_reason": "Both verification reports passed — no vulnerabilities, acceptable latency",
+          "decision_made_at": "2026-07-05T15:00:00Z"
+        },
+        "validation_summary": {
+          "validation_summary_id": "vs-004",
+          "checks_passed": ["security_check", "performance_check", "coverage_check"],
+          "quality_score": 0.95,
+          "review_required": false,
+          "summary": "All verification gates passed"
+        },
+        "finalization": {
+          "finalization_id": "fin-004",
+          "finalization_status": "approved",
+          "final_disposition": "accept",
+          "approved_by": "agent-mgr-01",
+          "approval_reason": "Security and performance verification both passed",
+          "release_ready": true,
+          "finalized_at": "2026-07-05T15:05:00Z"
+        },
+        "output": {
+          "output_id": "out-004",
+          "output_type": "verification_summary",
+          "result_summary": "Login module passed security and performance verification",
+          "final_output_refs": ["reports/verification_summary.md"],
+          "supporting_evidence_refs": ["scans/vuln_scan.xml", "benchmarks/perf_results.json"],
+          "residual_uncertainties": []
+        }
+      }
+    },
+    {
+      "name": "finalization_with_caveats_and_residual_uncertainties",
+      "description": "Output is approved but with caveats and residual uncertainties noted for followup.",
+      "envelope": {
+        "envelope_id": "env-syn-005",
+        "sources": [
+          {
+            "source_id": "src-pay-str",
+            "source_type": "branch_output",
+            "source_ref": "bo-str-001",
+            "origin_agent_id": "agent-coder-01",
+            "eligibility_status": "accepted",
+            "confidence": 0.95,
+            "evidence_refs": ["tests/test_stripe.py"]
+          },
+          {
+            "source_id": "src-pay-pp",
+            "source_type": "branch_output",
+            "source_ref": "bo-pp-001",
+            "origin_agent_id": "agent-coder-02",
+            "eligibility_status": "accepted",
+            "confidence": 0.85,
+            "evidence_refs": ["tests/test_paypal.py"]
+          }
+        ],
+        "decision": {
+          "decision_id": "dec-005",
+          "synthesis_policy": "merge_all_accepted",
+          "selected_source_ids": ["src-pay-str", "src-pay-pp"],
+          "decision_reason": "Both payment integrations functional and tested"
+        },
+        "validation_summary": {
+          "validation_summary_id": "vs-005",
+          "checks_passed": ["schema_compatibility", "unit_tests_pass"],
+          "checks_failed": ["integration_test_pending"],
+          "evidence_gaps": ["No end-to-end payment flow test"],
+          "quality_score": 0.78,
+          "review_required": false,
+          "summary": "Both payment integrations work independently; integration test is pending"
+        },
+        "finalization": {
+          "finalization_id": "fin-005",
+          "finalization_status": "approved",
+          "final_disposition": "accept_with_caveats",
+          "approved_by": "agent-mgr-01",
+          "approval_reason": "Stripe and PayPal integration functional; integration test gap acceptable for staging",
+          "release_ready": true,
+          "followup_required": true,
+          "finalized_at": "2026-07-05T14:00:00Z"
+        },
+        "output": {
+          "output_id": "out-005",
+          "output_type": "payment_integration",
+          "result_summary": "Stripe and PayPal payment integrations complete and tested",
+          "final_output_refs": ["src/payments/stripe.py", "src/payments/paypal.py"],
+          "supporting_evidence_refs": ["tests/test_stripe.py", "tests/test_paypal.py"],
+          "residual_uncertainties": [
+            "End-to-end payment flow not yet integration tested",
+            "PayPal webhook signature verification only unit tested"
+          ],
+          "consumer_notes": "Deploy to staging first; run manual payment flow test before production"
+        }
+      }
+    }
+  ]
+}

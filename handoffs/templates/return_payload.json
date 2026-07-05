@@ -1,0 +1,17 @@
+{
+  "return_id": "",
+  "handoff_id": "",
+  "from_agent_id": "",
+  "to_agent_id": null,
+  "return_status": "submitted",
+  "return_outcome": "success",
+  "result_summary": null,
+  "output_refs": [],
+  "evidence_refs": [],
+  "completed_actions": [],
+  "unresolved_items": [],
+  "blockers": [],
+  "confidence": null,
+  "recommended_next_action": null,
+  "submitted_at": "2026-07-05T12:00:00Z"
+}

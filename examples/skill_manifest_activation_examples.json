@@ -1,0 +1,460 @@
+[
+  {
+    "id": "ex-01-coding-skill-activated-by-rule",
+    "description": "Coding skill activated by rule-based activation",
+    "envelope": {
+      "envelope_id": "env-sk-ex-001",
+      "manifest": {
+        "skill_id": "skill-python-code-001",
+        "name": "Python Code Generator",
+        "version": "2.3.0",
+        "description": "Generates production-grade Python code from specifications",
+        "skill_type": "instructional",
+        "status": "active",
+        "entrypoint_ref": "skills/python-code/SKILL.md",
+        "compatible_agent_roles": ["coder", "specialist"],
+        "compatible_runtime_versions": [">=2.0.0"],
+        "tags": ["python", "codegen", "backend"],
+        "owner": "team-core",
+        "created_at": "2026-06-01T00:00:00Z",
+        "updated_at": "2026-07-01T00:00:00Z"
+      },
+      "inputs": [
+        {
+          "input_id": "in-sk-001",
+          "name": "specification",
+          "type": "string",
+          "required": true,
+          "description": "Natural language specification of the code to generate"
+        },
+        {
+          "input_id": "in-sk-002",
+          "name": "language_version",
+          "type": "string",
+          "required": false,
+          "default_value": "3.11",
+          "description": "Python version target"
+        }
+      ],
+      "outputs": [
+        {
+          "output_id": "out-sk-001",
+          "name": "source_code",
+          "type": "string",
+          "required": true,
+          "description": "Generated Python source code",
+          "evidence_required": true
+        }
+      ],
+      "permission_profile": {
+        "permission_profile_id": "perm-sk-001",
+        "tool_allowlist": ["read", "write", "execute"],
+        "tool_denylist": ["delete", "network"],
+        "network_access": false,
+        "file_write_access": true,
+        "delegation_allowed": false,
+        "approval_required": false,
+        "max_budget": 0.5,
+        "sensitive_data_access": false
+      },
+      "activation_rules": [
+        {
+          "rule_id": "rule-sk-001",
+          "activation_mode": "rule_based",
+          "match_conditions": ["task_type == coding", "language == python"],
+          "required_task_types": ["coding"],
+          "required_tags": ["python"],
+          "priority": 10
+        }
+      ],
+      "activation_request": {
+        "activation_request_id": "ar-ex-001",
+        "skill_id": "skill-python-code-001",
+        "run_id": "run-0070",
+        "step_id": "step-040",
+        "task_id": "task-api-endpoint",
+        "requested_by": "router",
+        "activation_mode": "rule_based",
+        "request_reason": "Rule match: task_type=coding, language=python",
+        "context_refs": ["specs/api.md"]
+      },
+      "activation_decision": {
+        "decision_id": "dec-ex-001",
+        "activation_request_id": "ar-ex-001",
+        "approved": true,
+        "decision_reason": "Skill active, permissions verified, dependencies satisfied",
+        "applied_rule_ids": ["rule-sk-001"],
+        "policy_checks": ["permission_profile_valid", "budget_within_limit", "dependency_check_passed"],
+        "permission_profile_id": "perm-sk-001",
+        "load_scope": "step",
+        "approved_at": "2026-07-05T10:00:00Z"
+      },
+      "activation_record": {
+        "activation_id": "act-ex-001",
+        "skill_id": "skill-python-code-001",
+        "activation_request_id": "ar-ex-001",
+        "activation_status": "executed",
+        "outcome": "success",
+        "loaded_instruction_refs": ["skills/python-code/SKILL.md"],
+        "execution_summary": "Generated FastAPI endpoint with validation and tests",
+        "output_refs": ["src/api/endpoint.py", "src/api/schema.py"],
+        "evidence_refs": ["test_output/api_test.log"],
+        "failure_reason": "",
+        "started_at": "2026-07-05T10:00:01Z",
+        "ended_at": "2026-07-05T10:02:30Z"
+      }
+    }
+  },
+  {
+    "id": "ex-02-verification-skill-activated-by-router",
+    "description": "Verification skill activated by router decision",
+    "envelope": {
+      "envelope_id": "env-sk-ex-002",
+      "manifest": {
+        "skill_id": "skill-security-verifier-001",
+        "name": "Security Verifier",
+        "version": "1.0.0",
+        "description": "Static analysis and security audit for generated code",
+        "skill_type": "verification",
+        "status": "active",
+        "entrypoint_ref": "skills/security-verifier/SKILL.md",
+        "tags": ["security", "audit", "static-analysis"],
+        "owner": "team-security",
+        "created_at": "2026-06-15T00:00:00Z",
+        "updated_at": "2026-07-01T00:00:00Z"
+      },
+      "inputs": [
+        {
+          "input_id": "in-sk-003",
+          "name": "target_path",
+          "type": "string",
+          "required": true,
+          "description": "Path to the code or config to audit"
+        },
+        {
+          "input_id": "in-sk-004",
+          "name": "severity_threshold",
+          "type": "string",
+          "required": false,
+          "default_value": "medium",
+          "description": "Minimum severity to report"
+        }
+      ],
+      "outputs": [
+        {
+          "output_id": "out-sk-002",
+          "name": "audit_report",
+          "type": "string",
+          "required": true,
+          "description": "Security audit report with findings and severity",
+          "evidence_required": true
+        }
+      ],
+      "permission_profile": {
+        "permission_profile_id": "perm-sk-002",
+        "tool_allowlist": ["read", "static_analysis"],
+        "tool_denylist": ["write", "delete", "network", "execute"],
+        "network_access": false,
+        "file_write_access": false,
+        "delegation_allowed": false,
+        "approval_required": false,
+        "sensitive_data_access": false
+      },
+      "activation_rules": [
+        {
+          "rule_id": "rule-sk-002",
+          "activation_mode": "router_selected",
+          "required_context_signals": ["high_risk", "verification_required"],
+          "risk_constraints": "medium|high",
+          "priority": 8
+        }
+      ],
+      "activation_request": {
+        "activation_request_id": "ar-ex-002",
+        "skill_id": "skill-security-verifier-001",
+        "run_id": "run-0071",
+        "step_id": "step-041",
+        "requested_by": "router",
+        "activation_mode": "router_selected",
+        "request_reason": "Router selected verifier for high-risk deployment audit",
+        "context_refs": ["deploy/", "state/current"]
+      },
+      "activation_decision": {
+        "decision_id": "dec-ex-002",
+        "activation_request_id": "ar-ex-002",
+        "approved": true,
+        "decision_reason": "High-risk task routed to verifier. Skill active and permissions scoped to read-only.",
+        "applied_rule_ids": ["rule-sk-002"],
+        "policy_checks": ["high_risk_requires_verifier", "permission_scope_read_only"],
+        "permission_profile_id": "perm-sk-002",
+        "approved_at": "2026-07-05T11:00:00Z"
+      },
+      "activation_record": {
+        "activation_id": "act-ex-002",
+        "skill_id": "skill-security-verifier-001",
+        "activation_request_id": "ar-ex-002",
+        "activation_status": "executed",
+        "outcome": "success",
+        "loaded_instruction_refs": ["skills/security-verifier/SKILL.md"],
+        "execution_summary": "Audit complete: 3 low-severity findings, 0 critical",
+        "output_refs": ["audit/deploy_security_report.md"],
+        "evidence_refs": ["scan/semgrep_results.json", "scan/secrets_scan.txt"],
+        "started_at": "2026-07-05T11:00:05Z",
+        "ended_at": "2026-07-05T11:08:30Z"
+      }
+    }
+  },
+  {
+    "id": "ex-03-disabled-skill-rejected-at-activation",
+    "description": "Disabled skill rejected at activation",
+    "envelope": {
+      "envelope_id": "env-sk-ex-003",
+      "manifest": {
+        "skill_id": "skill-legacy-001",
+        "name": "Legacy Data Migrator",
+        "version": "0.9.0",
+        "description": "Deprecated data migration utility",
+        "skill_type": "transformation",
+        "status": "disabled",
+        "tags": ["legacy", "migration"],
+        "owner": "team-core",
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-06-01T00:00:00Z"
+      },
+      "inputs": [
+        {
+          "input_id": "in-sk-005",
+          "name": "source_path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "output_id": "out-sk-003",
+          "name": "migration_result",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "permission_profile": {
+        "permission_profile_id": "perm-sk-003",
+        "tool_allowlist": ["read", "write"]
+      },
+      "activation_request": {
+        "activation_request_id": "ar-ex-003",
+        "skill_id": "skill-legacy-001",
+        "run_id": "run-0072",
+        "step_id": "step-042",
+        "requested_by": "scheduler",
+        "activation_mode": "rule_based",
+        "request_reason": "Scheduled migration task triggered"
+      },
+      "activation_decision": {
+        "decision_id": "dec-ex-003",
+        "activation_request_id": "ar-ex-003",
+        "approved": false,
+        "decision_reason": "Skill disabled. Migration requires active skill. Escalating to human operator.",
+        "policy_checks": ["skill_status_check_failed"],
+        "approved_at": "2026-07-05T12:00:00Z"
+      }
+    }
+  },
+  {
+    "id": "ex-04-skill-with-dependency-and-permission-constraints",
+    "description": "Skill with dependency and permission constraints",
+    "envelope": {
+      "envelope_id": "env-sk-ex-004",
+      "manifest": {
+        "skill_id": "skill-etl-pipeline-001",
+        "name": "ETL Pipeline Runner",
+        "version": "1.2.0",
+        "description": "Extracts, transforms, and loads data between systems",
+        "skill_type": "workflow",
+        "status": "active",
+        "tags": ["etl", "data", "pipeline"],
+        "owner": "team-data",
+        "created_at": "2026-05-01T00:00:00Z",
+        "updated_at": "2026-07-01T00:00:00Z"
+      },
+      "inputs": [
+        {
+          "input_id": "in-sk-006",
+          "name": "config_path",
+          "type": "string",
+          "required": true,
+          "description": "Path to ETL configuration"
+        },
+        {
+          "input_id": "in-sk-007",
+          "name": "source_connection",
+          "type": "string",
+          "required": true,
+          "description": "Source database connection string"
+        }
+      ],
+      "outputs": [
+        {
+          "output_id": "out-sk-004",
+          "name": "load_summary",
+          "type": "json",
+          "required": true,
+          "description": "Summary of records loaded",
+          "evidence_required": true
+        }
+      ],
+      "permission_profile": {
+        "permission_profile_id": "perm-sk-004",
+        "tool_allowlist": ["read", "write", "execute", "network"],
+        "tool_denylist": ["delete"],
+        "network_access": true,
+        "file_write_access": true,
+        "delegation_allowed": false,
+        "approval_required": true,
+        "max_budget": 20.0,
+        "sensitive_data_access": true
+      },
+      "dependencies": [
+        {
+          "dependency_id": "dep-ex-001",
+          "dependency_type": "tool",
+          "dependency_ref": "python3",
+          "version_constraint": ">=3.10"
+        },
+        {
+          "dependency_id": "dep-ex-002",
+          "dependency_type": "tool",
+          "dependency_ref": "pandas",
+          "version_constraint": ">=2.0.0"
+        },
+        {
+          "dependency_id": "dep-ex-003",
+          "dependency_type": "runtime_feature",
+          "dependency_ref": "network_io",
+          "notes": "Required for source/target connections"
+        }
+      ],
+      "activation_request": {
+        "activation_request_id": "ar-ex-004",
+        "skill_id": "skill-etl-pipeline-001",
+        "run_id": "run-0073",
+        "step_id": "step-043",
+        "requested_by": "workflow_orchestrator",
+        "activation_mode": "rule_based",
+        "request_reason": "Scheduled ETL pipeline execution"
+      },
+      "activation_decision": {
+        "decision_id": "dec-ex-004",
+        "activation_request_id": "ar-ex-004",
+        "approved": true,
+        "decision_reason": "Dependencies satisfied (python3>=3.10, pandas>=2.0.0, network_io), budget within limit",
+        "policy_checks": [
+          "dependency_version_check_passed",
+          "budget_check:20.0_within_limit",
+          "sensitive_data_access_requires_approval"
+        ],
+        "permission_profile_id": "perm-sk-004",
+        "approved_at": "2026-07-05T13:00:00Z"
+      }
+    }
+  },
+  {
+    "id": "ex-05-successful-activation-with-outputs-and-evidence",
+    "description": "Successful activation record with outputs and evidence",
+    "envelope": {
+      "envelope_id": "env-sk-ex-005",
+      "manifest": {
+        "skill_id": "skill-test-runner-001",
+        "name": "Test Runner",
+        "version": "3.1.0",
+        "description": "Runs test suites and produces coverage reports",
+        "skill_type": "tooling",
+        "status": "active",
+        "entrypoint_ref": "skills/test-runner/SKILL.md",
+        "tags": ["testing", "pytest", "coverage"],
+        "owner": "team-quality",
+        "created_at": "2026-04-01T00:00:00Z",
+        "updated_at": "2026-07-01T00:00:00Z"
+      },
+      "inputs": [
+        {
+          "input_id": "in-sk-008",
+          "name": "test_target",
+          "type": "string",
+          "required": true,
+          "description": "Test path or pattern"
+        },
+        {
+          "input_id": "in-sk-009",
+          "name": "coverage_threshold",
+          "type": "number",
+          "required": false,
+          "default_value": "80",
+          "description": "Minimum coverage percentage"
+        }
+      ],
+      "outputs": [
+        {
+          "output_id": "out-sk-005",
+          "name": "test_results",
+          "type": "json",
+          "required": true,
+          "description": "Test results summary with pass/fail counts",
+          "evidence_required": true
+        },
+        {
+          "output_id": "out-sk-006",
+          "name": "coverage_report",
+          "type": "string",
+          "required": false,
+          "description": "Coverage report path",
+          "evidence_required": true
+        }
+      ],
+      "permission_profile": {
+        "permission_profile_id": "perm-sk-005",
+        "tool_allowlist": ["read", "execute"],
+        "tool_denylist": ["write", "delete", "network"],
+        "network_access": false,
+        "file_write_access": false,
+        "delegation_allowed": false,
+        "max_budget": 0.2
+      },
+      "activation_request": {
+        "activation_request_id": "ar-ex-005",
+        "skill_id": "skill-test-runner-001",
+        "run_id": "run-0074",
+        "step_id": "step-044",
+        "task_id": "task-verify-auth",
+        "requested_by": "step_lifecycle",
+        "activation_mode": "context_match",
+        "request_reason": "Post-coding verification step: auth module tested",
+        "context_refs": ["src/auth/", "tests/test_auth.py"]
+      },
+      "activation_decision": {
+        "decision_id": "dec-ex-005",
+        "activation_request_id": "ar-ex-005",
+        "approved": true,
+        "decision_reason": "Context match: test files detected after coding. Skill active and budget ok.",
+        "applied_rule_ids": ["rule-context-match-001"],
+        "policy_checks": ["no_network_required", "budget_ok"],
+        "permission_profile_id": "perm-sk-005",
+        "approved_at": "2026-07-05T14:00:00Z"
+      },
+      "activation_record": {
+        "activation_id": "act-ex-005",
+        "skill_id": "skill-test-runner-001",
+        "activation_request_id": "ar-ex-005",
+        "activation_status": "executed",
+        "outcome": "success",
+        "loaded_instruction_refs": ["skills/test-runner/SKILL.md"],
+        "execution_summary": "Ran 89 tests, 89 passed, 0 failed, 94% coverage",
+        "output_refs": ["test_output/results.json"],
+        "evidence_refs": ["test_output/coverage.xml", "test_output/pytest_results.xml"],
+        "failure_reason": "",
+        "started_at": "2026-07-05T14:00:01Z",
+        "ended_at": "2026-07-05T14:03:15Z"
+      }
+    }
+  }
+]

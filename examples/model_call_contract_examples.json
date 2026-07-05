@@ -1,0 +1,229 @@
+[
+  {
+    "title": "Simple user prompt with system instruction",
+    "description": "Basic model call with a system instruction and user input block, no provenance",
+    "envelope": {
+      "call_id": "call-simple",
+      "run_id": "run-001",
+      "agent_id": "agent-code",
+      "model": {
+        "model_ref_id": "mr-001",
+        "provider": "anthropic",
+        "model_name": "claude-sonnet-4",
+        "model_version": "2026-01-01"
+      },
+      "prompt_blocks": [
+        {
+          "block_id": "blk-sys",
+          "block_type": "system_instruction",
+          "role": "system",
+          "content_ref": "prompts/system/v2.md",
+          "trust_level": "trusted"
+        },
+        {
+          "block_id": "blk-user",
+          "block_type": "user_input",
+          "role": "user",
+          "content_ref": "inputs/run-001/request.txt",
+          "trust_level": "trusted"
+        }
+      ],
+      "generation_config": {
+        "temperature": 0.3,
+        "max_output_tokens": 4096
+      },
+      "response": {
+        "response_ref": "resp-simple",
+        "finish_reason": "stop",
+        "prompt_tokens": 250,
+        "output_tokens": 80,
+        "latency_ms": 3400
+      }
+    }
+  },
+  {
+    "title": "Model call with retrieval context provenance",
+    "description": "Research call with a vector DB retrieval block carrying provenance metadata (source_type, timestamp, confidence)",
+    "envelope": {
+      "call_id": "call-ret",
+      "run_id": "run-002",
+      "task_id": "t-001",
+      "agent_id": "agent-code",
+      "model": {
+        "model_ref_id": "mr-002",
+        "provider": "openai",
+        "model_name": "gpt-4o"
+      },
+      "prompt_blocks": [
+        {
+          "block_id": "blk-sys",
+          "block_type": "system_instruction",
+          "role": "system",
+          "content_ref": "prompts/system/v1.md",
+          "trust_level": "trusted"
+        },
+        {
+          "block_id": "blk-ret",
+          "block_type": "retrieval",
+          "role": "user",
+          "content_ref": "retrieval/run-002/results.md",
+          "trust_level": "internal_unverified",
+          "provenance": {
+            "provenance_id": "prv-ret-001",
+            "source_type": "vector_db",
+            "source_ref": "collection=docs,query=semantic-search-v2",
+            "timestamp": "2026-07-04T10:00:00Z",
+            "confidence": 0.87
+          }
+        }
+      ],
+      "generation_config": {},
+      "response": {
+        "response_ref": "resp-ret",
+        "finish_reason": "stop",
+        "output_tokens": 320
+      }
+    }
+  },
+  {
+    "title": "Tool-output-enriched prompt with trust labels",
+    "description": "Prompt with system instruction, user query, and a tool output block labeled internal_unverified",
+    "envelope": {
+      "call_id": "call-tool",
+      "run_id": "run-003",
+      "task_id": "t-002",
+      "trace_id": "trace-tool",
+      "agent_id": "agent-code",
+      "model": {
+        "model_ref_id": "mr-001",
+        "provider": "anthropic",
+        "model_name": "claude-sonnet-4"
+      },
+      "prompt_blocks": [
+        {
+          "block_id": "blk-sys",
+          "block_type": "system_instruction",
+          "role": "system",
+          "content_ref": "prompts/system/v1.md",
+          "trust_level": "trusted"
+        },
+        {
+          "block_id": "blk-user",
+          "block_type": "user_input",
+          "role": "user",
+          "content_ref": "inputs/run-003/query.txt",
+          "trust_level": "trusted"
+        },
+        {
+          "block_id": "blk-tool",
+          "block_type": "tool_output",
+          "role": "tool",
+          "content_ref": "tools/search_code/output.json",
+          "trust_level": "internal_unverified"
+        }
+      ],
+      "generation_config": {
+        "temperature": 0.5,
+        "max_output_tokens": 2000,
+        "top_p": 0.9
+      },
+      "response": {
+        "response_ref": "resp-tool",
+        "finish_reason": "stop",
+        "output_tokens": 512,
+        "latency_ms": 5100
+      }
+    }
+  },
+  {
+    "title": "External untrusted web content block",
+    "description": "Prompt with an externally sourced web retrieval block marked EXTERNAL_UNTRUSTED, carrying full provenance and policy_ref",
+    "envelope": {
+      "call_id": "call-ext",
+      "run_id": "run-004",
+      "task_id": "t-003",
+      "agent_id": "agent-code",
+      "model": {
+        "model_ref_id": "mr-001",
+        "provider": "anthropic",
+        "model_name": "claude-sonnet-4"
+      },
+      "prompt_blocks": [
+        {
+          "block_id": "blk-sys",
+          "block_type": "system_instruction",
+          "role": "system",
+          "content_ref": "prompts/system/v1.md",
+          "trust_level": "trusted"
+        },
+        {
+          "block_id": "blk-ext",
+          "block_type": "retrieval",
+          "role": "user",
+          "content_ref": "web/example-com/article.md",
+          "trust_level": "external_untrusted",
+          "provenance": {
+            "provenance_id": "prv-web-001",
+            "source_type": "web",
+            "source_ref": "https://example.com/article",
+            "timestamp": "2026-07-04T09:00:00Z"
+          }
+        }
+      ],
+      "generation_config": {
+        "temperature": 0.2
+      },
+      "response": {
+        "response_ref": "resp-ext",
+        "finish_reason": "stop",
+        "prompt_tokens": 800,
+        "output_tokens": 200,
+        "latency_ms": 4800
+      },
+      "policy_ref": "pd-ext-content"
+    }
+  },
+  {
+    "title": "Response summary with token and latency metadata",
+    "description": "Model call with full usage stats showing LENGTH finish reason when max tokens was reached",
+    "envelope": {
+      "call_id": "call-meta",
+      "run_id": "run-005",
+      "agent_id": "agent-code",
+      "model": {
+        "model_ref_id": "mr-003",
+        "provider": "deepseek",
+        "model_name": "deepseek-v4-flash-free"
+      },
+      "prompt_blocks": [
+        {
+          "block_id": "blk-sys",
+          "block_type": "system_instruction",
+          "role": "system",
+          "content_ref": "prompts/system/v1.md",
+          "trust_level": "trusted"
+        },
+        {
+          "block_id": "blk-user",
+          "block_type": "user_input",
+          "role": "user",
+          "content_ref": "inputs/run-005/complex-query.txt",
+          "trust_level": "trusted"
+        }
+      ],
+      "generation_config": {
+        "temperature": 0.0,
+        "max_output_tokens": 1024,
+        "stop_sequences": ["\n\n"]
+      },
+      "response": {
+        "response_ref": "resp-meta",
+        "finish_reason": "length",
+        "output_ref": "outputs/run-005/completion.txt",
+        "prompt_tokens": 500,
+        "output_tokens": 1024,
+        "latency_ms": 5200
+      }
+    }
+  }
+]

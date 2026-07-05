@@ -1,0 +1,38 @@
+{
+  "envelope": {
+    "envelope_id": "env-syn-<seq>",
+    "sources": [
+      {
+        "source_id": "src-<name>-<seq>",
+        "source_type": "<branch_output|delegate_return|verification_report|review_note|artifact_ref|state_delta|evidence_bundle>",
+        "source_ref": "<reference_to_artifact>",
+        "origin_agent_id": "agent-<role>-<id>",
+        "eligibility_status": "accepted",
+        "confidence": 0.9
+      }
+    ],
+    "decision": {
+      "decision_id": "dec-<seq>",
+      "synthesis_policy": "<merge_all_accepted|merge_ranked_subset|verification_first|majority_supported|manual_editorial_review>",
+      "selected_source_ids": ["<src_id_1>", "<src_id_2>"],
+      "decision_reason": "<why these sources were selected>"
+    },
+    "validation_summary": {
+      "validation_summary_id": "vs-<seq>",
+      "quality_score": 0.9,
+      "review_required": false
+    },
+    "finalization": {
+      "finalization_id": "fin-<seq>",
+      "finalization_status": "<approved|released>",
+      "final_disposition": "<accept|accept_with_caveats>",
+      "approval_reason": "<why approved>",
+      "release_ready": true
+    },
+    "output": {
+      "output_id": "out-<seq>",
+      "result_summary": "<description of final output>",
+      "final_output_refs": ["<artifact_path_1>", "<artifact_path_2>"]
+    }
+  }
+}

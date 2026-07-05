@@ -1,0 +1,373 @@
+{
+  "description": "P56 Hybrid Task Intake Contract examples — raw request capture, structured extraction, field-level resolution, ambiguity handling, clarification, validation, and disposition.",
+  "examples": [
+    {
+      "name": "clear_user_request_accepted",
+      "description": "A clear user message is captured, extracted into structured fields, validated, and accepted.",
+      "envelope": {
+        "envelope_id": "env-intake-001",
+        "raw_intake": {
+          "intake_id": "intake-001",
+          "source_type": "user_message",
+          "session_id": "session-042",
+          "user_id": "user-shiva",
+          "received_at": "2026-07-05T09:00:00Z",
+          "raw_text": "Implement login endpoint with JWT authentication. Must include unit tests and security review.",
+          "language": "en",
+          "channel": "cli",
+          "source_metadata": {"client_version": "2.1.0"}
+        },
+        "structured_extraction": {
+          "extraction_id": "ext-001",
+          "intake_id": "intake-001",
+          "target_schema_id": "task-contract-v1",
+          "extraction_status": "extracted",
+          "task_type": "implementation",
+          "title": "Implement login endpoint",
+          "objective": "Implement login endpoint with JWT authentication including unit tests and security review",
+          "constraints": ["must_include_unit_tests", "must_pass_security_review"],
+          "deadline": "2026-07-06",
+          "priority": "high",
+          "requested_outputs": ["implementation", "unit_tests", "security_report"],
+          "extracted_at": "2026-07-05T09:00:05Z"
+        },
+        "fields": [
+          {
+            "field_record_id": "fld-001",
+            "field_name": "objective",
+            "field_value_ref": "Implement login endpoint with JWT authentication",
+            "resolution_status": "explicit",
+            "confidence": 0.98,
+            "source_span": "Implement login endpoint with JWT authentication",
+            "extraction_reason": "Directly stated in user message"
+          },
+          {
+            "field_record_id": "fld-002",
+            "field_name": "deadline",
+            "field_value_ref": "2026-07-06",
+            "resolution_status": "inferred",
+            "confidence": 0.85,
+            "extraction_reason": "Inferred from context — next sprint deadline"
+          },
+          {
+            "field_record_id": "fld-003",
+            "field_name": "task_type",
+            "field_value_ref": "implementation",
+            "resolution_status": "explicit",
+            "confidence": 0.95,
+            "extraction_reason": "Implementation task based on 'implement' keyword"
+          }
+        ],
+        "validation": {
+          "validation_id": "val-001",
+          "intake_id": "intake-001",
+          "required_fields_checked": ["objective", "task_type", "deadline"],
+          "missing_required_fields": [],
+          "invalid_fields": [],
+          "average_confidence": 0.93,
+          "schema_valid": true,
+          "review_required": false,
+          "validation_summary": "All required fields present, high confidence, schema valid"
+        },
+        "decision": {
+          "decision_id": "dec-001",
+          "intake_id": "intake-001",
+          "intake_disposition": "accepted",
+          "decision_reason": "Clear request with all required fields present and validated",
+          "accepted_task_ref": "task-contract-001",
+          "decided_at": "2026-07-05T09:00:10Z"
+        }
+      }
+    },
+    {
+      "name": "ambiguous_request_requiring_clarification",
+      "description": "A vague request has an ambiguous objective and missing deadline, requiring clarification.",
+      "envelope": {
+        "envelope_id": "env-intake-002",
+        "raw_intake": {
+          "intake_id": "intake-002",
+          "source_type": "user_message",
+          "session_id": "session-043",
+          "raw_text": "Can you fix the auth thing? Its kind of slow.",
+          "language": "en",
+          "channel": "cli",
+          "source_metadata": {}
+        },
+        "structured_extraction": {
+          "extraction_id": "ext-002",
+          "intake_id": "intake-002",
+          "target_schema_id": "task-contract-v1",
+          "extraction_status": "partially_extracted",
+          "task_type": "optimization",
+          "title": "Fix auth performance",
+          "objective": "Fix the auth thing, its kind of slow",
+          "deadline": null,
+          "priority": null,
+          "extracted_at": "2026-07-05T10:00:05Z"
+        },
+        "fields": [
+          {
+            "field_record_id": "fld-004",
+            "field_name": "objective",
+            "field_value_ref": "Fix the auth thing, its kind of slow",
+            "resolution_status": "ambiguous",
+            "confidence": 0.4,
+            "source_span": "fix the auth thing",
+            "extraction_reason": "Vague — 'auth thing' could refer to login, registration, or token refresh"
+          },
+          {
+            "field_record_id": "fld-005",
+            "field_name": "deadline",
+            "resolution_status": "missing",
+            "confidence": null,
+            "extraction_reason": "No deadline mentioned"
+          },
+          {
+            "field_record_id": "fld-006",
+            "field_name": "task_type",
+            "field_value_ref": "optimization",
+            "resolution_status": "inferred",
+            "confidence": 0.7,
+            "extraction_reason": "Inferred from 'slow' keyword"
+          }
+        ],
+        "ambiguities": [
+          {
+            "ambiguity_id": "amb-001",
+            "field_name": "objective",
+            "ambiguity_summary": "Auth thing is ambiguous — could be login, registration, or token refresh",
+            "candidate_values": ["login_endpoint", "registration_endpoint", "token_refresh"],
+            "impact_level": "high",
+            "clarification_needed": true
+          }
+        ],
+        "clarification_request": {
+          "clarification_id": "clr-001",
+          "intake_id": "intake-002",
+          "clarification_mode": "ask_user",
+          "questions": [
+            "Which auth component needs optimization? Options: login, registration, token refresh, or all?",
+            "What is the deadline for this task?"
+          ],
+          "blocking_fields": ["objective", "deadline"],
+          "recommended_defaults": {"deadline": "end_of_sprint"},
+          "requested_at": "2026-07-05T10:00:10Z"
+        },
+        "validation": {
+          "validation_id": "val-002",
+          "intake_id": "intake-002",
+          "required_fields_checked": ["objective", "task_type", "deadline"],
+          "missing_required_fields": ["deadline"],
+          "invalid_fields": [],
+          "average_confidence": 0.37,
+          "schema_valid": false,
+          "review_required": true,
+          "validation_summary": "Low confidence, ambiguous objective, missing deadline"
+        },
+        "decision": {
+          "decision_id": "dec-002",
+          "intake_id": "intake-002",
+          "intake_disposition": "clarification_required",
+          "decision_reason": "Objective ambiguous and deadline missing; clarification needed",
+          "clarification_ref": "clr-001",
+          "decided_at": "2026-07-05T10:00:15Z"
+        }
+      }
+    },
+    {
+      "name": "partially_extracted_accepted_with_gaps",
+      "description": "A partial request with missing deadline but clear objective is accepted with gaps.",
+      "envelope": {
+        "envelope_id": "env-intake-003",
+        "raw_intake": {
+          "intake_id": "intake-003",
+          "source_type": "user_message",
+          "session_id": "session-044",
+          "raw_text": "Write unit tests for the payment module. Use pytest.",
+          "language": "en"
+        },
+        "structured_extraction": {
+          "extraction_id": "ext-003",
+          "intake_id": "intake-003",
+          "target_schema_id": "task-contract-v1",
+          "extraction_status": "partially_extracted",
+          "task_type": "testing",
+          "title": "Write payment module unit tests",
+          "objective": "Write unit tests for the payment module using pytest",
+          "requested_outputs": ["unit_tests"],
+          "extracted_at": "2026-07-05T11:00:05Z"
+        },
+        "fields": [
+          {
+            "field_record_id": "fld-007",
+            "field_name": "objective",
+            "field_value_ref": "Write unit tests for the payment module using pytest",
+            "resolution_status": "explicit",
+            "confidence": 0.97,
+            "extraction_reason": "Clear statement of work"
+          },
+          {
+            "field_record_id": "fld-008",
+            "field_name": "deadline",
+            "resolution_status": "missing",
+            "confidence": null,
+            "extraction_reason": "No deadline mentioned"
+          },
+          {
+            "field_record_id": "fld-009",
+            "field_name": "task_type",
+            "field_value_ref": "testing",
+            "resolution_status": "explicit",
+            "confidence": 0.95,
+            "extraction_reason": "Explicitly testing work"
+          }
+        ],
+        "validation": {
+          "validation_id": "val-003",
+          "intake_id": "intake-003",
+          "required_fields_checked": ["objective", "task_type", "deadline"],
+          "missing_required_fields": ["deadline"],
+          "average_confidence": 0.64,
+          "schema_valid": true,
+          "review_required": false,
+          "validation_summary": "Objective and task type clear; deadline missing but acceptable"
+        },
+        "decision": {
+          "decision_id": "dec-003",
+          "intake_id": "intake-003",
+          "intake_disposition": "accepted_with_gaps",
+          "decision_reason": "Objective clear, testing scope well-defined; deadline can use default",
+          "accepted_task_ref": "task-contract-003",
+          "decided_at": "2026-07-05T11:00:10Z"
+        }
+      }
+    },
+    {
+      "name": "invalid_extraction_rejected",
+      "description": "A garbled request produces invalid extraction fields and is rejected.",
+      "envelope": {
+        "envelope_id": "env-intake-004",
+        "raw_intake": {
+          "intake_id": "intake-004",
+          "source_type": "user_message",
+          "session_id": "session-045",
+          "raw_text": "asdfgh zxcvbn qwerty 12345",
+          "language": "en"
+        },
+        "structured_extraction": {
+          "extraction_id": "ext-004",
+          "intake_id": "intake-004",
+          "target_schema_id": "task-contract-v1",
+          "extraction_status": "failed",
+          "extracted_at": "2026-07-05T12:00:05Z"
+        },
+        "fields": [
+          {
+            "field_record_id": "fld-010",
+            "field_name": "objective",
+            "resolution_status": "invalid",
+            "confidence": 0.05,
+            "extraction_reason": "Garbled text, no actionable objective found"
+          },
+          {
+            "field_record_id": "fld-011",
+            "field_name": "task_type",
+            "resolution_status": "invalid",
+            "confidence": 0.05,
+            "extraction_reason": "Could not determine task type"
+          }
+        ],
+        "validation": {
+          "validation_id": "val-004",
+          "intake_id": "intake-004",
+          "required_fields_checked": ["objective", "task_type"],
+          "invalid_fields": ["objective", "task_type"],
+          "average_confidence": 0.05,
+          "schema_valid": false,
+          "review_required": true,
+          "validation_summary": "Both required fields invalid; gibberish input detected"
+        },
+        "decision": {
+          "decision_id": "dec-004",
+          "intake_id": "intake-004",
+          "intake_disposition": "rejected",
+          "decision_reason": "Invalid extraction — both required fields invalid, likely garbled input",
+          "decided_at": "2026-07-05T12:00:10Z"
+        }
+      }
+    },
+    {
+      "name": "mixed_input_request_with_artifact_refs",
+      "description": "A request combines text instruction with an uploaded spec artifact.",
+      "envelope": {
+        "envelope_id": "env-intake-005",
+        "raw_intake": {
+          "intake_id": "intake-005",
+          "source_type": "mixed_input",
+          "session_id": "session-046",
+          "user_id": "user-arch",
+          "received_at": "2026-07-05T14:00:00Z",
+          "raw_text": "Implement the auth module following the attached spec. Use the same patterns as the existing user module.",
+          "raw_artifact_refs": ["attachments/auth_spec_v2.pdf"],
+          "language": "en",
+          "channel": "api"
+        },
+        "structured_extraction": {
+          "extraction_id": "ext-005",
+          "intake_id": "intake-005",
+          "target_schema_id": "task-contract-v1",
+          "extraction_status": "extracted",
+          "task_type": "implementation",
+          "title": "Implement auth module from spec",
+          "objective": "Implement the auth module following the attached spec using existing user module patterns",
+          "constraints": ["follow_existing_patterns"],
+          "requested_outputs": ["implementation"],
+          "extracted_at": "2026-07-05T14:00:05Z"
+        },
+        "fields": [
+          {
+            "field_record_id": "fld-012",
+            "field_name": "objective",
+            "field_value_ref": "Implement auth module from attached spec",
+            "resolution_status": "explicit",
+            "confidence": 0.92,
+            "extraction_reason": "Clear instruction with spec reference"
+          },
+          {
+            "field_record_id": "fld-013",
+            "field_name": "deadline",
+            "resolution_status": "missing",
+            "confidence": null,
+            "extraction_reason": "No deadline mentioned"
+          },
+          {
+            "field_record_id": "fld-014",
+            "field_name": "task_type",
+            "field_value_ref": "implementation",
+            "resolution_status": "explicit",
+            "confidence": 0.95,
+            "extraction_reason": "Implementation task based on 'implement' keyword"
+          }
+        ],
+        "validation": {
+          "validation_id": "val-005",
+          "intake_id": "intake-005",
+          "required_fields_checked": ["objective", "task_type", "deadline"],
+          "missing_required_fields": ["deadline"],
+          "average_confidence": 0.62,
+          "schema_valid": true,
+          "review_required": false,
+          "validation_summary": "Objective clear with spec reference; deadline missing but can use default"
+        },
+        "decision": {
+          "decision_id": "dec-005",
+          "intake_id": "intake-005",
+          "intake_disposition": "accepted_with_gaps",
+          "decision_reason": "Objective clear with attached spec; deadline deferred to default",
+          "accepted_task_ref": "task-contract-005",
+          "decided_at": "2026-07-05T14:00:10Z"
+        }
+      }
+    }
+  ]
+}

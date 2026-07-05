@@ -1,0 +1,23 @@
+{
+  "envelope_id": "string (required, non-blank)",
+  "budget_id": "string (required, non-blank)",
+  "scope_type": "session | run | task | agent | role | branch | tool_call | model_call",
+  "scope_ref": "string (required, non-blank)",
+  "budget_status": "planned | active | warning | overrun | exhausted | closed",
+  "lines": [
+    {
+      "budget_line_id": "string",
+      "resource_type": "string",
+      "allocated": "float",
+      "reserved": "float",
+      "consumed": "float",
+      "remaining": "float"
+    }
+  ],
+  "total_allocated": "float",
+  "total_consumed": "float",
+  "total_remaining": "float",
+  "alert_count": "int",
+  "decision_count": "int",
+  "generated_at": "ISO 8601 timestamp"
+}

@@ -1,0 +1,9 @@
+{
+  "clarification_id": "clr-<seq>",
+  "intake_id": "intake-<seq>",
+  "clarification_mode": "<ask_user|auto_repair|route_to_review|defer_until_context_available>",
+  "questions": ["<question_1>", "<question_2>"],
+  "blocking_fields": ["<field_1>"],
+  "recommended_defaults": {"<field>": "<default_value>"},
+  "requested_at": "<iso_timestamp>"
+}

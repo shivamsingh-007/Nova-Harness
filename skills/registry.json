@@ -1,0 +1,16 @@
+{
+  "registry_version": "1.0.0",
+  "updated_at": "2026-07-05T12:38:00Z",
+  "skills": [
+    {
+      "skill_id": "skill-example-001",
+      "name": "Example Skill",
+      "version": "1.0.0",
+      "skill_type": "instructional",
+      "status": "active",
+      "entrypoint": "skills/example_skill/SKILL.md",
+      "tags": ["python", "codegen", "example"],
+      "owner": "team-core"
+    }
+  ]
+}

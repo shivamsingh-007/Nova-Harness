@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P42: Configuration, Secrets &amp; Environment Contract</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #fbbf24; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #fbbf24 50%, #f59e0b 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p {
+  font-size: 1.05rem; color: #9494a8; max-width: 640px;
+}
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-r { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+.icon-b { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.icon-p { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+.icon-g { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-y { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.icon-s { background: rgba(148, 148, 168, 0.15); color: #9494a8; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #fbbf24; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .hl3 { color: #34d399; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+
+.flow { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; line-height: 2.2; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 42 &mdash; Config &amp; Secrets</div>
+    <h1>Configuration, Secrets &amp; Environment Contract</h1>
+    <p>
+      Typed config models, environment profiles, secret references without plaintext
+      exposure, source metadata, and startup validation &mdash; the runtime configuration layer.
+    </p>
+  </div>
+
+  <div class="section-label">Files</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/environment_contract.py              <span class="dim">(4 enums + 7 models)</span><br>
+    <span class="hl">CREATED</span>  tests/test_environment_contract.py           <span class="dim">(63 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/environment_contract_examples.json   <span class="dim">(5 examples)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 1959/1959 tests pass &mdash; P42: 198 lines, 100% coverage
+  </div>
+
+  <div class="section-label">Enums</div>
+
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9881;</div>
+        <div>
+          <div class="card-title">EnvironmentType</div>
+          <div class="card-subtitle">5 environments</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        local &bull; dev &bull; test<br>
+        staging &bull; production
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9881;</div>
+        <div>
+          <div class="card-title">ConfigScope</div>
+          <div class="card-subtitle">6 scopes</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        global &bull; project &bull; run<br>
+        task &bull; agent &bull; tool
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9881;</div>
+        <div>
+          <div class="card-title">ConfigSourceType</div>
+          <div class="card-subtitle">6 sources</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        default &bull; env_var &bull; file<br>
+        secret &bull; cli &bull; remote
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9881;</div>
+        <div>
+          <div class="card-title">SecretStorageType</div>
+          <div class="card-subtitle">6 types</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        env_var &bull; vault &bull; secret_manager<br>
+        kms &bull; file &bull; unknown
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Models</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">ConfigKeyRef</div>
+          <div class="card-subtitle">typed config key</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        key &bull; scope &bull; source<br>
+        required &bull; description?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9632;</div>
+        <div>
+          <div class="card-title">SecretRef</div>
+          <div class="card-subtitle">secret reference</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        secret_id &bull; name<br>
+        storage_type &bull; required<br>
+        source_hint? &bull; description?
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9632;</div>
+        <div>
+          <div class="card-title">RuntimeSettingRef</div>
+          <div class="card-subtitle">runtime setting</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        setting_id &bull; key_ref<br>
+        secret_ref? &bull; value_type<br>
+        default_value? &bull; sensitive
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">EnvironmentProfile</div>
+          <div class="card-subtitle">environment config</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        environment &bull; profile_id &bull; name<br>
+        description?<br>
+        config_keys[] &bull; secrets[]<br>
+        runtime_settings[]
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9632;</div>
+        <div>
+          <div class="card-title">ConfigBundle</div>
+          <div class="card-subtitle">resolved values</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        bundle_id &bull; profile<br>
+        values: Dict[str, str]
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-s">&#9632;</div>
+        <div>
+          <div class="card-title">SecretsManifest</div>
+          <div class="card-subtitle">declared secrets</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        manifest_id &bull; profile_id<br>
+        secrets[]
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9632;</div>
+        <div>
+          <div class="card-title">EnvironmentContractEnvelope</div>
+          <div class="card-subtitle">top-level wrapper</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        envelope_id &bull; bundle<br>
+        secrets_manifest
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Validation Rules</div>
+
+  <div class="diagram">
+    <span class="hl">NON-BLANK</span>  envelope_id, bundle_id, manifest_id, profile_id, name, key, setting_id, value_type, secret_id, secret.name<br>
+    <span class="hl">DUPLICATE</span>  duplicate config keys rejected within a profile<br>
+    <span class="hl">DUPLICATE</span>  duplicate secret names rejected within a profile and manifest<br>
+    <span class="hl">REQUIRED</span>  required config keys must have an entry in bundle.values<br>
+    <span class="hl">MAPPING</span>  runtime settings must reference declared config keys<br>
+    <span class="hl">SENSITIVE</span>  sensitive settings must not carry a default_value<br>
+    <span class="hl">SECRET OVERRIDE</span>  defaults must not silently override required secrets<br>
+    <span class="hl">MATCH</span>  secrets_manifest.profile_id must match bundle.profile.profile_id
+  </div>
+
+  <div class="section-label">Environment Profile Lifecycle</div>
+
+  <div class="diagram">
+    <span class="hl">LOCAL</span> &rarr; relaxed defaults, env-var secrets, localhost<br>
+    <span class="hl">DEV</span> &rarr; shared dev infra, env-var or file secrets<br>
+    <span class="hl">TEST</span> &rarr; CI-friendly in-memory defaults, test-specific secrets<br>
+    <span class="hl">STAGING</span> &rarr; mirror production with vault secrets, info logging<br>
+    <span class="hl">PRODUCTION</span> &rarr; strict required keys, secret-manager/KMS, warn logging<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&darr;<br>
+    <span class="hl3">STARTUP VALIDATION</span> &rarr; all required keys present, no duplicates, no secret leaks
+  </div>
+
+  <div class="section-label">Test Coverage</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">63 tests</div>
+          <div class="card-subtitle">All passing</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">7 models</div>
+          <div class="card-subtitle">4 enums + validators</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#10003;</div>
+        <div>
+          <div class="card-title">Startup validation</div>
+          <div class="card-subtitle">required keys, duplicates, secret mapping, sensitive masking, profile matching</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">All 42 Primitives</div>
+  <div class="diagram">
+    <span style="color:#818cf8;">P1&nbsp;&nbsp;INSTRUCTION LAYERING</span><br>
+    <span style="color:#34d399;">P2&nbsp;&nbsp;TASK CONTRACT SCHEMA</span><br>
+    <span style="color:#38bdf8;">P3&nbsp;&nbsp;CONTEXT DELIVERY SCHEMA</span><br>
+    <span style="color:#fbbf24;">P4&nbsp;&nbsp;CONTEXT SELECTION POLICY</span><br>
+    <span style="color:#f87171;">P5&nbsp;&nbsp;TOOL INTERFACE SCHEMA</span><br>
+    <span style="color:#a78bfa;">P6&nbsp;&nbsp;EXECUTION ENVIRONMENT</span><br>
+    <span style="color:#fbbf24;">P7&nbsp;&nbsp;DURABLE STATE SCHEMA</span><br>
+    <span style="color:#34d399;">P8&nbsp;&nbsp;VERIFICATION SCHEMA</span><br>
+    <span style="color:#38bdf8;">P9&nbsp;&nbsp;PROMPT ASSEMBLY SCHEMA</span><br>
+    <span style="color:#818cf8;">P10 RUN ORCHESTRATION STATE MACHINE</span><br>
+    <span style="color:#fbbf24;">P11 RETRY AND RECOVERY POLICY</span><br>
+    <span style="color:#ef4444;">P12 APPROVAL AND SAFETY POLICY</span><br>
+    <span style="color:#34d399;">P13 EVALUATION AND BENCHMARK SCHEMA</span><br>
+    <span style="color:#a855f7;">P14 OBSERVABILITY AND TRACE SCHEMA</span><br>
+    <span style="color:#fbbf24;">P15 STATE MACHINE DRIVER</span><br>
+    <span style="color:#34d399;">P16 PIPELINE EXECUTOR</span><br>
+    <span style="color:#fbbf24;">P17 PRODUCTION CONFIG &amp; SECRETS</span><br>
+    <span style="color:#a855f7;">P18 BUDGET &amp; RATE LIMIT POLICY</span><br>
+    <span style="color:#ef4444;">P19 FAILURE TAXONOMY &amp; ERROR ENVELOPE</span><br>
+    <span style="color:#38bdf8;">P20 INPUT &amp; OUTPUT GUARDRAILS</span><br>
+    <span style="color:#34d399;">P21 APPROVAL &amp; ESCALATION</span><br>
+    <span style="color:#a855f7;">P22 CAPABILITY MATRIX</span><br>
+    <span style="color:#818cf8;">P23 SESSION STATE &amp; CHECKPOINT</span><br>
+    <span style="color:#34d399;">P24 EVALUATION &amp; QUALITY GATE</span><br>
+    <span style="color:#38bdf8;">P25 TRACE, AUDIT &amp; PROVENANCE</span><br>
+    <span style="color:#a855f7;">P26 AGENT IDENTITY &amp; OWNERSHIP</span><br>
+    <span style="color:#a855f7;">P27 MEMORY BOUNDARY</span><br>
+    <span style="color:#ef4444;">P28 TOOL CAPABILITY &amp; PERMISSION</span><br>
+    <span style="color:#ef4444;">P29 POLICY EVALUATION &amp; GUARDRAIL</span><br>
+    <span style="color:#ef4444;">P30 HUMAN APPROVAL &amp; ESCALATION</span><br>
+    <span style="color:#38bdf8;">P31 TASK CONTRACT &amp; UNIT-OF-WORK</span><br>
+    <span style="color:#a855f7;">P32 TOOL INVOCATION RECEIPT</span><br>
+    <span style="color:#fbbf24;">P33 MODEL CALL &amp; PROMPT PROVENANCE</span><br>
+    <span style="color:#34d399;">P34 CHECKPOINT &amp; SESSION RECOVERY</span><br>
+    <span style="color:#ef4444;">P35 POLICY DECISION &amp; APPROVAL GATE</span><br>
+    <span style="color:#38bdf8;">P36 AUDIT TRAIL &amp; EVENT LOG CONTRACT</span><br>
+    <span style="color:#a855f7;">P37 MEMORY, CONTEXT &amp; RETRIEVAL SNAPSHOT</span><br>
+    <span style="color:#fbbf24;">P38 ARTIFACT, FILE &amp; GENERATED OUTPUT CONTRACT</span><br>
+    <span style="color:#34d399;">P39 FEEDBACK, EVALUATION &amp; QUALITY SIGNAL CONTRACT</span><br>
+    <span style="color:#f87171;">P40 RUN ORCHESTRATION &amp; EXECUTION STATE CONTRACT</span><br>
+    <span style="color:#f87171;">P41 FAILURE, EXCEPTION &amp; RECOVERY DECISION CONTRACT</span><br>
+    <span class="hl" style="color:#fbbf24;">P42 CONFIGURATION, SECRETS &amp; ENVIRONMENT CONTRACT</span>  <span class="dim">— <span style="color:#fbbf24;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P42 &bull; Configuration, Secrets &amp; Environment Contract &bull; 1959/1959 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

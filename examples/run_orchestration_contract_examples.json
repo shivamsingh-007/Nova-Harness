@@ -1,0 +1,123 @@
+[
+  {
+    "title": "Sequential run executing steps",
+    "description": "A sequential run with three steps: one completed, one active, one pending",
+    "envelope": {
+      "envelope_id": "env-seq",
+      "run": {
+        "run_id": "run-seq",
+        "session_id": "s-001",
+        "task_id": "t-002",
+        "agent_id": "agent-code",
+        "phase": "executing",
+        "status": "running",
+        "mode": "sequential",
+        "steps": [
+          { "step_id": "s-1", "step_type": "task_execution", "order_index": 0, "status": "completed", "task_id": "t-001" },
+          { "step_id": "s-2", "step_type": "task_execution", "order_index": 1, "status": "running", "task_id": "t-002" },
+          { "step_id": "s-3", "step_type": "task_execution", "order_index": 2, "status": "pending", "task_id": "t-003" }
+        ],
+        "blockers": [],
+        "progress": { "total_steps": 3, "completed_steps": 1, "active_step_id": "s-2", "blocked_steps": 0, "failed_steps": 0 },
+        "checkpoint_id": null,
+        "policy_decision_id": null
+      }
+    }
+  },
+  {
+    "title": "Parallel run with multiple active steps",
+    "description": "A parallel run with two steps actively running simultaneously",
+    "envelope": {
+      "envelope_id": "env-par",
+      "run": {
+        "run_id": "run-par",
+        "session_id": "s-001",
+        "agent_id": "agent-code",
+        "phase": "executing",
+        "status": "running",
+        "mode": "parallel",
+        "steps": [
+          { "step_id": "s-p1", "step_type": "analysis", "order_index": 0, "status": "running", "task_id": "t-001" },
+          { "step_id": "s-p2", "step_type": "retrieval", "order_index": 1, "status": "running", "task_id": "t-002" },
+          { "step_id": "s-p3", "step_type": "generation", "order_index": 2, "status": "pending", "task_id": "t-003" }
+        ],
+        "blockers": [],
+        "progress": { "total_steps": 3, "completed_steps": 0, "active_step_id": "s-p1", "blocked_steps": 0, "failed_steps": 0 }
+      }
+    }
+  },
+  {
+    "title": "Blocked run waiting on approval",
+    "description": "A sequential run blocked by a human approval gate with policy decision linkage",
+    "envelope": {
+      "envelope_id": "env-blocked",
+      "run": {
+        "run_id": "run-blocked",
+        "session_id": "s-001",
+        "task_id": "t-002",
+        "trace_id": "trace-001",
+        "agent_id": "agent-code",
+        "phase": "waiting",
+        "status": "blocked",
+        "mode": "sequential",
+        "steps": [
+          { "step_id": "s-1", "step_type": "tool_execution", "order_index": 0, "status": "completed", "task_id": "t-001", "tool_call_id": "tc-001" },
+          { "step_id": "s-2", "step_type": "deletion", "order_index": 1, "status": "blocked", "task_id": "t-002" }
+        ],
+        "blockers": [
+          { "blocker_id": "blk-001", "blocker_type": "approval", "reason": "Requires human approval to delete API endpoint", "related_ref": "approval://gate-001" }
+        ],
+        "progress": { "total_steps": 2, "completed_steps": 1, "active_step_id": "s-2", "blocked_steps": 1, "failed_steps": 0 },
+        "policy_decision_id": "pd-001"
+      }
+    }
+  },
+  {
+    "title": "Recovering run with checkpoint linkage",
+    "description": "A run that failed and is recovering from a checkpoint",
+    "envelope": {
+      "envelope_id": "env-recover",
+      "run": {
+        "run_id": "run-recover",
+        "session_id": "s-001",
+        "task_id": "t-002",
+        "agent_id": "agent-code",
+        "phase": "recovering",
+        "status": "failed",
+        "mode": "sequential",
+        "steps": [
+          { "step_id": "s-1", "step_type": "task_execution", "order_index": 0, "status": "completed", "task_id": "t-001" },
+          { "step_id": "s-2", "step_type": "task_execution", "order_index": 1, "status": "failed", "task_id": "t-002" },
+          { "step_id": "s-3", "step_type": "task_execution", "order_index": 2, "status": "pending", "task_id": "t-003" }
+        ],
+        "blockers": [],
+        "progress": { "total_steps": 3, "completed_steps": 1, "active_step_id": "s-2", "blocked_steps": 0, "failed_steps": 1 },
+        "checkpoint_id": "chk-001"
+      }
+    }
+  },
+  {
+    "title": "Finalized run with completed steps",
+    "description": "A run that completed all steps and reached the terminated phase",
+    "envelope": {
+      "envelope_id": "env-final",
+      "run": {
+        "run_id": "run-final",
+        "session_id": "s-001",
+        "task_id": "t-003",
+        "trace_id": "trace-001",
+        "agent_id": "agent-code",
+        "phase": "terminated",
+        "status": "completed",
+        "mode": "sequential",
+        "steps": [
+          { "step_id": "s-1", "step_type": "planning", "order_index": 0, "status": "completed", "task_id": "t-001" },
+          { "step_id": "s-2", "step_type": "execution", "order_index": 1, "status": "completed", "task_id": "t-002" },
+          { "step_id": "s-3", "step_type": "verification", "order_index": 2, "status": "completed", "task_id": "t-003" }
+        ],
+        "blockers": [],
+        "progress": { "total_steps": 3, "completed_steps": 3, "blocked_steps": 0, "failed_steps": 0 }
+      }
+    }
+  }
+]

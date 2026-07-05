@@ -1,0 +1,13 @@
+{
+  "risk_assessment_id": "string (required, non-blank)",
+  "scope_ref": "string (required, non-blank)",
+  "scope_type": "string | null (optional, e.g. task, run, step)",
+  "risk_category": "policy | safety | security | privacy | financial | legal | quality | operational",
+  "risk_level": "low | medium | high | critical",
+  "risk_score": "float (0.0–100.0, default 0.0)",
+  "uncertainty_score": "float (0.0–100.0, default 0.0)",
+  "trigger_reasons": ["string ..."],
+  "evidence_refs": ["string ..."],
+  "assessed_by": "string | null",
+  "assessed_at": "ISO 8601 timestamp"
+}

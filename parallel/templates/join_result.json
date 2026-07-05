@@ -1,0 +1,22 @@
+{
+  "join_execution": {
+    "join_id": "join-<seq>",
+    "parallel_request_id": "pr-<seq>",
+    "join_policy": "<wait_for_all|wait_for_quorum|wait_for_first_success|wait_for_required_set|manual_join>",
+    "join_status": "<merged|partial_merge|failed|cancelled>",
+    "completed_branch_ids": ["<branch_id_1>", "<branch_id_2>"],
+    "failed_branch_ids": [],
+    "late_branch_ids": [],
+    "selected_output_refs": ["<bo_id_1>", "<bo_id_2>"]
+  },
+  "merge_result": {
+    "merge_id": "merge-<seq>",
+    "join_id": "join-<seq>",
+    "merge_outcome": "<success|partial|conflict|rejected|needs_review>",
+    "merged_output_refs": ["<bo_id_1>"],
+    "rejected_output_refs": [],
+    "conflict_refs": [],
+    "review_required": false,
+    "next_action": "<next step>"
+  }
+}

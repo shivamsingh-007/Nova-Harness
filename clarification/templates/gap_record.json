@@ -1,0 +1,11 @@
+{
+  "gap_id": "string (required, non-blank)",
+  "intake_id": "string (required, non-blank)",
+  "field_name": "string (required, non-blank)",
+  "gap_type": "missing_required | missing_optional | ambiguous_value | invalid_value | conflicting_values | unsupported_request",
+  "gap_severity": "low | medium | high | blocking",
+  "blocking": "boolean (must be True if severity=blocking)",
+  "gap_summary": "string (required, non-blank)",
+  "candidate_values": ["string ..."],
+  "detected_at": "ISO datetime (default: now)"
+}

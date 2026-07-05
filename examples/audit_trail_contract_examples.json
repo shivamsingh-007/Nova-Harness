@@ -1,0 +1,253 @@
+[
+  {
+    "title": "Task created and completed event chain",
+    "description": "Two audit events tracking a task from creation to completion with parent-child linkage",
+    "envelope": {
+      "envelope_id": "env-task-chain",
+      "events": [
+        {
+          "audit_type": "task_created",
+          "metadata": {
+            "event_id": "evt-001",
+            "run_id": "run-001",
+            "task_id": "t-001",
+            "agent_id": "agent-code",
+            "timestamp": "2026-07-04T10:00:00Z",
+            "severity": "info",
+            "direction": "internal",
+            "actor_type": "agent"
+          },
+          "summary": "Task t-001 created for code review",
+          "event_refs": [
+            { "ref_id": "t-001", "ref_type": "task" }
+          ],
+          "evidence_refs": [],
+          "redacted": false
+        },
+        {
+          "audit_type": "task_completed",
+          "metadata": {
+            "event_id": "evt-002",
+            "run_id": "run-001",
+            "task_id": "t-001",
+            "agent_id": "agent-code",
+            "timestamp": "2026-07-04T10:30:00Z",
+            "severity": "info",
+            "direction": "internal",
+            "actor_type": "agent",
+            "parent_event_id": "evt-001"
+          },
+          "summary": "Task t-001 completed successfully",
+          "link_type": "follows",
+          "event_refs": [
+            { "ref_id": "evt-001", "ref_type": "audit_event" }
+          ],
+          "evidence_refs": [],
+          "redacted": false
+        }
+      ]
+    }
+  },
+  {
+    "title": "Tool requested and tool completed event chain",
+    "description": "A tool_read call traced from request to completion with evidence receipts",
+    "envelope": {
+      "envelope_id": "env-tool-chain",
+      "events": [
+        {
+          "audit_type": "tool_requested",
+          "metadata": {
+            "event_id": "evt-010",
+            "run_id": "run-001",
+            "task_id": "t-001",
+            "agent_id": "agent-code",
+            "timestamp": "2026-07-04T10:05:00Z",
+            "severity": "info",
+            "direction": "outbound",
+            "actor_type": "agent"
+          },
+          "summary": "Tool read_file requested on src/main.py",
+          "event_refs": [
+            { "ref_id": "t-001", "ref_type": "task" }
+          ],
+          "evidence_refs": [],
+          "redacted": false
+        },
+        {
+          "audit_type": "tool_completed",
+          "metadata": {
+            "event_id": "evt-011",
+            "run_id": "run-001",
+            "task_id": "t-001",
+            "agent_id": "agent-code",
+            "timestamp": "2026-07-04T10:05:03Z",
+            "severity": "info",
+            "direction": "inbound",
+            "actor_type": "tool",
+            "parent_event_id": "evt-010"
+          },
+          "summary": "Tool read_file completed: returned 1 file",
+          "link_type": "follows",
+          "evidence_refs": [
+            {
+              "evidence_id": "receipt-001",
+              "evidence_type": "tool_receipt",
+              "evidence_uri": "receipt://r-001",
+              "evidence_hash": "sha256:d1e5a8f3c2b4"
+            }
+          ],
+          "redacted": false
+        }
+      ]
+    }
+  },
+  {
+    "title": "Policy decided event with approval follow-up",
+    "description": "A policy engine blocks an action; the human reviewer denies the override request",
+    "envelope": {
+      "envelope_id": "env-policy-chain",
+      "events": [
+        {
+          "audit_type": "policy_decided",
+          "metadata": {
+            "event_id": "evt-020",
+            "run_id": "run-001",
+            "task_id": "t-002",
+            "agent_id": "agent-code",
+            "timestamp": "2026-07-04T10:10:00Z",
+            "severity": "medium",
+            "direction": "internal",
+            "actor_type": "policy_engine"
+          },
+          "summary": "Policy decision: block — endpoint deletion on protected route",
+          "event_refs": [
+            { "ref_id": "pd-001", "ref_type": "policy_decision" }
+          ],
+          "evidence_refs": [
+            {
+              "evidence_id": "rule-match-001",
+              "evidence_type": "policy_rule",
+              "evidence_uri": "policy://rule-012"
+            }
+          ],
+          "redacted": false
+        },
+        {
+          "audit_type": "approval_denied",
+          "metadata": {
+            "event_id": "evt-021",
+            "run_id": "run-001",
+            "task_id": "t-002",
+            "agent_id": "agent-code",
+            "timestamp": "2026-07-04T10:15:00Z",
+            "severity": "high",
+            "direction": "inbound",
+            "actor_type": "human",
+            "parent_event_id": "evt-020"
+          },
+          "summary": "Approval denied by API team lead — feature requires security review",
+          "link_type": "resolves",
+          "event_refs": [
+            { "ref_id": "gate-001", "ref_type": "approval_gate" }
+          ],
+          "evidence_refs": [],
+          "redacted": false
+        }
+      ]
+    }
+  },
+  {
+    "title": "Checkpoint created and restored event chain",
+    "description": "System checkpoints after a successful tool call, then restores after a failure",
+    "envelope": {
+      "envelope_id": "env-chk-chain",
+      "events": [
+        {
+          "audit_type": "checkpoint_created",
+          "metadata": {
+            "event_id": "evt-030",
+            "run_id": "run-001",
+            "task_id": "t-003",
+            "agent_id": "agent-code",
+            "timestamp": "2026-07-04T10:20:00Z",
+            "severity": "info",
+            "direction": "internal",
+            "actor_type": "system"
+          },
+          "summary": "Checkpoint created at safe unit boundary",
+          "event_refs": [
+            { "ref_id": "chk-001", "ref_type": "checkpoint" }
+          ],
+          "evidence_refs": [],
+          "redacted": false
+        },
+        {
+          "audit_type": "checkpoint_restored",
+          "metadata": {
+            "event_id": "evt-031",
+            "run_id": "run-001",
+            "task_id": "t-003",
+            "agent_id": "agent-code",
+            "timestamp": "2026-07-04T10:25:00Z",
+            "severity": "low",
+            "direction": "internal",
+            "actor_type": "system",
+            "parent_event_id": "evt-030"
+          },
+          "summary": "Checkpoint restored after tool timeout failure",
+          "link_type": "resolves",
+          "evidence_refs": [
+            {
+              "evidence_id": "recovery-log",
+              "evidence_type": "recovery_record",
+              "evidence_uri": "recovery://chk-001/restore",
+              "evidence_hash": "sha256:f9e2d4c1a6b8"
+            }
+          ],
+          "redacted": false
+        }
+      ]
+    }
+  },
+  {
+    "title": "Redacted critical event with evidence refs",
+    "description": "A critical failure event with redacted payload but preserved traceability metadata and evidence references",
+    "envelope": {
+      "envelope_id": "env-redacted-critical",
+      "events": [
+        {
+          "audit_type": "failure_recorded",
+          "metadata": {
+            "event_id": "evt-040",
+            "run_id": "run-001",
+            "task_id": "t-004",
+            "agent_id": "agent-code",
+            "timestamp": "2026-07-04T10:30:00Z",
+            "severity": "critical",
+            "direction": "internal",
+            "actor_type": "system"
+          },
+          "summary": "CRITICAL: secret detected in tool output — payload redacted",
+          "redacted": true,
+          "evidence_refs": [
+            {
+              "evidence_id": "ev-secret-1",
+              "evidence_type": "guardrail_finding",
+              "evidence_uri": "guardrail://finding-001",
+              "evidence_hash": "sha256:abc123def456"
+            },
+            {
+              "evidence_id": "ev-secret-2",
+              "evidence_type": "policy_decision",
+              "evidence_uri": "policy://pd-090",
+              "evidence_hash": "sha256:789ghi012jkl"
+            }
+          ],
+          "event_refs": [
+            { "ref_id": "pd-090", "ref_type": "policy_decision" }
+          ]
+        }
+      ]
+    }
+  }
+]

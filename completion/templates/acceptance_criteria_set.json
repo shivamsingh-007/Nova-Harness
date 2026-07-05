@@ -1,0 +1,23 @@
+{
+  "criteria_set_id": "string (required, non-blank)",
+  "task_id": "string (required, non-blank)",
+  "title": "string | null (optional)",
+  "criteria": [
+    {
+      "criterion_id": "string (required, non-blank)",
+      "task_id": "string (required, non-blank)",
+      "criterion_type": "functional | output | quality | constraint | approval | evidence",
+      "description": "string (required, non-blank)",
+      "priority": "int >= 0 (default: 0)",
+      "required": "boolean (default: true)",
+      "test_method": "string | null",
+      "expected_result": "string | null",
+      "status": "not_started | in_progress | met | failed | waived",
+      "owner": "string | null",
+      "notes": "string | null (required if required=true and status=waived)"
+    }
+  ],
+  "created_by": "string | null",
+  "created_at": "ISO datetime (default: now)",
+  "version": "string (default: '1.0')"
+}

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P33: Model Call &amp; Prompt Provenance Contract</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #fbbf24; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #fbbf24 50%, #d97706 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p {
+  font-size: 1.05rem; color: #9494a8; max-width: 640px;
+}
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-y { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.icon-b { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.icon-r { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.icon-p { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+.icon-g { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+.grid-5 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #fbbf24; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+
+.flow { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; line-height: 2.2; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 33 &mdash; Prompt Provenance</div>
+    <h1>Model Call &amp; Prompt Provenance Contract</h1>
+    <p>
+      Structured model-call trace with prompt assembly, context provenance, trust
+      labeling, generation config, output summary, and policy linkage. Distinguishes
+      instructions from evidence and trusted from untrusted context.
+    </p>
+  </div>
+
+  <div class="section-label">Files</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/model_call_contract.py              <span class="dim">(5 enums + 6 models)</span><br>
+    <span class="hl">CREATED</span>  tests/test_model_call_contract.py         <span class="dim">(58 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/model_call_contract_examples.json <span class="dim">(5 examples)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 1427/1427 tests pass &mdash; P33: 138 lines, 100% coverage
+  </div>
+
+  <div class="section-label">Enums</div>
+
+  <div class="grid-5">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9881;</div>
+        <div>
+          <div class="card-title">ContextBlockType</div>
+          <div class="card-subtitle">7 types</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        system_instruction &bull; user_input<br>
+        memory &bull; retrieval<br>
+        tool_output &bull; policy_note<br>
+        summary
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9881;</div>
+        <div>
+          <div class="card-title">ContextTrustLevel</div>
+          <div class="card-subtitle">3 levels</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        trusted<br>internal_unverified<br>external_untrusted
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9881;</div>
+        <div>
+          <div class="card-title">PromptRole</div>
+          <div class="card-subtitle">4 roles</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        system &bull; user<br>
+        assistant &bull; tool
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9881;</div>
+        <div>
+          <div class="card-title">ModelProviderType</div>
+          <div class="card-subtitle">5 providers</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        openai &bull; anthropic<br>
+        deepseek &bull; google<br>
+        other
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9881;</div>
+        <div>
+          <div class="card-title">FinishReason</div>
+          <div class="card-subtitle">5 reasons</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        stop &bull; length<br>
+        tool_call &bull; content_filter<br>
+        error
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Models</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">ModelRef</div>
+          <div class="card-subtitle">model identity</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        model_ref_id &bull; provider<br>
+        model_name<br>
+        model_version?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9632;</div>
+        <div>
+          <div class="card-title">ContextProvenance</div>
+          <div class="card-subtitle">source evidence</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        provenance_id &bull; source_type<br>
+        source_ref<br>
+        timestamp? &bull; confidence?
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9632;</div>
+        <div>
+          <div class="card-title">PromptContextBlock</div>
+          <div class="card-subtitle">prompt segment</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        block_id &bull; block_type<br>
+        role &bull; content_ref<br>
+        trust_level<br>
+        provenance?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">GenerationConfig</div>
+          <div class="card-subtitle">parameters</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        temperature? &bull; max_output_tokens?<br>
+        top_p? &bull; stop_sequences
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9632;</div>
+        <div>
+          <div class="card-title">ModelResponseSummary</div>
+          <div class="card-subtitle">output summary</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        response_ref &bull; finish_reason<br>
+        output_ref?<br>
+        prompt_tokens? &bull; output_tokens?<br>
+        latency_ms?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">ModelCallEnvelope</div>
+          <div class="card-subtitle">full call record</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        call_id &bull; run_id &bull; agent_id<br>
+        task_id? &bull; trace_id?<br>
+        model &bull; prompt_blocks<br>
+        generation_config &bull; response<br>
+        policy_ref?
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Context Trust Model</div>
+
+  <div class="flow">
+<span class="hl">TRUSTED</span><span class="dim">               Authored by the harness itself (system instructions, verified policy notes)</span>
+<span class="hl">INTERNAL_UNVERIFIED</span><span class="dim">    Sourced from internal systems but not independently verified (tool output, retrieval)</span>
+<span class="hl">EXTERNAL_UNTRUSTED</span><span class="dim">      Sourced from outside the system boundary (web content, user uploads)</span>
+  </div>
+
+  <div class="section-label">Validation Rules</div>
+
+  <div class="diagram">
+    <span class="hl">NON-EMPTY</span>  call_id, run_id, agent_id, model_ref_id, model_name, response_ref, block_id, content_ref, provenance_id, source_type, source_ref<br>
+    <span class="hl">CONFIDENCE</span>  confidence must be between 0.0 and 1.0 if present<br>
+    <span class="hl">TEMPERATURE</span> temperature must be between 0.0 and 2.0 if present<br>
+    <span class="hl">TOP_P</span>       top_p must be between 0.0 and 1.0 if present<br>
+    <span class="hl">TOKENS</span>      max_output_tokens must be >= 1; prompt_tokens, output_tokens, latency_ms must be >= 0<br>
+    <span class="hl">ORDER</span>       prompt_blocks order is preserved (list semantics)
+  </div>
+
+  <div class="section-label">Prompt Assembly Principles</div>
+
+  <div class="diagram">
+    <span class="hl">STRUCTURED</span>  Context is assembled as explicit ordered blocks, not a single opaque blob<br>
+    <span class="hl">SEPARATED</span>   Instructions (system_instruction) and evidence (retrieval, tool_output) are distinct block types<br>
+    <span class="hl">PROVENANCE</span>  Every block can carry source_type, source_ref, timestamp, and confidence<br>
+    <span class="hl">UNTRUSTED</span>   Externally sourced context is marked external_untrusted by default (injection resistance)
+  </div>
+
+  <div class="section-label">Test Coverage</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">58 tests</div>
+          <div class="card-subtitle">All passing</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">6 models</div>
+          <div class="card-subtitle">5 enums + validators</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#10003;</div>
+        <div>
+          <div class="card-title">Provenance integrity</div>
+          <div class="card-subtitle">confidence range, parameter hygiene, token validation, trust labeling, block ordering</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Not Implemented Yet</div>
+  <div class="diagram">
+    <span class="dim">&#10007; Prompt template registry and version diff viewer</span><br>
+    <span class="dim">&#10007; Injection classifier for external/untrusted blocks</span><br>
+    <span class="dim">&#10007; Provenance graph database for block lineage</span><br>
+    <span class="dim">&#10007; Prompt signing and full replay engine</span>
+  </div>
+
+  <div class="section-label">Primitives So Far</div>
+  <div class="diagram">
+    <span style="color:#818cf8;">P1&nbsp;&nbsp;INSTRUCTION LAYERING</span>            <span class="dim">Global + Project + Task layers</span><br>
+    <span style="color:#34d399;">P2&nbsp;&nbsp;TASK CONTRACT SCHEMA</span>            <span class="dim">Nested Pydantic + 2-layer validation</span><br>
+    <span style="color:#38bdf8;">P3&nbsp;&nbsp;CONTEXT DELIVERY SCHEMA</span>          <span class="dim">Structured bundle + reason-annotated items</span><br>
+    <span style="color:#fbbf24;">P4&nbsp;&nbsp;CONTEXT SELECTION POLICY</span>        <span class="dim">Heuristic pipeline + exclusions + caps</span><br>
+    <span style="color:#f87171;">P5&nbsp;&nbsp;TOOL INTERFACE SCHEMA</span>           <span class="dim">Definition, Invocation, Result</span><br>
+    <span style="color:#a78bfa;">P6&nbsp;&nbsp;EXECUTION ENVIRONMENT</span>          <span class="dim">Provider-agnostic runtime contract</span><br>
+    <span style="color:#fbbf24;">P7&nbsp;&nbsp;DURABLE STATE SCHEMA</span>           <span class="dim">Run-centric execution persistence</span><br>
+    <span style="color:#34d399;">P8&nbsp;&nbsp;VERIFICATION SCHEMA</span>            <span class="dim">Multi-check quality gate contract</span><br>
+    <span style="color:#38bdf8;">P9&nbsp;&nbsp;PROMPT ASSEMBLY SCHEMA</span>         <span class="dim">Layered prompt assembly</span><br>
+    <span style="color:#818cf8;">P10 RUN ORCHESTRATION STATE MACHINE</span>     <span class="dim">Deterministic control-flow contract</span><br>
+    <span style="color:#fbbf24;">P11 RETRY AND RECOVERY POLICY</span>     <span class="dim">Failure-classified retry contract</span><br>
+    <span style="color:#ef4444;">P12 APPROVAL AND SAFETY POLICY</span>     <span class="dim">Risk-classified governance contract</span><br>
+    <span style="color:#34d399;">P13 EVALUATION AND BENCHMARK SCHEMA</span>     <span class="dim">Task-grader-run benchmark contract</span><br>
+    <span style="color:#a855f7;">P14 OBSERVABILITY AND TRACE SCHEMA</span>     <span class="dim">Step-level execution evidence contract</span><br>
+    <span style="color:#fbbf24;">P15 STATE MACHINE DRIVER</span>          <span class="dim">Trigger, guard, history runtime</span><br>
+    <span style="color:#34d399;">P16 PIPELINE EXECUTOR</span>            <span class="dim">Single-run orchestration pipeline</span><br>
+    <span style="color:#fbbf24;">P17 PRODUCTION CONFIG &amp; SECRETS</span>    <span class="dim">Typed config + secret references + startup validation + redaction</span><br>
+    <span style="color:#a855f7;">P18 BUDGET &amp; RATE LIMIT POLICY</span>    <span class="dim">Hierarchical token/cost/runtime/tool-call/rate-limit contract</span><br>
+    <span style="color:#ef4444;">P19 FAILURE TAXONOMY &amp; ERROR ENVELOPE</span>  <span class="dim">Typed failure taxonomy + rich envelope + public-safe view + classification</span><br>
+    <span style="color:#38bdf8;">P20 INPUT &amp; OUTPUT GUARDRAILS</span>    <span class="dim">Input/output screening + risk classification + sanitization + decisions</span><br>
+    <span style="color:#34d399;">P21 APPROVAL &amp; ESCALATION</span>      <span class="dim">Risk-tiered approval + reviewer roles + evidence + timeout + escalation + outcome</span><br>
+    <span style="color:#a855f7;">P22 CAPABILITY MATRIX</span>          <span class="dim">Default-deny capability matrix + per-agent grants + environment-aware permissions + runtime authorization</span><br>
+    <span style="color:#818cf8;">P23 SESSION STATE &amp; CHECKPOINT</span>  <span class="dim">Working session lifecycle + checkpointing + replay safety + side-effect tracking + resume/recovery</span><br>
+    <span style="color:#34d399;">P24 EVALUATION &amp; QUALITY GATE</span>  <span class="dim">Structured metrics + mandatory checks + threshold policies + runtime gate actions</span><br>
+    <span style="color:#38bdf8;">P25 TRACE, AUDIT &amp; PROVENANCE</span>  <span class="dim">Chronological audit events + actor attribution + resource refs + evidence lineage + provenance graph + integrity envelopes</span><br>
+    <span style="color:#a855f7;">P26 AGENT IDENTITY &amp; OWNERSHIP</span>  <span class="dim">Unique agent identity + named ownership + authority models + delegation context + effective scopes + run ownership</span><br>
+    <span style="color:#a855f7;">P27 MEMORY BOUNDARY</span>  <span class="dim">Memory kind + scope boundaries + sensitivity + retention classes + lifecycle states + execution-context-aware retrieval</span><br>
+    <span style="color:#ef4444;">P28 TOOL CAPABILITY &amp; PERMISSION</span>  <span class="dim">Tool registration + action-level grants + execution constraints + invocation requests + runtime permission decisions</span><br>
+    <span style="color:#ef4444;">P29 POLICY EVALUATION &amp; GUARDRAIL</span>  <span class="dim">Policy evaluation + evidence signals + guardrail findings + risk scores + runtime decisions + obligations</span><br>
+    <span style="color:#ef4444;">P30 HUMAN APPROVAL &amp; ESCALATION</span>  <span class="dim">Approval requests + human reviewer context + role-routed decisions + escalation ladders + timeout handling + override control</span><br>
+    <span style="color:#38bdf8;">P31 TASK CONTRACT &amp; UNIT-OF-WORK</span>  <span class="dim">Bounded task spec + input/output declarations + scope boundaries + constraints + acceptance criteria + status lifecycle + failure modes + priority</span><br>
+    <span style="color:#a855f7;">P32 TOOL INVOCATION RECEIPT</span>  <span class="dim">Tool execution receipts + request/response linkage + timing + result references + side-effect classification + integrity metadata + policy/approval traceability</span><br>
+    <span class="hl" style="color:#fbbf24;">P33 MODEL CALL &amp; PROMPT PROVENANCE</span>  <span class="dim">Model identity + ordered prompt blocks + context provenance + trust levels + generation config + response summary + token/latency metadata — <span style="color:#fbbf24;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P33 &bull; Model Call &amp; Prompt Provenance Contract &bull; 1427/1427 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

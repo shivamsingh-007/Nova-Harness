@@ -1,0 +1,10 @@
+{
+  "question_id": "string (required, non-blank)",
+  "gap_id": "string (required, must reference a valid gap)",
+  "field_name": "string (required, non-blank)",
+  "question_text": "string (required, non-blank)",
+  "question_order": "int >= 0 (default: 0)",
+  "response_type": "string | null (optional, e.g. 'date', 'choice', 'free_text')",
+  "recommended_examples": ["string ..."],
+  "issued_at": "ISO datetime (default: now)"
+}

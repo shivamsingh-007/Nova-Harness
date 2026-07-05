@@ -1,0 +1,10 @@
+{
+  "negotiated_set_id": "string (required, non-blank)",
+  "evaluation_id": "string (required, non-blank)",
+  "negotiation_mode": "strict_intersection | best_effort | required_only | manual_override",
+  "negotiated_capabilities": ["string ..."],
+  "required_satisfied": ["string ..."],
+  "optional_satisfied": ["string ..."],
+  "session_effective_from": "ISO 8601 timestamp | null",
+  "session_effective_until": "ISO 8601 timestamp | null"
+}

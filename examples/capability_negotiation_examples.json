@@ -1,0 +1,221 @@
+{
+  "description": "P62 Capability Negotiation & Compatibility Contract examples — full compatibility, partial with fallback, hard incompatibility, session-effective subset, and manual override.",
+  "examples": [
+    {
+      "name": "full_compatibility_between_task_and_role",
+      "description": "A task and a role have fully compatible capabilities. The evaluation scores 100% and the decision is proceed.",
+      "envelope": {
+        "envelope_id": "env-full",
+        "request_declaration": {
+          "declaration_id": "dec-task-001",
+          "party_ref": "task-analysis",
+          "party_type": "task",
+          "capability_category": "tooling",
+          "schema_version": "1.0"
+        },
+        "offer_declaration": {
+          "declaration_id": "dec-role-001",
+          "party_ref": "role-analyst",
+          "party_type": "role",
+          "capability_category": "tooling"
+        },
+        "evaluation": {
+          "evaluation_id": "eval-full",
+          "request_declaration_id": "dec-task-001",
+          "offer_declaration_id": "dec-role-001",
+          "compatibility_status": "compatible",
+          "matched_requirement_ids": ["req-analysis-tool"],
+          "score": 100.0
+        },
+        "negotiated_set": {
+          "negotiated_set_id": "nset-full",
+          "evaluation_id": "eval-full",
+          "negotiation_mode": "strict_intersection",
+          "negotiated_capabilities": ["data_analysis", "charting"],
+          "required_satisfied": ["req-analysis-tool"]
+        },
+        "decision": {
+          "decision_id": "nd-full",
+          "evaluation_id": "eval-full",
+          "negotiated_set_id": "nset-full",
+          "negotiation_disposition": "proceed"
+        }
+      }
+    },
+    {
+      "name": "partial_compatibility_with_fallback_output_format",
+      "description": "A task requires CSV and HTML output. The tool only supports CSV. A partial match with fallback to CSV-only is decided.",
+      "envelope": {
+        "envelope_id": "env-partial",
+        "request_declaration": {
+          "declaration_id": "dec-task-002",
+          "party_ref": "task-data-pipeline",
+          "party_type": "task",
+          "capability_category": "output_format"
+        },
+        "offer_declaration": {
+          "declaration_id": "dec-tool-002",
+          "party_ref": "tool-renderer",
+          "party_type": "tool",
+          "capability_category": "output_format"
+        },
+        "evaluation": {
+          "evaluation_id": "eval-partial",
+          "request_declaration_id": "dec-task-002",
+          "offer_declaration_id": "dec-tool-002",
+          "compatibility_status": "partially_compatible",
+          "matched_requirement_ids": ["req-csv"],
+          "unmatched_requirement_ids": ["req-html"],
+          "score": 60.0
+        },
+        "gaps": [
+          {
+            "gap_id": "gap-partial",
+            "evaluation_id": "eval-partial",
+            "capability_name": "html_output",
+            "gap_summary": "Tool does not support HTML output",
+            "blocking": false,
+            "fallback_options": ["csv_only", "markdown"]
+          }
+        ],
+        "decision": {
+          "decision_id": "nd-partial",
+          "evaluation_id": "eval-partial",
+          "negotiation_disposition": "proceed_with_fallbacks",
+          "decision_reason": "HTML not supported, falling back to CSV",
+          "selected_fallbacks": ["csv_only"]
+        }
+      }
+    },
+    {
+      "name": "incompatible_tool_rejected",
+      "description": "A task requires transactional write capability. The legacy tool does not support it. The tool is rejected.",
+      "envelope": {
+        "envelope_id": "env-incomp",
+        "request_declaration": {
+          "declaration_id": "dec-task-003",
+          "party_ref": "task-db-migrate",
+          "party_type": "task",
+          "capability_category": "tooling"
+        },
+        "offer_declaration": {
+          "declaration_id": "dec-tool-003",
+          "party_ref": "tool-legacy",
+          "party_type": "tool",
+          "capability_category": "tooling"
+        },
+        "evaluation": {
+          "evaluation_id": "eval-incomp",
+          "request_declaration_id": "dec-task-003",
+          "offer_declaration_id": "dec-tool-003",
+          "compatibility_status": "incompatible",
+          "unmatched_requirement_ids": ["req-transactional"],
+          "score": 0.0
+        },
+        "gaps": [
+          {
+            "gap_id": "gap-incomp",
+            "evaluation_id": "eval-incomp",
+            "capability_name": "transactional_write",
+            "gap_summary": "Legacy tool does not support transactional writes",
+            "blocking": true
+          }
+        ],
+        "decision": {
+          "decision_id": "nd-incomp",
+          "evaluation_id": "eval-incomp",
+          "negotiation_disposition": "reject",
+          "decision_reason": "Critical capability missing: transactional write"
+        }
+      }
+    },
+    {
+      "name": "negotiated_session_effective_capability_subset",
+      "description": "A task requires search and summarize skills. The agent supports both, producing a negotiated capability set with session time bounds.",
+      "envelope": {
+        "envelope_id": "env-subset",
+        "request_declaration": {
+          "declaration_id": "dec-task-004",
+          "party_ref": "task-multi-skill",
+          "party_type": "task",
+          "capability_category": "skill_support"
+        },
+        "offer_declaration": {
+          "declaration_id": "dec-agent-004",
+          "party_ref": "agent-generalist",
+          "party_type": "agent",
+          "capability_category": "skill_support"
+        },
+        "evaluation": {
+          "evaluation_id": "eval-subset",
+          "request_declaration_id": "dec-task-004",
+          "offer_declaration_id": "dec-agent-004",
+          "compatibility_status": "compatible",
+          "matched_requirement_ids": ["req-search", "req-summarize"],
+          "score": 90.0
+        },
+        "negotiated_set": {
+          "negotiated_set_id": "nset-subset",
+          "evaluation_id": "eval-subset",
+          "negotiation_mode": "required_only",
+          "negotiated_capabilities": ["search", "summarize"],
+          "required_satisfied": ["req-search", "req-summarize"],
+          "session_effective_from": "2026-07-05T12:00:00Z",
+          "session_effective_until": "2026-07-05T13:00:00Z"
+        },
+        "decision": {
+          "decision_id": "nd-subset",
+          "evaluation_id": "eval-subset",
+          "negotiated_set_id": "nset-subset",
+          "negotiation_disposition": "proceed"
+        }
+      }
+    },
+    {
+      "name": "manual_override_for_non_blocking_preferred_gap",
+      "description": "A task prefers advanced reasoning but the model only supports basic. A human override approves proceeding with monitoring fallback.",
+      "envelope": {
+        "envelope_id": "env-override",
+        "request_declaration": {
+          "declaration_id": "dec-task-005",
+          "party_ref": "task-optimizer",
+          "party_type": "task",
+          "capability_category": "model_behavior"
+        },
+        "offer_declaration": {
+          "declaration_id": "dec-model-005",
+          "party_ref": "model-lite",
+          "party_type": "model",
+          "capability_category": "model_behavior"
+        },
+        "evaluation": {
+          "evaluation_id": "eval-override",
+          "request_declaration_id": "dec-task-005",
+          "offer_declaration_id": "dec-model-005",
+          "compatibility_status": "partially_compatible",
+          "matched_requirement_ids": ["req-basic-reasoning"],
+          "unmatched_requirement_ids": ["req-advanced-reasoning"],
+          "score": 50.0
+        },
+        "gaps": [
+          {
+            "gap_id": "gap-override",
+            "evaluation_id": "eval-override",
+            "capability_name": "advanced_reasoning",
+            "gap_summary": "Model does not support advanced reasoning chain",
+            "blocking": false,
+            "fallback_options": ["basic_reasoning", "override_with_monitoring"]
+          }
+        ],
+        "decision": {
+          "decision_id": "nd-override",
+          "evaluation_id": "eval-override",
+          "negotiation_disposition": "proceed_with_fallbacks",
+          "decision_reason": "Preferred reasoning gap accepted per manual override",
+          "selected_fallbacks": ["override_with_monitoring"],
+          "approved_override_ref": "override-approval-005"
+        }
+      }
+    }
+  ]
+}

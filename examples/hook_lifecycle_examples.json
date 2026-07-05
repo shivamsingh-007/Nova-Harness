@@ -1,0 +1,262 @@
+[
+  {
+    "id": "ex-01-pre-tool-call-policy-hook-blocks-unsafe-call",
+    "description": "pre_tool_call policy hook that blocks unsafe call",
+    "envelope": {
+      "envelope_id": "env-hk-ex-001",
+      "hook_point": {
+        "hook_point_id": "hp-ex-001",
+        "hook_point_type": "pre_tool_call",
+        "description": "Before any tool invocation",
+        "allowed_effects": ["observe", "block"],
+        "execution_mode": "ordered_chain",
+        "state_boundary_notes": "May read tool name and args. May block execution. Must not modify tool args."
+      },
+      "handler_manifest": {
+        "handler_id": "h-ex-001",
+        "name": "Production Safety Guard",
+        "version": "1.0.0",
+        "hook_point_type": "pre_tool_call",
+        "effect_type": "block",
+        "priority": 100,
+        "enabled": true,
+        "failure_policy": "fail_closed",
+        "tags": ["policy", "safety", "production"]
+      },
+      "context": {
+        "context_id": "ctx-ex-001",
+        "run_id": "run-0090",
+        "loop_id": "loop-045",
+        "step_id": "step-060",
+        "event_ref": "pre_tool_call",
+        "input_refs": ["tools/delete.sh"],
+        "policy_refs": ["policy/production-safety.md"],
+        "sensitive": true,
+        "read_only_fields": ["tool_name", "args"]
+      },
+      "result": {
+        "result_id": "res-ex-001",
+        "handler_id": "h-ex-001",
+        "hook_point_type": "pre_tool_call",
+        "status": "blocked",
+        "effect_type": "block",
+        "message": "Delete operation on production database blocked",
+        "block_reason": "Policy violation: delete operations on production require human approval",
+        "emitted_event_refs": ["evt-policy-block-prod-001"],
+        "started_at": "2026-07-05T10:00:00Z",
+        "ended_at": "2026-07-05T10:00:00.100Z"
+      }
+    }
+  },
+  {
+    "id": "ex-02-post-tool-call-hook-annotates-result",
+    "description": "post_tool_call hook that annotates result",
+    "envelope": {
+      "envelope_id": "env-hk-ex-002",
+      "hook_point": {
+        "hook_point_id": "hp-ex-002",
+        "hook_point_type": "post_tool_call",
+        "description": "After tool invocation completes",
+        "allowed_effects": ["observe", "annotate", "emit_event"],
+        "execution_mode": "synchronous"
+      },
+      "handler_manifest": {
+        "handler_id": "h-ex-002",
+        "name": "Tool Performance Recorder",
+        "version": "1.0.0",
+        "hook_point_type": "post_tool_call",
+        "effect_type": "annotate",
+        "priority": 50,
+        "enabled": true,
+        "failure_policy": "log_and_continue",
+        "tags": ["observability", "performance"]
+      },
+      "context": {
+        "context_id": "ctx-ex-002",
+        "run_id": "run-0091",
+        "step_id": "step-061",
+        "event_ref": "post_tool_call",
+        "input_refs": ["tools/git_commit.sh"],
+        "state_snapshot_refs": ["state/timing-091.json"]
+      },
+      "result": {
+        "result_id": "res-ex-002",
+        "handler_id": "h-ex-002",
+        "hook_point_type": "post_tool_call",
+        "status": "pass_through",
+        "effect_type": "annotate",
+        "message": "Tool completed: exit_code=0, duration=1.2s, stdout_size=340B",
+        "emitted_event_refs": ["evt-timing-002"],
+        "started_at": "2026-07-05T10:01:00Z",
+        "ended_at": "2026-07-05T10:01:00.050Z"
+      }
+    }
+  },
+  {
+    "id": "ex-03-pre-verify-hook-proposes-additional-checks",
+    "description": "pre_verify hook that proposes additional checks",
+    "envelope": {
+      "envelope_id": "env-hk-ex-003",
+      "hook_point": {
+        "hook_point_id": "hp-ex-003",
+        "hook_point_type": "pre_verify",
+        "description": "Before verification runs",
+        "allowed_effects": ["observe", "modify"],
+        "execution_mode": "ordered_chain",
+        "state_boundary_notes": "May propose additional verification checks. Must not modify verification results or bypass existing checks."
+      },
+      "handler_manifest": {
+        "handler_id": "h-ex-003",
+        "name": "Quality Gate Enforcer",
+        "version": "2.0.0",
+        "hook_point_type": "pre_verify",
+        "effect_type": "modify",
+        "priority": 30,
+        "enabled": true,
+        "failure_policy": "fail_open",
+        "tags": ["quality", "verification"]
+      },
+      "context": {
+        "context_id": "ctx-ex-003",
+        "run_id": "run-0092",
+        "step_id": "step-062",
+        "task_id": "task-auth-endpoint",
+        "event_ref": "pre_verify",
+        "artifact_refs": ["src/api/auth.py", "tests/test_auth.py"]
+      },
+      "result": {
+        "result_id": "res-ex-003",
+        "handler_id": "h-ex-003",
+        "hook_point_type": "pre_verify",
+        "status": "modified",
+        "effect_type": "modify",
+        "message": "Added 2 additional verification checks",
+        "mutation_proposals": [
+          {
+            "proposal_id": "prop-ex-001",
+            "handler_id": "h-ex-003",
+            "target_field": "verification.checks",
+            "proposed_value_ref": "[check: coverage > 85%, check: security_scan_enabled]",
+            "reason": "Auth endpoints must meet higher quality bar",
+            "requires_approval": false,
+            "safe_to_apply": true
+          }
+        ],
+        "started_at": "2026-07-05T10:02:00Z",
+        "ended_at": "2026-07-05T10:02:00.200Z"
+      }
+    }
+  },
+  {
+    "id": "ex-04-on-failure-hook-emits-recovery-event",
+    "description": "on_failure hook that emits recovery event",
+    "envelope": {
+      "envelope_id": "env-hk-ex-004",
+      "hook_point": {
+        "hook_point_id": "hp-ex-004",
+        "hook_point_type": "on_failure",
+        "description": "When a step or tool call fails",
+        "allowed_effects": ["observe", "emit_event", "request_escalation"],
+        "execution_mode": "synchronous"
+      },
+      "handler_manifest": {
+        "handler_id": "h-ex-004",
+        "name": "Recovery Event Emitter",
+        "version": "1.0.0",
+        "hook_point_type": "on_failure",
+        "effect_type": "emit_event",
+        "priority": 20,
+        "enabled": true,
+        "failure_policy": "log_and_continue",
+        "tags": ["observability", "recovery"]
+      },
+      "context": {
+        "context_id": "ctx-ex-004",
+        "run_id": "run-0093",
+        "step_id": "step-063",
+        "event_ref": "on_failure",
+        "state_snapshot_refs": ["state/failure-093.json"],
+        "artifact_refs": []
+      },
+      "result": {
+        "result_id": "res-ex-004",
+        "handler_id": "h-ex-004",
+        "hook_point_type": "on_failure",
+        "status": "pass_through",
+        "effect_type": "emit_event",
+        "message": "Tool call timed out after 30s. Emitted recovery signal.",
+        "emitted_event_refs": ["evt-recovery-timeout-001"],
+        "escalation_requested": true,
+        "started_at": "2026-07-05T10:03:00Z",
+        "ended_at": "2026-07-05T10:03:00.100Z"
+      }
+    }
+  },
+  {
+    "id": "ex-05-ordered-chain-with-modify-and-pass-through",
+    "description": "Ordered chain of hooks where one modifies and another passes through",
+    "envelope": {
+      "envelope_id": "env-hk-ex-005",
+      "hook_point": {
+        "hook_point_id": "hp-ex-005",
+        "hook_point_type": "pre_plan",
+        "description": "Before planning phase",
+        "allowed_effects": ["observe", "modify"],
+        "execution_mode": "ordered_chain",
+        "state_boundary_notes": "May enrich plan context. Must not add speculative tasks or alter existing committed work."
+      },
+      "handler_manifest": {
+        "handler_id": "h-ex-005a",
+        "name": "Context Enricher",
+        "version": "1.0.0",
+        "hook_point_type": "pre_plan",
+        "effect_type": "modify",
+        "priority": 10,
+        "enabled": true,
+        "failure_policy": "fail_open",
+        "tags": ["enrichment"]
+      },
+      "context": {
+        "context_id": "ctx-ex-005",
+        "run_id": "run-0094",
+        "loop_id": "loop-046",
+        "step_id": "step-064",
+        "task_id": "task-api-v2",
+        "event_ref": "pre_plan",
+        "artifact_refs": ["specs/api-v2.md"],
+        "policy_refs": ["policy/coding-standards.md"]
+      },
+      "result": {
+        "result_id": "res-ex-005",
+        "handler_id": "h-ex-005a",
+        "hook_point_type": "pre_plan",
+        "status": "modified",
+        "effect_type": "modify",
+        "message": "Enriched plan context with relevant specs and policy refs",
+        "mutation_proposals": [
+          {
+            "proposal_id": "prop-ex-002",
+            "handler_id": "h-ex-005a",
+            "target_field": "plan.additional_context",
+            "proposed_value_ref": "['docs/architecture.md', 'policy/api-design.md']",
+            "reason": "Plan needs architecture context and API design policy",
+            "requires_approval": false,
+            "safe_to_apply": true
+          }
+        ],
+        "started_at": "2026-07-05T10:04:00Z",
+        "ended_at": "2026-07-05T10:04:00.150Z"
+      },
+      "chain_execution": {
+        "chain_id": "chain-ex-005",
+        "hook_point_type": "pre_plan",
+        "registered_handler_ids": ["h-ex-005a", "h-ex-005b"],
+        "executed_handler_ids": ["h-ex-005a", "h-ex-005b"],
+        "execution_order": ["h-ex-005a", "h-ex-005b"],
+        "chain_status": "completed",
+        "final_effect": "modify",
+        "aggregated_notes": "Handler A enriched context (MODIFY). Handler B logged enrichment (PASS_THROUGH)."
+      }
+    }
+  }
+]

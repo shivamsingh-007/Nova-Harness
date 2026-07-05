@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P41: Failure, Exception &amp; Recovery Decision Contract</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(248, 113, 113, 0.12);
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #f87171; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #f87171 50%, #dc2626 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p {
+  font-size: 1.05rem; color: #9494a8; max-width: 640px;
+}
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-r { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+.icon-b { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.icon-p { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+.icon-g { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-y { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.icon-s { background: rgba(148, 148, 168, 0.15); color: #9494a8; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #f87171; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .hl3 { color: #34d399; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+
+.flow { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; line-height: 2.2; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 41 &mdash; Failure &amp; Recovery</div>
+    <h1>Failure, Exception &amp; Recovery Decision Contract</h1>
+    <p>
+      Classify failures by category, severity, origin, and recoverability &mdash;
+      then cross-validate recovery decisions (retry, skip, escalate, pause, abort,
+      restart from checkpoint) against failure properties.
+    </p>
+  </div>
+
+  <div class="section-label">Files</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/failure_recovery_contract.py              <span class="dim">(5 enums + 5 models)</span><br>
+    <span class="hl">CREATED</span>  tests/test_failure_recovery_contract.py           <span class="dim">(56 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/failure_recovery_contract_examples.json   <span class="dim">(5 examples)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 1896/1896 tests pass &mdash; P41: 173 lines, 100% coverage
+  </div>
+
+  <div class="section-label">Enums</div>
+
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9881;</div>
+        <div>
+          <div class="card-title">FailureCategory</div>
+          <div class="card-subtitle">10 categories</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        tool &bull; model &bull; policy<br>
+        validation &bull; checkpoint<br>
+        storage &bull; network<br>
+        auth &bull; system &bull; unknown
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9881;</div>
+        <div>
+          <div class="card-title">FailureSeverity</div>
+          <div class="card-subtitle">4 levels</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        low &bull; medium<br>
+        high &bull; critical
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9881;</div>
+        <div>
+          <div class="card-title">Recoverability</div>
+          <div class="card-subtitle">4 levels</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        recoverable<br>
+        partially_recoverable<br>
+        non_recoverable &bull; unknown
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9881;</div>
+        <div>
+          <div class="card-title">RecoveryAction</div>
+          <div class="card-subtitle">6 actions</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        retry &bull; skip &bull; escalate<br>
+        pause &bull; abort<br>
+        restart_from_checkpoint
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Models</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9632;</div>
+        <div>
+          <div class="card-title">FailureRecord</div>
+          <div class="card-subtitle">failure classification</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        failure_id &bull; category &bull; severity<br>
+        origin &bull; summary &bull; description?<br>
+        recoverability &bull; causes[]<br>
+        related_run_id? &bull; related_task_id?<br>
+        related_tool_call_id? &bull; related_model_call_id?<br>
+        related_checkpoint_id?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">RecoveryDecisionRecord</div>
+          <div class="card-subtitle">recovery action</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        decision_id &bull; failure_id<br>
+        action &bull; reason<br>
+        retry_policy_ref?<br>
+        requires_human_review<br>
+        next_checkpoint_id? &bull; next_step_ref?
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9632;</div>
+        <div>
+          <div class="card-title">FailureCauseRef</div>
+          <div class="card-subtitle">root cause link</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        cause_id &bull; cause_type<br>
+        detail_ref?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">RetryPolicyRef</div>
+          <div class="card-subtitle">retry config</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        policy_id &bull; policy_name<br>
+        max_attempts?
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9632;</div>
+        <div>
+          <div class="card-title">FailureDecisionEnvelope</div>
+          <div class="card-subtitle">failure + decision wrapper</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        envelope_id &bull; failure<br>
+        recovery_decision
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Validation Rules</div>
+
+  <div class="diagram">
+    <span class="hl">NON-BLANK</span>  failure_id, summary, decision_id, envelope_id, cause_id, cause_type, policy_id, policy_name, reason<br>
+    <span class="hl">NON-NEGATIVE</span>  max_attempts<br>
+    <span class="hl">MATCH</span>  recovery_decision.failure_id must equal failure.failure_id<br>
+    <span class="hl">NON_RECOVERABLE</span>  must not use RETRY or RESTART_FROM_CHECKPOINT<br>
+    <span class="hl">RESTART_FROM_CHECKPOINT</span>  requires next_checkpoint_id on decision, plus failure.related_checkpoint_id or decision.next_checkpoint_id
+  </div>
+
+  <div class="section-label">Recovery Flow</div>
+
+  <div class="diagram">
+    <span class="hl">FAILURE</span> &rarr; <span class="hl2">CLASSIFY</span> (category, severity, origin, recoverability) &rarr; <span class="hl2">CAUSE ANALYSIS</span> (0..n FailureCauseRef) &rarr; <span class="hl">DECIDE</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&darr;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;retry &bull; skip &bull; escalate &bull; pause &bull; abort &bull; restart_from_checkpoint<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&darr;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="hl3">ENVELOPE ASSEMBLED</span> &rarr; cross-validation enforces safe combinations
+  </div>
+
+  <div class="section-label">Test Coverage</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">56 tests</div>
+          <div class="card-subtitle">All passing</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">5 models</div>
+          <div class="card-subtitle">5 enums + validators</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#10003;</div>
+        <div>
+          <div class="card-title">Cross-validation</div>
+          <div class="card-subtitle">failure_id match, NON_RECOVERABLE action guard, RESTART_FROM_CHECKPOINT checkpoint guard, retry policy boundaries</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">All 41 Primitives</div>
+  <div class="diagram">
+    <span style="color:#818cf8;">P1&nbsp;&nbsp;INSTRUCTION LAYERING</span><br>
+    <span style="color:#34d399;">P2&nbsp;&nbsp;TASK CONTRACT SCHEMA</span><br>
+    <span style="color:#38bdf8;">P3&nbsp;&nbsp;CONTEXT DELIVERY SCHEMA</span><br>
+    <span style="color:#fbbf24;">P4&nbsp;&nbsp;CONTEXT SELECTION POLICY</span><br>
+    <span style="color:#f87171;">P5&nbsp;&nbsp;TOOL INTERFACE SCHEMA</span><br>
+    <span style="color:#a78bfa;">P6&nbsp;&nbsp;EXECUTION ENVIRONMENT</span><br>
+    <span style="color:#fbbf24;">P7&nbsp;&nbsp;DURABLE STATE SCHEMA</span><br>
+    <span style="color:#34d399;">P8&nbsp;&nbsp;VERIFICATION SCHEMA</span><br>
+    <span style="color:#38bdf8;">P9&nbsp;&nbsp;PROMPT ASSEMBLY SCHEMA</span><br>
+    <span style="color:#818cf8;">P10 RUN ORCHESTRATION STATE MACHINE</span><br>
+    <span style="color:#fbbf24;">P11 RETRY AND RECOVERY POLICY</span><br>
+    <span style="color:#ef4444;">P12 APPROVAL AND SAFETY POLICY</span><br>
+    <span style="color:#34d399;">P13 EVALUATION AND BENCHMARK SCHEMA</span><br>
+    <span style="color:#a855f7;">P14 OBSERVABILITY AND TRACE SCHEMA</span><br>
+    <span style="color:#fbbf24;">P15 STATE MACHINE DRIVER</span><br>
+    <span style="color:#34d399;">P16 PIPELINE EXECUTOR</span><br>
+    <span style="color:#fbbf24;">P17 PRODUCTION CONFIG &amp; SECRETS</span><br>
+    <span style="color:#a855f7;">P18 BUDGET &amp; RATE LIMIT POLICY</span><br>
+    <span style="color:#ef4444;">P19 FAILURE TAXONOMY &amp; ERROR ENVELOPE</span><br>
+    <span style="color:#38bdf8;">P20 INPUT &amp; OUTPUT GUARDRAILS</span><br>
+    <span style="color:#34d399;">P21 APPROVAL &amp; ESCALATION</span><br>
+    <span style="color:#a855f7;">P22 CAPABILITY MATRIX</span><br>
+    <span style="color:#818cf8;">P23 SESSION STATE &amp; CHECKPOINT</span><br>
+    <span style="color:#34d399;">P24 EVALUATION &amp; QUALITY GATE</span><br>
+    <span style="color:#38bdf8;">P25 TRACE, AUDIT &amp; PROVENANCE</span><br>
+    <span style="color:#a855f7;">P26 AGENT IDENTITY &amp; OWNERSHIP</span><br>
+    <span style="color:#a855f7;">P27 MEMORY BOUNDARY</span><br>
+    <span style="color:#ef4444;">P28 TOOL CAPABILITY &amp; PERMISSION</span><br>
+    <span style="color:#ef4444;">P29 POLICY EVALUATION &amp; GUARDRAIL</span><br>
+    <span style="color:#ef4444;">P30 HUMAN APPROVAL &amp; ESCALATION</span><br>
+    <span style="color:#38bdf8;">P31 TASK CONTRACT &amp; UNIT-OF-WORK</span><br>
+    <span style="color:#a855f7;">P32 TOOL INVOCATION RECEIPT</span><br>
+    <span style="color:#fbbf24;">P33 MODEL CALL &amp; PROMPT PROVENANCE</span><br>
+    <span style="color:#34d399;">P34 CHECKPOINT &amp; SESSION RECOVERY</span><br>
+    <span style="color:#ef4444;">P35 POLICY DECISION &amp; APPROVAL GATE</span><br>
+    <span style="color:#38bdf8;">P36 AUDIT TRAIL &amp; EVENT LOG CONTRACT</span><br>
+    <span style="color:#a855f7;">P37 MEMORY, CONTEXT &amp; RETRIEVAL SNAPSHOT</span><br>
+    <span style="color:#fbbf24;">P38 ARTIFACT, FILE &amp; GENERATED OUTPUT CONTRACT</span><br>
+    <span style="color:#34d399;">P39 FEEDBACK, EVALUATION &amp; QUALITY SIGNAL CONTRACT</span><br>
+    <span style="color:#f87171;">P40 RUN ORCHESTRATION &amp; EXECUTION STATE CONTRACT</span><br>
+    <span class="hl" style="color:#f87171;">P41 FAILURE, EXCEPTION &amp; RECOVERY DECISION CONTRACT</span>  <span class="dim">— <span style="color:#f87171;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P41 &bull; Failure, Exception &amp; Recovery Decision Contract &bull; 1896/1896 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

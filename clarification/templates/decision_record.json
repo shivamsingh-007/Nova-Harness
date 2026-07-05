@@ -1,0 +1,9 @@
+{
+  "decision_id": "string (required, non-blank)",
+  "clarification_session_id": "string (required, non-blank)",
+  "clarification_disposition": "ready_to_proceed | proceed_with_gaps | awaiting_response | rejected | escalated",
+  "remaining_open_gap_ids": ["string ... (must reference valid gaps)"],
+  "decision_reason": "string | null (required for rejected/escalated)",
+  "proceeding_constraints": ["string ..."],
+  "decided_at": "ISO datetime (default: now)"
+}

@@ -1,0 +1,289 @@
+[
+  {
+    "title": "Build loop — full lifecycle completed",
+    "description": "A manual BUILD loop that ran two cycles, verified each, and completed successfully",
+    "envelope": {
+      "envelope_id": "env-loop-build",
+      "status": "completed",
+      "stop_reason": "success",
+      "phase": "handoff",
+      "goal": "build",
+      "trigger": "manual",
+      "objective": "Add user authentication feature",
+      "plan": {
+        "loop_id": "loop-build-001",
+        "run_id": "run-001",
+        "session_id": "sess-001",
+        "max_iterations": 20,
+        "max_no_progress_iterations": 5,
+        "verification_required": true,
+        "update_artifacts_required": true,
+        "commit_policy": "commit_on_verified_progress",
+        "escalation_policy": "escalate_on_blocker"
+      },
+      "rules": {
+        "update_per_iteration": ["loop_execution.md", "loop_memory.md", "todo.json", "state.md"],
+        "stop_conditions": ["max_iterations", "verification_failed", "repeated_no_progress"],
+        "retry_conditions": ["transient_failure", "test_flakiness"],
+        "escalate_conditions": ["approval_required", "security_issue"],
+        "commit_conditions": ["verified_progress", "all_tests_pass"],
+        "feature_done_conditions": ["all_acceptance_criteria_met", "tests_pass"],
+        "lesson_promotion_rules": ["3_occurrences_promotes_to_rule"]
+      },
+      "cycles": [
+        {
+          "iteration": 1,
+          "started_at": "2026-07-04T10:00:00Z",
+          "ended_at": "2026-07-04T10:30:00Z",
+          "phase_transitions": ["intake", "plan", "execute", "verify", "update_state", "stop_check"],
+          "selected_task_id": "task-auth-001",
+          "actions_performed": ["Created auth model schema", "Added password hashing"],
+          "artifacts_touched": ["models/auth.py", "tests/test_auth.py"],
+          "result_summary": "Auth model created with password hashing",
+          "progress_delta": "added",
+          "verification_result": "PASS",
+          "lessons_extracted": ["Use bcrypt for password hashing"],
+          "next_suggested_step": "Add JWT token generation"
+        },
+        {
+          "iteration": 2,
+          "started_at": "2026-07-04T10:31:00Z",
+          "ended_at": "2026-07-04T11:00:00Z",
+          "phase_transitions": ["intake", "plan", "execute", "verify", "update_state", "stop_check", "handoff"],
+          "selected_task_id": "task-auth-002",
+          "actions_performed": ["Implemented JWT generation", "Added token verification endpoint"],
+          "artifacts_touched": ["models/auth.py", "routes/auth.py", "tests/test_auth.py"],
+          "result_summary": "JWT token generation implemented and verified",
+          "progress_delta": "added",
+          "verification_result": "PASS",
+          "lessons_extracted": ["Set short JWT expiry for security"],
+          "next_suggested_step": null
+        }
+      ],
+      "memory": {
+        "current_objective": "Add user authentication feature",
+        "active_task_id": null,
+        "recent_evidence": ["Auth model schema complete", "JWT generation working", "All tests pass"],
+        "unresolved_blockers": [],
+        "known_failures": [],
+        "recent_lessons": ["Use bcrypt for password hashing", "Set short JWT expiry for security"],
+        "next_action": "Feature complete; handoff"
+      },
+      "created_at": "2026-07-04T10:00:00Z",
+      "updated_at": "2026-07-04T11:00:00Z"
+    }
+  },
+  {
+    "title": "Repair loop — exhausted after max iterations",
+    "description": "A repair loop that exhausted its iterations without fully resolving the bug",
+    "envelope": {
+      "envelope_id": "env-loop-repair",
+      "status": "exhausted",
+      "stop_reason": "max_iterations",
+      "phase": "stop_check",
+      "goal": "repair",
+      "trigger": "event",
+      "objective": "Fix intermittent login timeout bug",
+      "plan": {
+        "loop_id": "loop-repair-001",
+        "run_id": "run-002",
+        "max_iterations": 5,
+        "max_no_progress_iterations": 3,
+        "verification_required": true,
+        "update_artifacts_required": true,
+        "commit_policy": "commit_on_verified_progress",
+        "escalation_policy": "escalate_on_blocker"
+      },
+      "rules": {
+        "update_per_iteration": ["loop_execution.md", "loop_memory.md", "todo.json"],
+        "stop_conditions": ["max_iterations", "repeated_no_progress"],
+        "retry_conditions": ["transient_failure"],
+        "escalate_conditions": ["approval_required"],
+        "commit_conditions": ["verified_progress"],
+        "feature_done_conditions": ["bug_reproduced_and_fixed"],
+        "lesson_promotion_rules": []
+      },
+      "cycles": [
+        {
+          "iteration": 1,
+          "started_at": "2026-07-04T12:00:00Z",
+          "actions_performed": ["Added debug logging", "Reproduced timeout"],
+          "verification_result": "PASS",
+          "result_summary": "Timeout reproduced in debug mode"
+        },
+        {
+          "iteration": 2,
+          "started_at": "2026-07-04T12:30:00Z",
+          "actions_performed": ["Tried increasing pool size"],
+          "verification_result": "FAIL",
+          "result_summary": "Pool size increase did not resolve timeout"
+        }
+      ],
+      "memory": {
+        "current_objective": "Fix intermittent login timeout bug",
+        "active_task_id": "task-repair-002",
+        "recent_evidence": ["Timeout reproduced", "Pool size not the cause"],
+        "unresolved_blockers": ["Cannot reproduce reliably in staging"],
+        "known_failures": ["Pool size fix failed"],
+        "recent_lessons": ["Timeout only happens under concurrent load"],
+        "next_action": "Escalate to senior engineer"
+      },
+      "created_at": "2026-07-04T12:00:00Z",
+      "updated_at": "2026-07-04T13:00:00Z"
+    }
+  },
+  {
+    "title": "Recovery resume loop",
+    "description": "A loop resuming after a crash, carrying forward blockers and incomplete work",
+    "envelope": {
+      "envelope_id": "env-loop-resume",
+      "status": "running",
+      "phase": "intake",
+      "goal": "build",
+      "trigger": "recovery_resume",
+      "objective": "Complete feature build after session crash",
+      "plan": {
+        "loop_id": "loop-resume-001",
+        "run_id": "run-003",
+        "session_id": "sess-002",
+        "max_iterations": 30,
+        "max_no_progress_iterations": 5,
+        "verification_required": true,
+        "update_artifacts_required": true,
+        "commit_policy": "commit_on_verified_progress",
+        "escalation_policy": "escalate_on_blocker"
+      },
+      "rules": {
+        "update_per_iteration": ["loop_execution.md", "loop_memory.md", "todo.json", "state.md"],
+        "stop_conditions": ["max_iterations", "verification_failed"],
+        "retry_conditions": ["transient_failure"],
+        "escalate_conditions": ["approval_required"],
+        "commit_conditions": ["verified_progress"],
+        "feature_done_conditions": ["all_acceptance_criteria_met"],
+        "lesson_promotion_rules": []
+      },
+      "cycles": [
+        {
+          "iteration": 1,
+          "started_at": "2026-07-04T09:00:00Z",
+          "actions_performed": ["Partial DB migration", "Wrote test stubs"],
+          "verification_result": "PASS",
+          "result_summary": "Partial progress before crash"
+        }
+      ],
+      "memory": {
+        "current_objective": "Complete feature build after session crash",
+        "active_task_id": "task-db-001",
+        "recent_evidence": ["DB migration half-done", "Test stubs exist"],
+        "unresolved_blockers": ["Crash during migration — need to verify state"],
+        "known_failures": ["Session crashed at iteration 1"],
+        "recent_lessons": ["Commit before risky operations"],
+        "next_action": "Verify database state before continuing migration"
+      },
+      "created_at": "2026-07-04T09:00:00Z",
+      "updated_at": "2026-07-04T14:00:00Z"
+    }
+  },
+  {
+    "title": "Research loop — complete with findings",
+    "description": "A RESEARCH loop that explored options and completed with documented findings",
+    "envelope": {
+      "envelope_id": "env-loop-research",
+      "status": "completed",
+      "stop_reason": "success",
+      "phase": "handoff",
+      "goal": "research",
+      "trigger": "manual",
+      "objective": "Evaluate ORM options for the project",
+      "plan": {
+        "loop_id": "loop-research-001",
+        "max_iterations": 10,
+        "max_no_progress_iterations": 3,
+        "verification_required": false,
+        "update_artifacts_required": true,
+        "commit_policy": "commit_on_verified_progress",
+        "escalation_policy": "escalate_on_blocker"
+      },
+      "rules": {
+        "update_per_iteration": ["loop_memory.md", "state.md"],
+        "stop_conditions": ["objective_met", "max_iterations"],
+        "retry_conditions": [],
+        "escalate_conditions": [],
+        "commit_conditions": [],
+        "feature_done_conditions": [],
+        "lesson_promotion_rules": []
+      },
+      "cycles": [
+        {
+          "iteration": 1,
+          "started_at": "2026-07-04T15:00:00Z",
+          "actions_performed": ["Researched SQLAlchemy", "Read docs"],
+          "verification_result": null,
+          "result_summary": "SQLAlchemy supports async and migrations"
+        }
+      ],
+      "memory": {
+        "current_objective": "Evaluate ORM options",
+        "active_task_id": null,
+        "recent_evidence": ["SQLAlchemy: async + Alembic", "Django ORM: batteries included"],
+        "unresolved_blockers": [],
+        "known_failures": [],
+        "recent_lessons": ["SQLAlchemy fits our async pattern"],
+        "next_action": "Document recommendation in ADR"
+      },
+      "created_at": "2026-07-04T15:00:00Z",
+      "updated_at": "2026-07-04T16:00:00Z"
+    }
+  },
+  {
+    "title": "Verify loop — verification failed",
+    "description": "A VERIFY loop that ran and failed because verification did not pass",
+    "envelope": {
+      "envelope_id": "env-loop-verify",
+      "status": "failed",
+      "stop_reason": "verification_failed",
+      "phase": "verify",
+      "goal": "verify",
+      "trigger": "event",
+      "objective": "Verify migration script does not break existing data",
+      "plan": {
+        "loop_id": "loop-verify-001",
+        "max_iterations": 3,
+        "max_no_progress_iterations": 2,
+        "verification_required": true,
+        "update_artifacts_required": true,
+        "commit_policy": "commit_on_verified_progress",
+        "escalation_policy": "escalate_on_failure"
+      },
+      "rules": {
+        "update_per_iteration": ["loop_execution.md", "loop_memory.md"],
+        "stop_conditions": ["verification_failed", "max_iterations"],
+        "retry_conditions": ["test_flakiness"],
+        "escalate_conditions": ["data_integrity_risk"],
+        "commit_conditions": [],
+        "feature_done_conditions": [],
+        "lesson_promotion_rules": []
+      },
+      "cycles": [
+        {
+          "iteration": 1,
+          "started_at": "2026-07-04T16:00:00Z",
+          "actions_performed": ["Ran migration dry-run", "Checked data integrity"],
+          "verification_result": "FAIL",
+          "result_summary": "Migration would drop 3 columns with live data"
+        }
+      ],
+      "memory": {
+        "current_objective": "Verify migration script safety",
+        "active_task_id": "task-verify-001",
+        "recent_evidence": ["Migration drops columns with data"],
+        "unresolved_blockers": ["Data loss risk — cannot proceed"],
+        "known_failures": ["Verification failed on iteration 1"],
+        "recent_lessons": ["Always dry-run migrations first"],
+        "next_action": "Notify team and revise migration script"
+      },
+      "created_at": "2026-07-04T16:00:00Z",
+      "updated_at": "2026-07-04T16:15:00Z"
+    }
+  }
+]

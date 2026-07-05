@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P55: Synthesis & Finalization Contract</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #a855f7; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #a855f7 50%, #7c3aed 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p {
+  font-size: 1.05rem; color: #9494a8; max-width: 640px;
+}
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-r { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+.icon-b { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.icon-p { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+.icon-g { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-y { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.icon-s { background: rgba(148, 148, 168, 0.15); color: #9494a8; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+.grid-5 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 0.75rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #a855f7; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .hl3 { color: #34d399; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+
+.flow { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; line-height: 2.2; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 55 &mdash; Synthesis &amp; Finalization</div>
+    <h1>Synthesis &amp; Finalization Contract</h1>
+    <p>
+      Typed contract for selecting, normalizing, merging, validating, and
+      finalizing outputs from multiple branches, delegates, or agents into
+      a single coherent result.
+    </p>
+  </div>
+
+  <div class="section-label">Files</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/synthesis_finalization_contract.py              <span class="dim">(5 enums + 8 models)</span><br>
+    <span class="hl">CREATED</span>  tests/test_synthesis_finalization_contract.py           <span class="dim">(67 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/synthesis_finalization_examples.json            <span class="dim">(5 examples)</span><br>
+    <span class="hl">CREATED</span>  synthesis/SYNTHESIS.md &bull; templates/                  <span class="dim">(protocol doc + templates)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 2813/2813 tests pass &mdash; P55: 310 lines, 67 tests
+  </div>
+
+  <div class="section-label">Enums</div>
+
+  <div class="grid-5">
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-b">&#9881;</div>
+        <div>
+          <div class="card-title">SynthesisInputType</div>
+          <div class="card-subtitle">7 types</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        branch_output<br>delegate_return<br>verification_report<br>review_note<br>artifact_ref<br>state_delta<br>evidence_bundle
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-p">&#9881;</div>
+        <div>
+          <div class="card-title">NormalizationMode</div>
+          <div class="card-subtitle">5 modes</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        identity<br>schema_map<br>rank_and_filter<br>deduplicate<br>canonicalize
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-y">&#9881;</div>
+        <div>
+          <div class="card-title">SynthesisPolicy</div>
+          <div class="card-subtitle">5 policies</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        merge_all_accepted<br>merge_ranked_subset<br>verification_first<br>majority_supported<br>manual_editorial_review
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-g">&#9881;</div>
+        <div>
+          <div class="card-title">FinalizationStatus</div>
+          <div class="card-subtitle">7 statuses</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        draft &bull; in_synthesis<br>validated &bull; approved<br>rejected<br>needs_rework &bull; released
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-r">&#9881;</div>
+        <div>
+          <div class="card-title">FinalDisposition</div>
+          <div class="card-subtitle">5 dispositions</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        accept<br>accept_with_caveats<br>return_for_rework<br>reject &bull; escalate
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Models</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">SynthesisSourceRecord</div>
+          <div class="card-subtitle">one input into synthesis</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        source_id &bull; source_type<br>source_ref &bull; origin_agent_id?<br>origin_role_id?<br>eligibility_status<br>selection_reason? &bull; confidence?<br>priority? &bull; evidence_refs[]
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9632;</div>
+        <div>
+          <div class="card-title">NormalizationRecord</div>
+          <div class="card-subtitle">transformation to mergeable form</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        normalization_id &bull; source_id<br>normalization_mode<br>input_ref &bull; normalized_ref<br>schema_version? &bull; notes?
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9632;</div>
+        <div>
+          <div class="card-title">SynthesisConflictRecord</div>
+          <div class="card-subtitle">contradiction or collision</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        conflict_id &bull; source_ids[2+]<br>conflict_type?<br>conflict_summary<br>resolution_strategy?<br>resolved &bull; resolution_notes?<br>review_required
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9632;</div>
+        <div>
+          <div class="card-title">SynthesisDecisionRecord</div>
+          <div class="card-subtitle">merge decision</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        decision_id &bull; synthesis_policy<br>selected_source_ids[]<br>rejected_source_ids[]<br>conflict_ids[]<br>decision_reason?<br>editorial_notes?<br>decision_made_at?
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">ValidationSummaryRecord</div>
+          <div class="card-subtitle">quality check</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        validation_summary_id<br>validation_refs[]<br>checks_passed[]<br>checks_failed[]<br>evidence_gaps[]<br>quality_score?<br>review_required<br>summary?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-s">&#9632;</div>
+        <div>
+          <div class="card-title">FinalizationRecord</div>
+          <div class="card-subtitle">release readiness</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        finalization_id<br>finalization_status<br>final_disposition<br>approved_by?<br>approval_reason?<br>release_ready<br>followup_required<br>finalized_at?
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">SynthesisOutputRecord</div>
+          <div class="card-subtitle">finalized product</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        output_id &bull; output_type?<br>result_summary<br>final_output_refs[]<br>supporting_evidence_refs[]<br>residual_uncertainties[]<br>consumer_notes?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9632;</div>
+        <div>
+          <div class="card-title">SynthesisFinalizationEnvelope</div>
+          <div class="card-subtitle">top-level wrapper</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        envelope_id &bull; sources[]<br>normalizations[]?<br>conflicts[]?<br>decision<br>validation_summary<br>finalization<br>output
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Synthesis Pipeline</div>
+
+  <div class="diagram">
+    <span class="hl">SELECT SOURCES</span> &rarr; <span class="hl">NORMALIZE</span> &rarr; <span class="hl">RESOLVE CONFLICTS</span> &rarr; <span class="hl">ASSEMBLE RESULT</span> &rarr; <span class="hl">FINALIZE</span><br>
+    <span class="dim"><span style="color:#34d399;">accepted</span> / <span style="color:#f87171;">rejected</span></span> &nbsp;&nbsp; <span class="dim">schema_map/dedup</span> &nbsp;&nbsp; <span class="dim">rank/resolve/review</span> &nbsp;&nbsp; <span class="dim">merge & validate</span> &nbsp;&nbsp; <span class="dim"><span style="color:#34d399;">approved</span> / <span style="color:#f87171;">rework/reject</span></span>
+  </div>
+
+  <div class="section-label">Validation Rules</div>
+
+  <div class="diagram">
+    <span class="hl">NON-BLANK</span>  envelope_id, source_id, source_ref, eligibility_status, normalization_id, input_ref, normalized_ref, conflict_id, conflict_summary, decision_id, validation_summary_id, finalization_id, output_id, result_summary<br>
+    <span class="hl">ELIGIBILITY</span>  at least one source must be eligible (accepted)<br>
+    <span class="hl">REJECTED</span>  rejected-only inputs cannot become approved or released outputs<br>
+    <span class="hl">RELEASED</span>  released status requires release_ready=True<br>
+    <span class="hl">ACCEPT</span>  accept dispositions require at least one final_output_ref<br>
+    <span class="hl">REWORK/REJECT</span>  must include approval_reason<br>
+    <span class="hl">CONFLICTS</span>  unresolved conflicts must set review_required on validation summary<br>
+    <span class="hl">QUALITY</span>  quality_score bounded 0.0 &le; v &le; 1.0<br>
+    <span class="hl">CONFIDENCE</span>  confidence bounded 0.0 &le; v &le; 1.0
+  </div>
+
+  <div class="section-label">Test Coverage</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">67 tests</div>
+          <div class="card-subtitle">All passing</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">8 models</div>
+          <div class="card-subtitle">5 enums + validators</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#10003;</div>
+        <div>
+          <div class="card-title">Synthesis integrity</div>
+          <div class="card-subtitle">source selection, normalization, conflict resolution, merge policy, validation gates, final disposition, release readiness</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">All 55 Primitives</div>
+  <div class="diagram">
+    <span style="color:#818cf8;">P1&nbsp;&nbsp;INSTRUCTION LAYERING</span><br>
+    <span style="color:#34d399;">P2&nbsp;&nbsp;TASK CONTRACT SCHEMA</span><br>
+    <span style="color:#38bdf8;">P3&nbsp;&nbsp;CONTEXT DELIVERY SCHEMA</span><br>
+    <span style="color:#fbbf24;">P4&nbsp;&nbsp;CONTEXT SELECTION POLICY</span><br>
+    <span style="color:#f87171;">P5&nbsp;&nbsp;TOOL INTERFACE SCHEMA</span><br>
+    <span style="color:#a78bfa;">P6&nbsp;&nbsp;EXECUTION ENVIRONMENT</span><br>
+    <span style="color:#fbbf24;">P7&nbsp;&nbsp;DURABLE STATE SCHEMA</span><br>
+    <span style="color:#34d399;">P8&nbsp;&nbsp;VERIFICATION SCHEMA</span><br>
+    <span style="color:#38bdf8;">P9&nbsp;&nbsp;PROMPT ASSEMBLY SCHEMA</span><br>
+    <span style="color:#818cf8;">P10 RUN ORCHESTRATION STATE MACHINE</span><br>
+    <span style="color:#fbbf24;">P11 RETRY AND RECOVERY POLICY</span><br>
+    <span style="color:#ef4444;">P12 APPROVAL AND SAFETY POLICY</span><br>
+    <span style="color:#34d399;">P13 EVALUATION AND BENCHMARK SCHEMA</span><br>
+    <span style="color:#a855f7;">P14 OBSERVABILITY AND TRACE SCHEMA</span><br>
+    <span style="color:#fbbf24;">P15 STATE MACHINE DRIVER</span><br>
+    <span style="color:#34d399;">P16 PIPELINE EXECUTOR</span><br>
+    <span style="color:#fbbf24;">P17 PRODUCTION CONFIG &amp; SECRETS</span><br>
+    <span style="color:#a855f7;">P18 BUDGET &amp; RATE LIMIT POLICY</span><br>
+    <span style="color:#ef4444;">P19 FAILURE TAXONOMY &amp; ERROR ENVELOPE</span><br>
+    <span style="color:#38bdf8;">P20 INPUT &amp; OUTPUT GUARDRAILS</span><br>
+    <span style="color:#34d399;">P21 APPROVAL &amp; ESCALATION</span><br>
+    <span style="color:#a855f7;">P22 CAPABILITY MATRIX</span><br>
+    <span style="color:#818cf8;">P23 SESSION STATE &amp; CHECKPOINT</span><br>
+    <span style="color:#34d399;">P24 EVALUATION &amp; QUALITY GATE</span><br>
+    <span style="color:#38bdf8;">P25 TRACE, AUDIT &amp; PROVENANCE</span><br>
+    <span style="color:#a855f7;">P26 AGENT IDENTITY &amp; OWNERSHIP</span><br>
+    <span style="color:#a855f7;">P27 MEMORY BOUNDARY</span><br>
+    <span style="color:#ef4444;">P28 TOOL CAPABILITY &amp; PERMISSION</span><br>
+    <span style="color:#ef4444;">P29 POLICY EVALUATION &amp; GUARDRAIL</span><br>
+    <span style="color:#ef4444;">P30 HUMAN APPROVAL &amp; ESCALATION</span><br>
+    <span style="color:#38bdf8;">P31 TASK CONTRACT &amp; UNIT-OF-WORK</span><br>
+    <span style="color:#a855f7;">P32 TOOL INVOCATION RECEIPT</span><br>
+    <span style="color:#fbbf24;">P33 MODEL CALL &amp; PROMPT PROVENANCE</span><br>
+    <span style="color:#34d399;">P34 CHECKPOINT &amp; SESSION RECOVERY</span><br>
+    <span style="color:#ef4444;">P35 POLICY DECISION &amp; APPROVAL GATE</span><br>
+    <span style="color:#38bdf8;">P36 AUDIT TRAIL &amp; EVENT LOG CONTRACT</span><br>
+    <span style="color:#a855f7;">P37 MEMORY, CONTEXT &amp; RETRIEVAL SNAPSHOT</span><br>
+    <span style="color:#fbbf24;">P38 ARTIFACT, FILE &amp; GENERATED OUTPUT CONTRACT</span><br>
+    <span style="color:#34d399;">P39 FEEDBACK, EVALUATION &amp; QUALITY SIGNAL CONTRACT</span><br>
+    <span style="color:#f87171;">P40 RUN ORCHESTRATION &amp; EXECUTION STATE CONTRACT</span><br>
+    <span style="color:#f87171;">P41 FAILURE, EXCEPTION &amp; RECOVERY DECISION CONTRACT</span><br>
+    <span style="color:#fbbf24;">P42 CONFIGURATION, SECRETS &amp; ENVIRONMENT CONTRACT</span><br>
+    <span style="color:#38bdf8;">P43 LOGGING, TRACE &amp; OBSERVABILITY EVENT CONTRACT</span><br>
+    <span style="color:#34d399;">P44 RUNNING LOOP CONTRACT</span><br>
+    <span style="color:#a855f7;">P45 STEP / TURN LIFECYCLE CONTRACT</span><br>
+    <span style="color:#818cf8;">P46 SUPERVISION &amp; DELEGATION CONTRACT</span><br>
+    <span style="color:#38bdf8;">P47 ROUTING &amp; DISPATCH CONTRACT</span><br>
+    <span style="color:#34d399;">P48 INPUT VALIDATION CONTRACT</span><br>
+    <span style="color:#fbbf24;">P49 HOOK LIFECYCLE CONTRACT</span><br>
+    <span style="color:#a855f7;">P50 AGENT ROLE &amp; SPECIALIZATION CONTRACT</span><br>
+    <span style="color:#38bdf8;">P51 HANDOFF &amp; RETURN ENVELOPE CONTRACT</span><br>
+    <span style="color:#34d399;">P52 MULTI-AGENT SESSION GRAPH CONTRACT</span><br>
+    <span style="color:#a855f7;">P53 CROSS-AGENT MESSAGING CONTRACT</span><br>
+    <span style="color:#38bdf8;">P54 PARALLEL WORK &amp; JOIN CONTRACT</span><br>
+    <span class="hl" style="color:#a855f7;">P55 SYNTHESIS &amp; FINALIZATION CONTRACT</span>  <span class="dim">— <span style="color:#a855f7;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P55 &bull; Synthesis &amp; Finalization Contract &bull; 2813/2813 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P30: Human Approval &amp; Escalation Contract</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #ef4444; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #ef4444 50%, #dc2626 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p { font-size: 1.05rem; color: #9494a8; max-width: 640px; }
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-r { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.icon-b { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.icon-p { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+.icon-g { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-y { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+.grid-5 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #ef4444; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+
+.flow { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; line-height: 2.2; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 30 &mdash; Human Approval</div>
+    <h1>Human Approval &amp; Escalation Contract</h1>
+    <p>
+      Approval requests, human reviewer context, role-based routing, risk-tiered
+      decisions, escalation ladders, timeout handling, and auditable override paths
+      for AI agent oversight.
+    </p>
+  </div>
+
+  <div class="section-label">Files</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/human_approval_contract.py              <span class="dim">(5 enums + 6 models)</span><br>
+    <span class="hl">CREATED</span>  tests/test_human_approval_contract.py         <span class="dim">(57 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/human_approval_contract_examples.json <span class="dim">(5 examples)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 1248/1248 tests pass across all primitives
+  </div>
+
+  <div class="section-label">Enums</div>
+
+  <div class="grid-5">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9881;</div>
+        <div>
+          <div class="card-title">ApprovalStatus</div>
+          <div class="card-subtitle">6 states</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        pending &bull; approved<br>
+        denied &bull; expired<br>
+        escalated &bull; cancelled
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9881;</div>
+        <div>
+          <div class="card-title">ApprovalDecisionType</div>
+          <div class="card-subtitle">4 outcomes</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        approve &bull; deny<br>
+        escalate &bull; override
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9881;</div>
+        <div>
+          <div class="card-title">ApprovalReasonType</div>
+          <div class="card-subtitle">5 reasons</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        policy_trigger &bull; high_risk_action<br>
+        sensitive_data_access<br>
+        scope_expansion &bull; unknown_condition
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9881;</div>
+        <div>
+          <div class="card-title">RiskTier</div>
+          <div class="card-subtitle">4 tiers</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        low &bull; moderate<br>
+        high &bull; critical
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9881;</div>
+        <div>
+          <div class="card-title">EscalationStatus</div>
+          <div class="card-subtitle">4 states</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        not_escalated &bull; in_progress<br>
+        resolved &bull; timed_out
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Models</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">ApproverRef</div>
+          <div class="card-subtitle">human identity</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        approver_id &bull; approver_role<br>
+        display_name?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9632;</div>
+        <div>
+          <div class="card-title">ApprovalContext</div>
+          <div class="card-subtitle">reviewer briefing</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        subject_ref &bull; summary &bull; policy_ref?<br>
+        risk_tier &bull; evidence_refs &bull; rollback_plan?
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9632;</div>
+        <div>
+          <div class="card-title">ApprovalRequest</div>
+          <div class="card-subtitle">pending request</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        approval_request_id &bull; run_id &bull; requested_by<br>
+        reason_type &bull; status &bull; context<br>
+        eligible_approvers &bull; expires_at
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">ApprovalDecision</div>
+          <div class="card-subtitle">human verdict</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        approval_decision_id &bull; approval_request_id<br>
+        decided_by &bull; decision &bull; justification<br>
+        decided_at
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9632;</div>
+        <div>
+          <div class="card-title">EscalationStep</div>
+          <div class="card-subtitle">ladder record</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        escalation_step_id &bull; approval_request_id<br>
+        from_role? &bull; to_role<br>
+        escalation_status &bull; note?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9632;</div>
+        <div>
+          <div class="card-title">ApprovalEnvelope</div>
+          <div class="card-subtitle">complete record</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        envelope_id &bull; request<br>
+        decision? &bull; escalation_steps
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Approval Flow</div>
+
+  <div class="flow">
+<span class="hl">TRIGGER</span><span class="dim">      Policy / risk / unknown condition requires human approval</span>
+<span class="hl">CONTEXT</span><span class="dim">      Subject, summary, risk tier, evidence refs, rollback plan assembled</span>
+<span class="hl">REQUEST</span><span class="dim">      ApprovalRequest created with PENDING status and eligible approvers</span>
+<span class="hl">ROUTING</span><span class="dim">      Eligible approvers notified (role-based match)</span>
+<span class="hl">DECISION</span><span class="dim">     Approve | Deny | Escalate | Override</span>
+<span class="hl">ESCALATION</span><span class="dim">    EscalationStep recorded with from/to roles and status</span>
+<span class="hl">RESOLUTION</span><span class="dim">    Envelope closed with final decision or expiry</span><br>
+
+<span class="dim">Timeouts fail safe to EXPIRED (not implicit allow).</span>
+<span class="dim">Override requires higher authority role (approver_role containing 'override').</span>
+<span class="dim">ESCALATE decision must have at least one escalation step.</span>
+  </div>
+
+  <div class="section-label">Validation Rules</div>
+
+  <div class="diagram">
+    <span class="hl">NON-EMPTY</span>  approval_request_id, run_id, requested_by, subject_ref, summary, approval_decision_id, justification, decided_at, escalation_step_id, to_role, envelope_id<br>
+    <span class="hl">APPROVERS</span>   PENDING requests must have at least one eligible_approver<br>
+    <span class="hl">OVERRIDE</span>    OVERRIDE decision requires 'override' in approver_role<br>
+    <span class="hl">ESCALATE</span>    ESCALATE decision requires at least one escalation_step<br>
+    <span class="hl">EXPIRED</span>     EXPIRED request must not have APPROVE or OVERRIDE decision<br>
+    <span class="hl">REF INTEGRITY</span>  decision and escalation steps must reference matching approval_request_id
+  </div>
+
+  <div class="section-label">Decision Semantics</div>
+
+  <div class="diagram">
+    <span class="hl">APPROVE</span>     Execution may proceed (risk accepted by authorized role)<br>
+    <span class="hl">DENY</span>        Execution blocked (reason recorded)<br>
+    <span class="hl">ESCALATE</span>    Passed to higher authority with escalation step record<br>
+    <span class="hl">OVERRIDE</span>    Forced through by explicit override authority (audit trail)
+  </div>
+
+  <div class="section-label">Test Coverage</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">57 tests</div>
+          <div class="card-subtitle">All passing</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">6 models</div>
+          <div class="card-subtitle">5 enums + validators</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#10003;</div>
+        <div>
+          <div class="card-title">Oversight integrity</div>
+          <div class="card-subtitle">override gating, escalation enforcement, fail-safe expiry, role routing</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Not Implemented Yet</div>
+  <div class="diagram">
+    <span class="dim">&#10007; Reviewer inbox UI and notification service</span><br>
+    <span class="dim">&#10007; SLA engine and escalation scheduling</span><br>
+    <span class="dim">&#10007; Approval dashboard and audit viewer</span><br>
+    <span class="dim">&#10007; Routing microservice with dynamic role resolution</span><br>
+    <span class="dim">&#10007; Multi-party voting and consensus logic</span>
+  </div>
+
+  <div class="section-label">Primitives So Far</div>
+  <div class="diagram">
+    <span style="color:#818cf8;">P1&nbsp;&nbsp;INSTRUCTION LAYERING</span>            <span class="dim">Global + Project + Task layers</span><br>
+    <span style="color:#34d399;">P2&nbsp;&nbsp;TASK CONTRACT SCHEMA</span>            <span class="dim">Nested Pydantic + 2-layer validation</span><br>
+    <span style="color:#38bdf8;">P3&nbsp;&nbsp;CONTEXT DELIVERY SCHEMA</span>          <span class="dim">Structured bundle + reason-annotated items</span><br>
+    <span style="color:#fbbf24;">P4&nbsp;&nbsp;CONTEXT SELECTION POLICY</span>        <span class="dim">Heuristic pipeline + exclusions + caps</span><br>
+    <span style="color:#f87171;">P5&nbsp;&nbsp;TOOL INTERFACE SCHEMA</span>           <span class="dim">Definition, Invocation, Result</span><br>
+    <span style="color:#a78bfa;">P6&nbsp;&nbsp;EXECUTION ENVIRONMENT</span>          <span class="dim">Provider-agnostic runtime contract</span><br>
+    <span style="color:#fbbf24;">P7&nbsp;&nbsp;DURABLE STATE SCHEMA</span>           <span class="dim">Run-centric execution persistence</span><br>
+    <span style="color:#34d399;">P8&nbsp;&nbsp;VERIFICATION SCHEMA</span>            <span class="dim">Multi-check quality gate contract</span><br>
+    <span style="color:#38bdf8;">P9&nbsp;&nbsp;PROMPT ASSEMBLY SCHEMA</span>         <span class="dim">Layered prompt assembly</span><br>
+    <span style="color:#818cf8;">P10 RUN ORCHESTRATION STATE MACHINE</span>     <span class="dim">Deterministic control-flow contract</span><br>
+    <span style="color:#fbbf24;">P11 RETRY AND RECOVERY POLICY</span>     <span class="dim">Failure-classified retry contract</span><br>
+    <span style="color:#ef4444;">P12 APPROVAL AND SAFETY POLICY</span>     <span class="dim">Risk-classified governance contract</span><br>
+    <span style="color:#34d399;">P13 EVALUATION AND BENCHMARK SCHEMA</span>     <span class="dim">Task-grader-run benchmark contract</span><br>
+    <span style="color:#a855f7;">P14 OBSERVABILITY AND TRACE SCHEMA</span>     <span class="dim">Step-level execution evidence contract</span><br>
+    <span style="color:#fbbf24;">P15 STATE MACHINE DRIVER</span>          <span class="dim">Trigger, guard, history runtime</span><br>
+    <span style="color:#34d399;">P16 PIPELINE EXECUTOR</span>            <span class="dim">Single-run orchestration pipeline</span><br>
+    <span style="color:#fbbf24;">P17 PRODUCTION CONFIG &amp; SECRETS</span>    <span class="dim">Typed config + secret references + startup validation + redaction</span><br>
+    <span style="color:#a855f7;">P18 BUDGET &amp; RATE LIMIT POLICY</span>    <span class="dim">Hierarchical token/cost/runtime/tool-call/rate-limit contract</span><br>
+    <span style="color:#ef4444;">P19 FAILURE TAXONOMY &amp; ERROR ENVELOPE</span>  <span class="dim">Typed failure taxonomy + rich envelope + public-safe view + classification</span><br>
+    <span style="color:#38bdf8;">P20 INPUT &amp; OUTPUT GUARDRAILS</span>    <span class="dim">Input/output screening + risk classification + sanitization + decisions</span><br>
+    <span style="color:#34d399;">P21 APPROVAL &amp; ESCALATION</span>      <span class="dim">Risk-tiered approval + reviewer roles + evidence + timeout + escalation + outcome</span><br>
+    <span style="color:#a855f7;">P22 CAPABILITY MATRIX</span>          <span class="dim">Default-deny capability matrix + per-agent grants + environment-aware permissions + runtime authorization</span><br>
+    <span style="color:#818cf8;">P23 SESSION STATE &amp; CHECKPOINT</span>  <span class="dim">Working session lifecycle + checkpointing + replay safety + side-effect tracking + resume/recovery</span><br>
+    <span style="color:#34d399;">P24 EVALUATION &amp; QUALITY GATE</span>  <span class="dim">Structured metrics + mandatory checks + threshold policies + runtime gate actions</span><br>
+    <span style="color:#38bdf8;">P25 TRACE, AUDIT &amp; PROVENANCE</span>  <span class="dim">Chronological audit events + actor attribution + resource refs + evidence lineage + provenance graph + integrity envelopes</span><br>
+    <span style="color:#a855f7;">P26 AGENT IDENTITY &amp; OWNERSHIP</span>  <span class="dim">Unique agent identity + named ownership + authority models + delegation context + effective scopes + run ownership</span><br>
+    <span style="color:#a855f7;">P27 MEMORY BOUNDARY</span>  <span class="dim">Memory kind + scope boundaries + sensitivity + retention classes + lifecycle states + execution-context-aware retrieval</span><br>
+    <span style="color:#ef4444;">P28 TOOL CAPABILITY &amp; PERMISSION</span>  <span class="dim">Tool registration + action-level grants + execution constraints + invocation requests + runtime permission decisions</span><br>
+    <span style="color:#ef4444;">P29 POLICY EVALUATION &amp; GUARDRAIL</span>  <span class="dim">Policy evaluation + evidence signals + guardrail findings + risk scores + runtime decisions + obligations</span><br>
+    <span class="hl" style="color:#ef4444;">P30 HUMAN APPROVAL &amp; ESCALATION</span>  <span class="dim">Approval requests + human reviewer context + role-routed decisions + escalation ladders + timeout handling + override control — <span style="color:#ef4444;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P30 &bull; Human Approval &amp; Escalation &bull; 1248/1248 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

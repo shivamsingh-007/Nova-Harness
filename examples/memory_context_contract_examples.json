@@ -1,0 +1,252 @@
+[
+  {
+    "title": "Session memory snapshot",
+    "description": "Current session context with tool output and user-provided memory items",
+    "envelope": {
+      "envelope_id": "env-session",
+      "session_id": "s-001",
+      "agent_id": "agent-code",
+      "snapshot": {
+        "snapshot_id": "snap-session",
+        "run_id": "run-001",
+        "task_id": "t-001",
+        "query": "get session context",
+        "hits": [],
+        "memory_items": [
+          {
+            "memory_id": "mem-001",
+            "scope": "session",
+            "status": "active",
+            "source_type": "tool_output",
+            "source_ref": "tool://list-dir",
+            "summary": "Project directory structure: /src, /docs, /tests",
+            "trust_level": "trusted",
+            "confidence": null
+          },
+          {
+            "memory_id": "mem-002",
+            "scope": "session",
+            "status": "active",
+            "source_type": "user_provided",
+            "source_ref": "user://message-5",
+            "summary": "User specified preference for Python 3.12+",
+            "trust_level": "trusted",
+            "confidence": 0.98
+          }
+        ]
+      },
+      "context_blocks": [
+        {
+          "block_id": "blk-001",
+          "block_type": "memory",
+          "content_ref": "ref://mem-001",
+          "trust_level": "trusted",
+          "origin_ref": "run://run-001"
+        },
+        {
+          "block_id": "blk-002",
+          "block_type": "memory",
+          "content_ref": "ref://mem-002",
+          "trust_level": "trusted",
+          "origin_ref": "user://message-5"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Task-specific retrieval snapshot",
+    "description": "Vector search retrieval for a specific task with ranked hits and confidence scores",
+    "envelope": {
+      "envelope_id": "env-task-retrieval",
+      "session_id": "s-001",
+      "agent_id": "agent-code",
+      "snapshot": {
+        "snapshot_id": "snap-task-001",
+        "run_id": "run-001",
+        "task_id": "t-002",
+        "trace_id": "trace-001",
+        "query": "find function validate_input",
+        "hits": [
+          {
+            "hit_id": "hit-001",
+            "memory_id": "mem-task-1",
+            "rank": 1,
+            "score": 0.94,
+            "matched_query": "find function validate_input"
+          },
+          {
+            "hit_id": "hit-002",
+            "memory_id": "mem-task-2",
+            "rank": 2,
+            "score": 0.72,
+            "matched_query": "find function validate_input"
+          }
+        ],
+        "memory_items": [
+          {
+            "memory_id": "mem-task-1",
+            "scope": "task",
+            "status": "active",
+            "source_type": "vector_search",
+            "source_ref": "vector://query-abc",
+            "summary": "def validate_input(data: dict) -> bool — validates required fields",
+            "trust_level": "trusted",
+            "confidence": 0.94
+          },
+          {
+            "memory_id": "mem-task-2",
+            "scope": "task",
+            "status": "active",
+            "source_type": "vector_search",
+            "source_ref": "vector://query-abc",
+            "summary": "def sanitize_string(s: str) -> str — strips HTML tags",
+            "trust_level": "trusted",
+            "confidence": 0.72
+          }
+        ]
+      },
+      "context_blocks": [
+        {
+          "block_id": "blk-task-1",
+          "block_type": "retrieval",
+          "content_ref": "ref://mem-task-1",
+          "trust_level": "trusted",
+          "origin_ref": "task://t-002"
+        },
+        {
+          "block_id": "blk-task-2",
+          "block_type": "retrieval",
+          "content_ref": "ref://mem-task-2",
+          "trust_level": "trusted",
+          "origin_ref": "task://t-002"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Project memory item with promotion policy",
+    "description": "A manually imported project memory with retention and promotion rules",
+    "envelope": {
+      "envelope_id": "env-project-promotion",
+      "session_id": "s-001",
+      "agent_id": "agent-code",
+      "snapshot": {
+        "snapshot_id": "snap-project-001",
+        "run_id": "run-001",
+        "task_id": "t-003",
+        "query": "onboarding instructions",
+        "hits": [
+          {
+            "hit_id": "hit-001",
+            "memory_id": "mem-project-1",
+            "rank": 1,
+            "score": 0.88,
+            "matched_query": "onboarding instructions"
+          }
+        ],
+        "memory_items": [
+          {
+            "memory_id": "mem-project-1",
+            "scope": "project",
+            "status": "active",
+            "source_type": "manual_import",
+            "source_ref": "doc://onboarding.md",
+            "summary": "Project onboarding guide: repo structure, setup steps, coding conventions",
+            "trust_level": "trusted",
+            "confidence": 1.0
+          }
+        ]
+      },
+      "retention_policy": {
+        "retention_policy_id": "rp-project",
+        "keep_until": "2027-01-01T00:00:00Z",
+        "expire_after_days": 180,
+        "promote_to_project_memory": true,
+        "summarize_before_store": true
+      }
+    }
+  },
+  {
+    "title": "External untrusted retrieval block",
+    "description": "User-provided content retrieved with low confidence and untrusted trust label",
+    "envelope": {
+      "envelope_id": "env-external",
+      "session_id": "s-001",
+      "agent_id": "agent-code",
+      "snapshot": {
+        "snapshot_id": "snap-ext-001",
+        "run_id": "run-001",
+        "task_id": "t-004",
+        "query": "api docs",
+        "hits": [
+          {
+            "hit_id": "hit-ext-1",
+            "memory_id": "mem-ext-1",
+            "rank": 1,
+            "score": 0.35,
+            "matched_query": "api docs"
+          }
+        ],
+        "memory_items": [
+          {
+            "memory_id": "mem-ext-1",
+            "scope": "session",
+            "status": "active",
+            "source_type": "user_provided",
+            "source_ref": "user://message-42",
+            "summary": "User-provided API documentation snippet from external blog post",
+            "trust_level": "external_untrusted",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "context_blocks": [
+        {
+          "block_id": "blk-ext-1",
+          "block_type": "user_provided",
+          "content_ref": "ref://mem-ext-1",
+          "trust_level": "external_untrusted",
+          "origin_ref": "user://message-42"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Stale and active memory items retained for audit",
+    "description": "A stale memory item kept alongside the active replacement for audit trail purposes",
+    "envelope": {
+      "envelope_id": "env-stale-audit",
+      "session_id": "s-001",
+      "agent_id": "agent-code",
+      "snapshot": {
+        "snapshot_id": "snap-stale-001",
+        "run_id": "run-002",
+        "task_id": "t-005",
+        "query": "config format",
+        "hits": [],
+        "memory_items": [
+          {
+            "memory_id": "mem-stale-1",
+            "scope": "task",
+            "status": "stale",
+            "source_type": "tool_output",
+            "source_ref": "tool://old-query",
+            "summary": "Deprecated config format v1 (superseded by v2)",
+            "trust_level": "internal_unverified",
+            "confidence": 0.2
+          },
+          {
+            "memory_id": "mem-active-1",
+            "scope": "task",
+            "status": "active",
+            "source_type": "tool_output",
+            "source_ref": "tool://new-query",
+            "summary": "Current config format v2 with new schema",
+            "trust_level": "trusted",
+            "confidence": 0.95
+          }
+        ]
+      }
+    }
+  }
+]

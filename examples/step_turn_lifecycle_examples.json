@@ -1,0 +1,327 @@
+[
+  {
+    "title": "Successful implementation step with verification pass",
+    "description": "A step that creates an auth model, verifies it passes tests, and updates memory/todo/state",
+    "envelope": {
+      "envelope_id": "env-step-success",
+      "loop_id": "loop-build-001",
+      "run_id": "run-001",
+      "step": {
+        "step_id": "s-001",
+        "status": "completed",
+        "outcome": "success",
+        "current_phase": "close",
+        "trigger_type": "loop_iteration",
+        "selection_context": {
+          "step_id": "s-001",
+          "loop_id": "loop-build-001",
+          "run_id": "run-001",
+          "iteration_id": "iter-003",
+          "selected_task_id": "task-auth-001",
+          "selection_reason": "Highest priority unstarted task",
+          "priority": "high",
+          "blocking_dependencies": [],
+          "input_refs": ["todo.json", "state.md"]
+        },
+        "intent": {
+          "intent_id": "int-001",
+          "objective": "Create user authentication model",
+          "expected_output": "User model with email and hashed password",
+          "acceptance_criteria": [
+            "User model has email, password_hash fields",
+            "Email uniqueness enforced",
+            "Passwords hashed with bcrypt",
+            "All auth model tests pass"
+          ],
+          "verification_mode": "auto",
+          "allowed_actions": ["file_edit", "tool_call", "test_run"],
+          "forbidden_actions": ["deployment", "deletion"],
+          "delegation_allowed": false
+        },
+        "actions": [
+          {
+            "action_id": "act-001",
+            "phase": "act",
+            "action_type": "file_edit",
+            "started_at": "2026-07-05T10:00:00Z",
+            "ended_at": "2026-07-05T10:15:00Z",
+            "status": "completed",
+            "artifact_refs": ["models/auth.py"],
+            "summary": "Created User model with bcrypt password hashing"
+          },
+          {
+            "action_id": "act-002",
+            "phase": "verify",
+            "action_type": "verification_call",
+            "started_at": "2026-07-05T10:15:00Z",
+            "ended_at": "2026-07-05T10:16:00Z",
+            "status": "completed",
+            "related_tool_call_id": "tc-002",
+            "summary": "Ran auth model tests"
+          }
+        ],
+        "verification": {
+          "verification_id": "ver-001",
+          "verification_mode": "auto",
+          "evidence_refs": ["test_output.txt"],
+          "checks_performed": [
+            "User model creates with email",
+            "Password hash != plaintext",
+            "Email uniqueness enforced"
+          ],
+          "passed": true,
+          "confidence": 0.95,
+          "requires_retry": false,
+          "requires_escalation": false
+        },
+        "state_delta": {
+          "updated_task_status": "done",
+          "memory_changes": ["User auth model complete"],
+          "state_changes": ["Added auth.py to models"],
+          "new_lessons": ["bcrypt cost factor 12 is sufficient"],
+          "next_action": "Implement JWT token generation"
+        },
+        "artifact_updates": {
+          "updated_loop_execution": true,
+          "updated_loop_memory": true,
+          "updated_todo": true,
+          "updated_state": true,
+          "updated_lessons": true,
+          "update_summary": "Auth model done, todo advanced, lesson captured"
+        },
+        "started_at": "2026-07-05T10:00:00Z",
+        "ended_at": "2026-07-05T10:16:00Z",
+        "stop_reason": "verified_success",
+        "next_step_hint": "Implement JWT token generation"
+      }
+    }
+  },
+  {
+    "title": "Tool-failure step with retry hint",
+    "description": "A step where a migration tool fails verification; step records failure, updates blockers and memory, hints at retry",
+    "envelope": {
+      "envelope_id": "env-step-tool-fail",
+      "loop_id": "loop-migrate-001",
+      "step": {
+        "step_id": "s-002",
+        "status": "failed",
+        "outcome": "failure",
+        "current_phase": "stop_check",
+        "trigger_type": "loop_iteration",
+        "selection_context": {
+          "step_id": "s-002",
+          "loop_id": "loop-migrate-001",
+          "run_id": "run-002",
+          "selected_task_id": "task-migrate-001",
+          "selection_reason": "Database migration needed for auth feature",
+          "priority": "high"
+        },
+        "intent": {
+          "intent_id": "int-002",
+          "objective": "Run database migration for user table",
+          "acceptance_criteria": [
+            "Migration creates users table",
+            "Rollback works cleanly",
+            "No data loss in dry-run"
+          ]
+        },
+        "actions": [
+          {
+            "action_id": "act-003",
+            "phase": "act",
+            "action_type": "tool_call",
+            "started_at": "2026-07-05T11:00:00Z",
+            "ended_at": "2026-07-05T11:02:00Z",
+            "status": "completed",
+            "related_tool_call_id": "tc-003",
+            "summary": "Ran migration dry-run"
+          }
+        ],
+        "verification": {
+          "verification_id": "ver-002",
+          "verification_mode": "auto",
+          "evidence_refs": ["dry_run_output.txt"],
+          "checks_performed": ["No columns dropped", "All indexes created"],
+          "passed": false,
+          "confidence": 1.0,
+          "failure_summary": "Migration would drop 3 columns with live data",
+          "requires_retry": true,
+          "requires_escalation": false
+        },
+        "state_delta": {
+          "updated_task_status": "blocked",
+          "memory_changes": ["Migration unsafe, needs revision"],
+          "new_blockers": ["Data loss risk in migration script"],
+          "next_action": "Revise migration script to preserve data"
+        },
+        "artifact_updates": {
+          "updated_loop_memory": true,
+          "updated_todo": true,
+          "update_summary": "Migration blocked, task status set to blocked"
+        },
+        "started_at": "2026-07-05T11:00:00Z",
+        "ended_at": "2026-07-05T11:02:00Z",
+        "stop_reason": "verification_failed",
+        "next_step_hint": "Revise migration script to add data migration before DROP"
+      }
+    }
+  },
+  {
+    "title": "No-progress step escalating after repeated attempts",
+    "description": "A step that made no progress on a flaky test, captures a lesson, and escalates for human help",
+    "envelope": {
+      "envelope_id": "env-step-noprogress",
+      "loop_id": "loop-repair-001",
+      "step": {
+        "step_id": "s-003",
+        "status": "failed",
+        "outcome": "no_progress",
+        "current_phase": "stop_check",
+        "trigger_type": "loop_iteration",
+        "selection_context": {
+          "step_id": "s-003",
+          "loop_id": "loop-repair-001",
+          "run_id": "run-003",
+          "selected_task_id": "task-flaky-001",
+          "selection_reason": "Flaky test blocking CI pipeline",
+          "priority": "critical"
+        },
+        "intent": {
+          "intent_id": "int-003",
+          "objective": "Fix flaky test test_login_timeout",
+          "acceptance_criteria": [
+            "Test passes 3 consecutive runs",
+            "Root cause identified and documented"
+          ]
+        },
+        "actions": [
+          {
+            "action_id": "act-004",
+            "phase": "act",
+            "action_type": "tool_call",
+            "started_at": "2026-07-05T14:00:00Z",
+            "summary": "Increased timeout, added debug logging"
+          }
+        ],
+        "state_delta": {
+          "memory_changes": ["Flaky test not reproducible in isolation"],
+          "new_lessons": ["Timeout only fails under concurrent load — not reproducible in single-threaded test run"],
+          "next_action": "Escalate to senior engineer for concurrent test setup"
+        },
+        "artifact_updates": {
+          "updated_loop_memory": true,
+          "updated_lessons": true,
+          "update_summary": "Lesson captured: concurrent load issue"
+        },
+        "started_at": "2026-07-05T14:00:00Z",
+        "ended_at": "2026-07-05T14:30:00Z",
+        "stop_reason": "repeated_no_progress",
+        "next_step_hint": "Escalate to senior engineer. Root cause likely test isolation under concurrent load."
+      }
+    }
+  },
+  {
+    "title": "Blocked step waiting for approval",
+    "description": "A step that is blocked waiting for human approval before deleting a deprecated endpoint",
+    "envelope": {
+      "envelope_id": "env-step-blocked",
+      "loop_id": "loop-cleanup-001",
+      "step": {
+        "step_id": "s-004",
+        "status": "blocked",
+        "outcome": "approval_required",
+        "current_phase": "stop_check",
+        "trigger_type": "manual_resume",
+        "selection_context": {
+          "step_id": "s-004",
+          "loop_id": "loop-cleanup-001",
+          "run_id": "run-004",
+          "selected_task_id": "task-cleanup-001",
+          "selection_reason": "Deprecated endpoint blocking security audit",
+          "priority": "medium",
+          "blocking_dependencies": ["Approval from security team"]
+        },
+        "intent": {
+          "intent_id": "int-004",
+          "objective": "Delete deprecated /api/v1/old endpoint",
+          "acceptance_criteria": [
+            "Endpoint removed from router",
+            "Migration guide updated",
+            "No active traffic to endpoint"
+          ]
+        },
+        "started_at": "2026-07-05T16:00:00Z",
+        "next_step_hint": "Waiting for human approval to delete deprecated endpoint"
+      }
+    }
+  },
+  {
+    "title": "Partial progress step with artifact updates",
+    "description": "A step that made partial progress on a database migration, updating todo, memory, and state for the next step",
+    "envelope": {
+      "envelope_id": "env-step-partial",
+      "loop_id": "loop-build-001",
+      "step": {
+        "step_id": "s-005",
+        "status": "completed",
+        "outcome": "partial",
+        "current_phase": "close",
+        "trigger_type": "loop_iteration",
+        "selection_context": {
+          "step_id": "s-005",
+          "loop_id": "loop-build-001",
+          "run_id": "run-001",
+          "selected_task_id": "task-db-001",
+          "selection_reason": "Database migration needed for user table",
+          "priority": "high"
+        },
+        "intent": {
+          "intent_id": "int-005",
+          "objective": "Create initial database migration for users and sessions",
+          "acceptance_criteria": [
+            "Migration script creates users table",
+            "Migration script creates sessions table",
+            "Rollback script exists"
+          ]
+        },
+        "actions": [
+          {
+            "action_id": "act-005",
+            "phase": "act",
+            "action_type": "file_edit",
+            "started_at": "2026-07-05T09:00:00Z",
+            "ended_at": "2026-07-05T09:20:00Z",
+            "status": "completed",
+            "artifact_refs": ["migrations/001_create_users.py"],
+            "summary": "Created users table migration"
+          }
+        ],
+        "verification": {
+          "verification_id": "ver-005",
+          "verification_mode": "manual",
+          "checks_performed": ["Migration syntax valid"],
+          "passed": true,
+          "confidence": 0.8,
+          "failure_summary": "",
+          "requires_retry": false
+        },
+        "state_delta": {
+          "updated_task_status": "in_progress",
+          "memory_changes": ["Users migration created, sessions still needed"],
+          "next_action": "Create sessions table migration"
+        },
+        "artifact_updates": {
+          "updated_loop_execution": true,
+          "updated_loop_memory": true,
+          "updated_todo": true,
+          "updated_state": true,
+          "update_summary": "Partial migration done, todo advanced to sessions"
+        },
+        "started_at": "2026-07-05T09:00:00Z",
+        "ended_at": "2026-07-05T09:20:00Z",
+        "stop_reason": "verified_success",
+        "next_step_hint": "Create sessions table migration in next step"
+      }
+    }
+  }
+]

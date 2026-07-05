@@ -1,0 +1,144 @@
+[
+  {
+    "title": "Recoverable tool failure with retry",
+    "description": "A tool call timed out but is recoverable; the system decides to retry with a retry policy",
+    "envelope": {
+      "envelope_id": "env-tool-retry",
+      "failure": {
+        "failure_id": "fail-tool",
+        "category": "tool",
+        "severity": "high",
+        "origin": "tool",
+        "summary": "Tool read_file timed out after 30s",
+        "description": "Connection to file service timed out on retry-1",
+        "recoverability": "recoverable",
+        "causes": [
+          { "cause_id": "cause-001", "cause_type": "timeout", "detail_ref": "trace://step-3" }
+        ],
+        "related_run_id": "run-001",
+        "related_task_id": "t-001",
+        "related_tool_call_id": "tc-001"
+      },
+      "recovery_decision": {
+        "decision_id": "dec-tool",
+        "failure_id": "fail-tool",
+        "action": "retry",
+        "reason": "Transient timeout, retry with exponential backoff",
+        "retry_policy_ref": {
+          "policy_id": "rp-default",
+          "policy_name": "default_retry",
+          "max_attempts": 3
+        }
+      }
+    }
+  },
+  {
+    "title": "Non-recoverable policy failure with pause",
+    "description": "A critical policy violation is non-recoverable; the system pauses for mandatory human review",
+    "envelope": {
+      "envelope_id": "env-policy-pause",
+      "failure": {
+        "failure_id": "fail-policy",
+        "category": "policy",
+        "severity": "critical",
+        "origin": "system",
+        "summary": "Policy violation: delete on protected API path",
+        "description": "Attempted to delete /api/v1/users which is in the protected paths list",
+        "recoverability": "non_recoverable",
+        "causes": [],
+        "related_run_id": "run-001",
+        "related_task_id": "t-001"
+      },
+      "recovery_decision": {
+        "decision_id": "dec-policy",
+        "failure_id": "fail-policy",
+        "action": "pause",
+        "reason": "Cannot retry policy violation; human must review and override",
+        "requires_human_review": true
+      }
+    }
+  },
+  {
+    "title": "Model failure requiring human review",
+    "description": "A model output failed confidence checks; escalated for human review due to uncertainty",
+    "envelope": {
+      "envelope_id": "env-model-escalate",
+      "failure": {
+        "failure_id": "fail-model",
+        "category": "model",
+        "severity": "medium",
+        "origin": "model",
+        "summary": "Model output failed confidence threshold",
+        "description": "Output confidence score 0.32 is below required minimum of 0.70",
+        "recoverability": "unknown",
+        "causes": [
+          { "cause_id": "cause-001", "cause_type": "hallucination_detected" },
+          { "cause_id": "cause-002", "cause_type": "low_confidence", "detail_ref": "model://mc-001" }
+        ],
+        "related_run_id": "run-001",
+        "related_model_call_id": "mc-001"
+      },
+      "recovery_decision": {
+        "decision_id": "dec-model",
+        "failure_id": "fail-model",
+        "action": "escalate",
+        "reason": "Model output quality uncertain, escalate for human review",
+        "requires_human_review": true
+      }
+    }
+  },
+  {
+    "title": "Validation failure escalating to abort",
+    "description": "A security validation failure is non-recoverable; the run must abort",
+    "envelope": {
+      "envelope_id": "env-val-abort",
+      "failure": {
+        "failure_id": "fail-val",
+        "category": "validation",
+        "severity": "high",
+        "origin": "agent",
+        "summary": "Generated code failed security validation",
+        "description": "SQL injection pattern detected in generated query output",
+        "recoverability": "non_recoverable",
+        "causes": [],
+        "related_run_id": "run-001",
+        "related_task_id": "t-001"
+      },
+      "recovery_decision": {
+        "decision_id": "dec-val",
+        "failure_id": "fail-val",
+        "action": "abort",
+        "reason": "Security validation failure cannot be retried; aborting run"
+      }
+    }
+  },
+  {
+    "title": "Checkpoint failure restarting from checkpoint",
+    "description": "A checkpoint write failed mid-execution; the system restarts from the last valid checkpoint",
+    "envelope": {
+      "envelope_id": "env-chk-restart",
+      "failure": {
+        "failure_id": "fail-chk",
+        "category": "checkpoint",
+        "severity": "medium",
+        "origin": "system",
+        "summary": "Checkpoint write failed mid-execution",
+        "description": "Storage write error when persisting checkpoint state",
+        "recoverability": "partially_recoverable",
+        "causes": [
+          { "cause_id": "cause-001", "cause_type": "storage_write_error", "detail_ref": "storage://checkpoint-001" }
+        ],
+        "related_run_id": "run-001",
+        "related_checkpoint_id": "chk-001"
+      },
+      "recovery_decision": {
+        "decision_id": "dec-chk",
+        "failure_id": "fail-chk",
+        "action": "restart_from_checkpoint",
+        "reason": "Previous checkpoint chk-001 is valid; restarting from safe state",
+        "next_checkpoint_id": "chk-001",
+        "next_step_ref": "step-002"
+      }
+    }
+  }
+]

@@ -1,0 +1,38 @@
+{
+  "features": [
+    {
+      "feature_id": "feature-auth",
+      "name": "User Authentication",
+      "description": "Complete user authentication with registration, login, JWT tokens, and password management",
+      "status": "in_progress",
+      "scope": "core",
+      "acceptance_criteria": [
+        "Users can register with email and password",
+        "Users can log in and receive JWT",
+        "Tokens expire and refresh",
+        "Passwords are hashed securely"
+      ],
+      "related_tasks": ["task-auth-001", "task-auth-002", "task-auth-003"],
+      "quality_signals": ["Auth model schema complete", "JWT generation working"],
+      "risk_level": "medium",
+      "last_verified_at": null
+    },
+    {
+      "feature_id": "feature-api",
+      "name": "REST API Framework",
+      "description": "Core REST API with routing, middleware, error handling, and request validation",
+      "status": "planning",
+      "scope": "core",
+      "acceptance_criteria": [
+        "Router maps URLs to handlers",
+        "Middleware chain works",
+        "Structured error responses",
+        "Request body validation"
+      ],
+      "related_tasks": [],
+      "quality_signals": [],
+      "risk_level": "low",
+      "last_verified_at": null
+    }
+  ]
+}

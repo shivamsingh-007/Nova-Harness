@@ -1,0 +1,376 @@
+{
+  "examples": [
+    {
+      "label": "safe_tool_call_allowed",
+      "description": "Low-risk search tool read action is allowed with no obligations",
+      "policy_evaluation": {
+        "evaluation_id": "eval-safe-001",
+        "target_type": "tool_invocation",
+        "target_ref": "tool://td-search/read",
+        "policy": {
+          "policy_id": "pol-search",
+          "policy_name": "search_policy",
+          "policy_version": "1.0"
+        },
+        "findings": [],
+        "risk_level": "low",
+        "rationale": "Search tool read actions are allowlisted for agent-reader; no violations detected"
+      },
+      "guardrail_decision_envelope": {
+        "decision_id": "dec-safe-001",
+        "evaluation": {
+          "evaluation_id": "eval-safe-001",
+          "target_type": "tool_invocation",
+          "target_ref": "tool://td-search/read",
+          "policy": {
+            "policy_id": "pol-search",
+            "policy_name": "search_policy",
+            "policy_version": "1.0"
+          },
+          "findings": [],
+          "risk_level": "low",
+          "rationale": "Search tool read actions are allowlisted for agent-reader; no violations detected"
+        },
+        "decision": "allow",
+        "obligations": [],
+        "execution_allowed": true,
+        "decided_by": "guardrail:runtime-v1"
+      }
+    },
+    {
+      "label": "high_risk_delete_action_denied",
+      "description": "Critical-risk delete on production storage is denied with evidence",
+      "policy_evaluation": {
+        "evaluation_id": "eval-del-001",
+        "target_type": "tool_invocation",
+        "target_ref": "tool://td-storage/delete",
+        "policy": {
+          "policy_id": "pol-dlp",
+          "policy_name": "data_loss_prevention",
+          "policy_version": "2.1"
+        },
+        "findings": [
+          {
+            "finding_id": "f-del-001",
+            "severity": "critical",
+            "category": "data_loss_prevention",
+            "summary": "DELETE action on production blob storage is prohibited",
+            "evidence_signals": [
+              {
+                "signal_id": "sig-del-001",
+                "signal_type": "risk_classifier",
+                "source_ref": "policy:data_governance",
+                "summary": "DELETE on production container 'prod-backup-2025'",
+                "confidence": 0.98
+              }
+            ]
+          }
+        ],
+        "risk_level": "critical",
+        "rationale": "DELETE on production storage violates data loss prevention policy"
+      },
+      "guardrail_decision_envelope": {
+        "decision_id": "dec-del-001",
+        "evaluation": {
+          "evaluation_id": "eval-del-001",
+          "target_type": "tool_invocation",
+          "target_ref": "tool://td-storage/delete",
+          "policy": {
+            "policy_id": "pol-dlp",
+            "policy_name": "data_loss_prevention",
+            "policy_version": "2.1"
+          },
+          "findings": [
+            {
+              "finding_id": "f-del-001",
+              "severity": "critical",
+              "category": "data_loss_prevention",
+              "summary": "DELETE action on production blob storage is prohibited",
+              "evidence_signals": [
+                {
+                  "signal_id": "sig-del-001",
+                  "signal_type": "risk_classifier",
+                  "source_ref": "policy:data_governance",
+                  "summary": "DELETE on production container 'prod-backup-2025'",
+                  "confidence": 0.98
+                }
+              ]
+            }
+          ],
+          "risk_level": "critical",
+          "rationale": "DELETE on production storage violates data loss prevention policy"
+        },
+        "decision": "deny",
+        "obligations": [],
+        "execution_allowed": false,
+        "decided_by": "guardrail:runtime-v1"
+      }
+    },
+    {
+      "label": "model_output_modified_with_masking",
+      "description": "Model output with PII is modified via masking obligation",
+      "policy_evaluation": {
+        "evaluation_id": "eval-pii-001",
+        "target_type": "model_output",
+        "target_ref": "output://run-42/msg-7",
+        "policy": {
+          "policy_id": "pol-pii",
+          "policy_name": "pii_redaction",
+          "policy_version": "3.0"
+        },
+        "findings": [
+          {
+            "finding_id": "f-pii-001",
+            "severity": "moderate",
+            "category": "pii_detection",
+            "summary": "Email address and phone number detected in model output",
+            "evidence_signals": [
+              {
+                "signal_id": "sig-pii-001",
+                "signal_type": "regex",
+                "source_ref": "guardrail:pii_detector_v2",
+                "summary": "Matched email pattern: user@example.com",
+                "confidence": 0.95
+              },
+              {
+                "signal_id": "sig-pii-002",
+                "signal_type": "ner_classifier",
+                "source_ref": "model:entity_extractor",
+                "summary": "Named entity type PHONE_NUMBER detected",
+                "confidence": 0.88
+              }
+            ]
+          }
+        ],
+        "risk_level": "moderate",
+        "rationale": "Model output contains PII; masking required before delivery to consumer"
+      },
+      "guardrail_decision_envelope": {
+        "decision_id": "dec-pii-001",
+        "evaluation": {
+          "evaluation_id": "eval-pii-001",
+          "target_type": "model_output",
+          "target_ref": "output://run-42/msg-7",
+          "policy": {
+            "policy_id": "pol-pii",
+            "policy_name": "pii_redaction",
+            "policy_version": "3.0"
+          },
+          "findings": [
+            {
+              "finding_id": "f-pii-001",
+              "severity": "moderate",
+              "category": "pii_detection",
+              "summary": "Email address and phone number detected in model output",
+              "evidence_signals": [
+                {
+                  "signal_id": "sig-pii-001",
+                  "signal_type": "regex",
+                  "source_ref": "guardrail:pii_detector_v2",
+                  "summary": "Matched email pattern: user@example.com",
+                  "confidence": 0.95
+                },
+                {
+                  "signal_id": "sig-pii-002",
+                  "signal_type": "ner_classifier",
+                  "source_ref": "model:entity_extractor",
+                  "summary": "Named entity type PHONE_NUMBER detected",
+                  "confidence": 0.88
+                }
+              ]
+            }
+          ],
+          "risk_level": "moderate",
+          "rationale": "Model output contains PII; masking required before delivery to consumer"
+        },
+        "decision": "modify",
+        "obligations": [
+          {
+            "obligation_type": "mask_content",
+            "parameters": ["email", "phone"]
+          }
+        ],
+        "execution_allowed": true,
+        "decided_by": "guardrail:runtime-v1"
+      }
+    },
+    {
+      "label": "memory_access_deferred_for_review",
+      "description": "Cross-tenant memory access flagged for human review with approval obligation",
+      "policy_evaluation": {
+        "evaluation_id": "eval-mem-001",
+        "target_type": "memory_access",
+        "target_ref": "memory://mem-042",
+        "policy": {
+          "policy_id": "pol-mem",
+          "policy_name": "memory_isolation",
+          "policy_version": "1.2"
+        },
+        "findings": [
+          {
+            "finding_id": "f-mem-001",
+            "severity": "high",
+            "category": "tenant_isolation",
+            "summary": "Memory access crosses tenant boundary",
+            "evidence_signals": [
+              {
+                "signal_id": "sig-mem-001",
+                "signal_type": "scope_check",
+                "source_ref": "policy:memory_boundary",
+                "summary": "Memory tenant=acme-ops, request tenant=acme-marketing",
+                "confidence": 0.85
+              }
+            ]
+          }
+        ],
+        "risk_level": "high",
+        "rationale": "Cross-tenant memory access flagged for human review per tenant isolation policy"
+      },
+      "guardrail_decision_envelope": {
+        "decision_id": "dec-mem-001",
+        "evaluation": {
+          "evaluation_id": "eval-mem-001",
+          "target_type": "memory_access",
+          "target_ref": "memory://mem-042",
+          "policy": {
+            "policy_id": "pol-mem",
+            "policy_name": "memory_isolation",
+            "policy_version": "1.2"
+          },
+          "findings": [
+            {
+              "finding_id": "f-mem-001",
+              "severity": "high",
+              "category": "tenant_isolation",
+              "summary": "Memory access crosses tenant boundary",
+              "evidence_signals": [
+                {
+                  "signal_id": "sig-mem-001",
+                  "signal_type": "scope_check",
+                  "source_ref": "policy:memory_boundary",
+                  "summary": "Memory tenant=acme-ops, request tenant=acme-marketing",
+                  "confidence": 0.85
+                }
+              ]
+            }
+          ],
+          "risk_level": "high",
+          "rationale": "Cross-tenant memory access flagged for human review per tenant isolation policy"
+        },
+        "decision": "review",
+        "obligations": [
+          {
+            "obligation_type": "require_approval",
+            "parameters": ["security_team"]
+          }
+        ],
+        "execution_allowed": true,
+        "decided_by": "guardrail:runtime-v1"
+      }
+    },
+    {
+      "label": "workflow_step_quarantined_due_to_critical_findings",
+      "description": "Deploy step quarantined with multiple critical findings",
+      "policy_evaluation": {
+        "evaluation_id": "eval-wf-001",
+        "target_type": "workflow_step",
+        "target_ref": "step://build/deploy",
+        "policy": {
+          "policy_id": "pol-wf",
+          "policy_name": "workflow_safety",
+          "policy_version": "1.0"
+        },
+        "findings": [
+          {
+            "finding_id": "f-wf-001",
+            "severity": "critical",
+            "category": "security",
+            "summary": "Command injection vulnerability detected in deploy script",
+            "evidence_signals": [
+              {
+                "signal_id": "sig-wf-001",
+                "signal_type": "static_analysis",
+                "source_ref": "analyzer:codeql",
+                "summary": "Unsanitized user input in shell command at line 42",
+                "confidence": 0.92
+              }
+            ]
+          },
+          {
+            "finding_id": "f-wf-002",
+            "severity": "critical",
+            "category": "secrets_leak",
+            "summary": "Hardcoded API key in workflow configuration",
+            "evidence_signals": [
+              {
+                "signal_id": "sig-wf-002",
+                "signal_type": "secret_scan",
+                "source_ref": "scanner:secrets",
+                "summary": "Regex match for AWS access key pattern in config/deploy.yml",
+                "confidence": 0.99
+              }
+            ]
+          }
+        ],
+        "risk_level": "critical",
+        "rationale": "Two critical findings prevent safe execution: command injection and hardcoded credential"
+      },
+      "guardrail_decision_envelope": {
+        "decision_id": "dec-wf-001",
+        "evaluation": {
+          "evaluation_id": "eval-wf-001",
+          "target_type": "workflow_step",
+          "target_ref": "step://build/deploy",
+          "policy": {
+            "policy_id": "pol-wf",
+            "policy_name": "workflow_safety",
+            "policy_version": "1.0"
+          },
+          "findings": [
+            {
+              "finding_id": "f-wf-001",
+              "severity": "critical",
+              "category": "security",
+              "summary": "Command injection vulnerability detected in deploy script",
+              "evidence_signals": [
+                {
+                  "signal_id": "sig-wf-001",
+                  "signal_type": "static_analysis",
+                  "source_ref": "analyzer:codeql",
+                  "summary": "Unsanitized user input in shell command at line 42",
+                  "confidence": 0.92
+                }
+              ]
+            },
+            {
+              "finding_id": "f-wf-002",
+              "severity": "critical",
+              "category": "secrets_leak",
+              "summary": "Hardcoded API key in workflow configuration",
+              "evidence_signals": [
+                {
+                  "signal_id": "sig-wf-002",
+                  "signal_type": "secret_scan",
+                  "source_ref": "scanner:secrets",
+                  "summary": "Regex match for AWS access key pattern in config/deploy.yml",
+                  "confidence": 0.99
+                }
+              ]
+            }
+          ],
+          "risk_level": "critical",
+          "rationale": "Two critical findings prevent safe execution: command injection and hardcoded credential"
+        },
+        "decision": "quarantine",
+        "obligations": [
+          {
+            "obligation_type": "require_approval",
+            "parameters": ["security_team", "lead_engineer"]
+          }
+        ],
+        "execution_allowed": false,
+        "decided_by": "guardrail:runtime-v1"
+      }
+    }
+  ]
+}

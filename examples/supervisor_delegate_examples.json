@@ -1,0 +1,394 @@
+[
+  {
+    "id": "ex-01-supervisor-delegates-coding-task",
+    "description": "Supervisor delegates coding task to specialist and accepts result",
+    "envelope": {
+      "envelope_id": "env-ex-001",
+      "delegation_request": {
+        "delegation_id": "del-ex-001",
+        "parent_run_id": "run-0042",
+        "parent_step_id": "step-007",
+        "supervisor_agent_id": "agent-super-001",
+        "delegation_reason": "specialized_capability_required",
+        "requested_role": "coder",
+        "objective": "Implement JWT authentication middleware",
+        "expected_output": "Express middleware that validates JWT tokens from Authorization headers",
+        "acceptance_criteria": [
+          "Extracts Bearer token from Authorization header",
+          "Verifies JWT signature with configured secret",
+          "Returns 401 for missing or invalid tokens",
+          "Attaches decoded payload to req.user"
+        ],
+        "priority": "high",
+        "created_at": "2026-07-05T10:00:00Z"
+      },
+      "delegation_assignment": {
+        "assignment_id": "asn-ex-001",
+        "delegation_request": null,
+        "context_slice": {
+          "context_slice_id": "ctx-ex-001",
+          "task_ref": "task-jwt-middleware",
+          "feature_ref": "feature-auth",
+          "relevant_state_refs": ["state/auth-design-v2"],
+          "artifact_refs": ["specs/auth.md", "src/app.ts"],
+          "prompt_refs": ["prompts/coding-standard.md"],
+          "memory_refs": ["loop_memory.md"],
+          "policy_refs": ["policy/security.md"],
+          "max_context_tokens": 8000,
+          "excluded_refs": [],
+          "self_contained": false
+        },
+        "constraints": {
+          "constraint_id": "cst-ex-001",
+          "time_budget_ms": 300000,
+          "cost_budget": null,
+          "tool_allowlist": ["read", "write", "execute"],
+          "tool_denylist": ["delete", "network"],
+          "write_permissions": true,
+          "network_permissions": false,
+          "approval_required": false,
+          "must_verify": true,
+          "must_not_delegate_further": true,
+          "allowed_output_types": ["typescript", "json"]
+        },
+        "selection": {
+          "selection_id": "sel-ex-001",
+          "candidate_roles": ["coder", "specialist"],
+          "candidate_delegate_ids": ["agent-coder-001", "agent-coder-002"],
+          "selected_delegate_id": "agent-coder-001",
+          "selected_role": "coder",
+          "selection_reason": "agent-coder-001 has JWT middleware experience",
+          "selection_confidence": 0.9,
+          "fallback_delegate_ids": ["agent-coder-002"]
+        },
+        "child_run_id": "child-run-042",
+        "child_session_id": "child-sess-042",
+        "status": "accepted",
+        "started_at": "2026-07-05T10:00:01Z",
+        "deadline_at": "2026-07-05T10:05:00Z"
+      },
+      "delegation_return": {
+        "return_id": "ret-ex-001",
+        "assignment_id": "asn-ex-001",
+        "delegate_agent_id": "agent-coder-001",
+        "outcome": "success",
+        "result_summary": "Implemented JWT middleware with full validation, error handling, and tests",
+        "output_refs": ["src/middleware/jwt.ts", "src/types/auth.ts"],
+        "evidence_refs": ["test_output/jwt_middleware_test.log"],
+        "changed_artifact_refs": ["src/middleware/jwt.ts"],
+        "open_questions": [],
+        "blockers": [],
+        "confidence": 0.95,
+        "suggested_next_action": "Integrate middleware into route definitions",
+        "returned_at": "2026-07-05T10:04:30Z"
+      },
+      "supervisor_review": {
+        "review_id": "rev-ex-001",
+        "assignment_id": "asn-ex-001",
+        "return_id": "ret-ex-001",
+        "reviewer_agent_id": "agent-super-001",
+        "disposition": "accept",
+        "accepted_output_refs": ["src/middleware/jwt.ts", "src/types/auth.ts"],
+        "rejection_reason": "",
+        "retry_reason": "",
+        "reroute_reason": "",
+        "integration_notes": "Merged to main. All tests pass. Proceeding to route integration.",
+        "reviewed_at": "2026-07-05T10:04:45Z"
+      }
+    }
+  },
+  {
+    "id": "ex-02-delegate-returns-partial-result-with-blocker",
+    "description": "Delegate returns partial result with blocker",
+    "envelope": {
+      "envelope_id": "env-ex-002",
+      "delegation_request": {
+        "delegation_id": "del-ex-002",
+        "parent_run_id": "run-0043",
+        "parent_step_id": "step-009",
+        "supervisor_agent_id": "agent-super-001",
+        "delegation_reason": "context_isolation_required",
+        "requested_role": "tool_operator",
+        "objective": "Set up GitHub Actions CI pipeline",
+        "expected_output": "Working CI workflow that runs tests and linting",
+        "acceptance_criteria": [
+          "Runs on every push and PR",
+          "Executes npm test",
+          "Executes npm run lint",
+          "Reports status back to PR"
+        ],
+        "priority": "medium",
+        "created_at": "2026-07-05T11:00:00Z"
+      },
+      "delegation_assignment": {
+        "assignment_id": "asn-ex-002",
+        "context_slice": {
+          "context_slice_id": "ctx-ex-002",
+          "task_ref": "task-ci-setup",
+          "artifact_refs": ["package.json"],
+          "excluded_refs": ["secrets/"],
+          "self_contained": false
+        },
+        "constraints": {
+          "constraint_id": "cst-ex-002",
+          "network_permissions": true,
+          "must_not_delegate_further": true,
+          "allowed_output_types": ["yaml"]
+        },
+        "selection": {
+          "selection_id": "sel-ex-002",
+          "candidate_roles": ["tool_operator", "specialist"],
+          "selected_delegate_id": "agent-ci-001",
+          "selected_role": "tool_operator",
+          "selection_reason": "agent-ci-001 configured last 3 CI pipelines",
+          "selection_confidence": 0.85,
+          "fallback_delegate_ids": ["agent-ci-002"]
+        },
+        "status": "returned",
+        "started_at": "2026-07-05T11:00:05Z"
+      },
+      "delegation_return": {
+        "return_id": "ret-ex-002",
+        "assignment_id": "asn-ex-002",
+        "delegate_agent_id": "agent-ci-001",
+        "outcome": "partial",
+        "result_summary": "Created workflow file, but npm registry auth not configured",
+        "output_refs": [".github/workflows/ci.yml"],
+        "evidence_refs": ["test_output/ci_dry_run.log"],
+        "changed_artifact_refs": [".github/workflows/ci.yml"],
+        "blockers": ["npm registry requires authentication token"],
+        "confidence": 0.6,
+        "suggested_next_action": "Provide NPM_TOKEN secret and retry",
+        "returned_at": "2026-07-05T11:03:00Z"
+      },
+      "supervisor_review": {
+        "review_id": "rev-ex-002",
+        "assignment_id": "asn-ex-002",
+        "return_id": "ret-ex-002",
+        "reviewer_agent_id": "agent-super-001",
+        "disposition": "retry_same_delegate",
+        "retry_reason": "Pipeline configuration is correct, just missing registry auth",
+        "integration_notes": "Will provide NPM_TOKEN from vault",
+        "reviewed_at": "2026-07-05T11:03:15Z"
+      }
+    }
+  },
+  {
+    "id": "ex-03-supervisor-rejects-low-quality-retry-same",
+    "description": "Supervisor rejects low-quality result and retries same delegate",
+    "envelope": {
+      "envelope_id": "env-ex-003",
+      "delegation_request": {
+        "delegation_id": "del-ex-003",
+        "supervisor_agent_id": "agent-super-001",
+        "delegation_reason": "specialized_capability_required",
+        "requested_role": "summarizer",
+        "objective": "Generate API changelog from git log",
+        "acceptance_criteria": [
+          "All commits since last release included",
+          "Grouped by type (feat, fix, chore)",
+          "Generated markdown format"
+        ],
+        "priority": "low",
+        "created_at": "2026-07-05T12:00:00Z"
+      },
+      "delegation_assignment": {
+        "assignment_id": "asn-ex-003",
+        "context_slice": {
+          "context_slice_id": "ctx-ex-003",
+          "task_ref": "task-changelog",
+          "artifact_refs": ["CHANGELOG.md"],
+          "self_contained": true
+        },
+        "constraints": {
+          "constraint_id": "cst-ex-003",
+          "must_not_delegate_further": true,
+          "allowed_output_types": ["markdown"]
+        },
+        "selection": {
+          "selection_id": "sel-ex-003",
+          "candidate_roles": ["summarizer"],
+          "selected_delegate_id": "agent-doc-001",
+          "selected_role": "summarizer",
+          "selection_reason": "Only summarizer available",
+          "selection_confidence": 0.7
+        },
+        "status": "returned",
+        "started_at": "2026-07-05T12:00:10Z"
+      },
+      "delegation_return": {
+        "return_id": "ret-ex-003",
+        "assignment_id": "asn-ex-003",
+        "delegate_agent_id": "agent-doc-001",
+        "outcome": "partial",
+        "result_summary": "Changelog generated but commits not grouped by type",
+        "output_refs": ["CHANGELOG.md"],
+        "evidence_refs": [],
+        "confidence": 0.4,
+        "suggested_next_action": "Regroup commits by conventional commit type",
+        "returned_at": "2026-07-05T12:02:30Z"
+      },
+      "supervisor_review": {
+        "review_id": "rev-ex-003",
+        "assignment_id": "asn-ex-003",
+        "return_id": "ret-ex-003",
+        "reviewer_agent_id": "agent-super-001",
+        "disposition": "retry_same_delegate",
+        "retry_reason": "Commits not grouped by type as specified in acceptance criteria",
+        "integration_notes": "Re-emphasize grouping requirement",
+        "reviewed_at": "2026-07-05T12:02:45Z"
+      }
+    }
+  },
+  {
+    "id": "ex-04-supervisor-reroutes-to-different-specialist",
+    "description": "Supervisor reroutes task to a different specialist",
+    "envelope": {
+      "envelope_id": "env-ex-004",
+      "delegation_request": {
+        "delegation_id": "del-ex-004",
+        "parent_run_id": "run-0044",
+        "parent_step_id": "step-012",
+        "supervisor_agent_id": "agent-super-001",
+        "delegation_reason": "specialized_capability_required",
+        "requested_role": "specialist",
+        "objective": "Optimize slow database queries",
+        "expected_output": "Indexed queries with < 100ms execution time",
+        "acceptance_criteria": [
+          "Identify top 5 slowest queries",
+          "Add appropriate indexes",
+          "Verify query time under 100ms"
+        ],
+        "priority": "high",
+        "created_at": "2026-07-05T14:00:00Z"
+      },
+      "delegation_assignment": {
+        "assignment_id": "asn-ex-004",
+        "context_slice": {
+          "context_slice_id": "ctx-ex-004",
+          "task_ref": "task-db-optimize",
+          "artifact_refs": ["src/db/queries.ts"],
+          "policy_refs": ["policy/database.md"]
+        },
+        "constraints": {
+          "constraint_id": "cst-ex-004",
+          "time_budget_ms": 600000,
+          "tool_allowlist": ["read", "execute"],
+          "write_permissions": false,
+          "must_not_delegate_further": true
+        },
+        "selection": {
+          "selection_id": "sel-ex-004",
+          "candidate_roles": ["specialist"],
+          "candidate_delegate_ids": ["agent-general-001", "agent-db-001"],
+          "selected_delegate_id": "agent-general-001",
+          "selected_role": "specialist",
+          "selection_reason": "agent-general-001 was available first",
+          "selection_confidence": 0.65,
+          "fallback_delegate_ids": ["agent-db-001"]
+        },
+        "status": "rerouted",
+        "started_at": "2026-07-05T14:00:05Z"
+      },
+      "delegation_return": {
+        "return_id": "ret-ex-004",
+        "assignment_id": "asn-ex-004",
+        "delegate_agent_id": "agent-general-001",
+        "outcome": "failure",
+        "result_summary": "Could not identify optimization opportunities",
+        "evidence_refs": ["perf_report.log"],
+        "confidence": 0.25,
+        "suggested_next_action": "Hand off to database specialist",
+        "returned_at": "2026-07-05T14:08:00Z"
+      },
+      "supervisor_review": {
+        "review_id": "rev-ex-004",
+        "assignment_id": "asn-ex-004",
+        "return_id": "ret-ex-004",
+        "reviewer_agent_id": "agent-super-001",
+        "disposition": "reroute_to_other_delegate",
+        "reroute_reason": "Generalist lacks DB expertise for query optimization",
+        "integration_notes": "Rerouting to agent-db-001 who has PostgreSQL expertise",
+        "reviewed_at": "2026-07-05T14:08:15Z"
+      }
+    }
+  },
+  {
+    "id": "ex-05-verification-delegate-returns-evidence",
+    "description": "Verification delegate returns evidence for supervisor review",
+    "envelope": {
+      "envelope_id": "env-ex-005",
+      "delegation_request": {
+        "delegation_id": "del-ex-005",
+        "supervisor_agent_id": "agent-super-001",
+        "delegation_reason": "verification_needed",
+        "requested_role": "verifier",
+        "objective": "Audit deployment script for security issues",
+        "expected_output": "Security audit report with findings and severity levels",
+        "acceptance_criteria": [
+          "All hardcoded secrets identified",
+          "Permission boundaries checked",
+          "Network exposure analyzed",
+          "Report with severity tagging"
+        ],
+        "priority": "high",
+        "created_at": "2026-07-05T16:00:00Z"
+      },
+      "delegation_assignment": {
+        "assignment_id": "asn-ex-005",
+        "context_slice": {
+          "context_slice_id": "ctx-ex-005",
+          "task_ref": "task-security-audit",
+          "artifact_refs": ["deploy/deploy.sh", "deploy/terraform/"],
+          "prompt_refs": ["prompts/security-review.md"]
+        },
+        "constraints": {
+          "constraint_id": "cst-ex-005",
+          "tool_allowlist": ["read", "static_analysis"],
+          "write_permissions": false,
+          "must_verify": true,
+          "must_not_delegate_further": true
+        },
+        "selection": {
+          "selection_id": "sel-ex-005",
+          "candidate_roles": ["verifier", "reviewer"],
+          "selected_delegate_id": "agent-security-001",
+          "selected_role": "verifier",
+          "selection_reason": "agent-security-001 has security audit specialization",
+          "selection_confidence": 0.95
+        },
+        "status": "accepted",
+        "started_at": "2026-07-05T16:00:10Z"
+      },
+      "delegation_return": {
+        "return_id": "ret-ex-005",
+        "assignment_id": "asn-ex-005",
+        "delegate_agent_id": "agent-security-001",
+        "outcome": "success",
+        "result_summary": "Audit complete: 2 low-severity findings, no critical issues",
+        "output_refs": ["audit/deploy_security_report.md"],
+        "evidence_refs": [
+          "scan_output/semgrep_results.json",
+          "scan_output/secrets_scan.txt",
+          "scan_output/terraform_validate.json"
+        ],
+        "changed_artifact_refs": [],
+        "open_questions": ["Should we add pre-commit hook for secret scanning?"],
+        "blockers": [],
+        "confidence": 0.98,
+        "suggested_next_action": "Address 2 low-severity items in next sprint",
+        "returned_at": "2026-07-05T16:12:30Z"
+      },
+      "supervisor_review": {
+        "review_id": "rev-ex-005",
+        "assignment_id": "asn-ex-005",
+        "return_id": "ret-ex-005",
+        "reviewer_agent_id": "agent-super-001",
+        "disposition": "accept",
+        "accepted_output_refs": ["audit/deploy_security_report.md"],
+        "integration_notes": "Creating tasks for the 2 low-severity findings in backlog",
+        "reviewed_at": "2026-07-05T16:12:45Z"
+      }
+    }
+  }
+]

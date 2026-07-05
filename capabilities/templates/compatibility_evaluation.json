@@ -1,0 +1,11 @@
+{
+  "evaluation_id": "string (required, non-blank)",
+  "request_declaration_id": "string (required, non-blank)",
+  "offer_declaration_id": "string (required, non-blank)",
+  "compatibility_status": "compatible | partially_compatible | incompatible | unknown",
+  "matched_requirement_ids": ["string ..."],
+  "unmatched_requirement_ids": ["string ... (required for incompatible, forbidden for compatible)"],
+  "score": "float (0.0–100.0)",
+  "evaluation_notes": "string | null",
+  "evaluated_at": "ISO 8601 timestamp"
+}

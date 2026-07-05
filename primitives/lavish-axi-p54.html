@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P54: Parallel Work & Join Contract</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #a855f7; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #a855f7 50%, #7c3aed 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p {
+  font-size: 1.05rem; color: #9494a8; max-width: 640px;
+}
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-r { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+.icon-b { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.icon-p { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+.icon-g { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-y { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.icon-s { background: rgba(148, 148, 168, 0.15); color: #9494a8; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+.grid-5 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 0.75rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #a855f7; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .hl3 { color: #34d399; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+
+.flow { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; line-height: 2.2; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 54 &mdash; Parallel Work &amp; Join</div>
+    <h1>Parallel Work &amp; Join Contract</h1>
+    <p>
+      Typed fan-out/fan-in workflow contract for controlled parallel execution:
+      branch assignment, join policies, merge outcomes, and conflict tracking
+      in a multi-agent runtime.
+    </p>
+  </div>
+
+  <div class="section-label">Files</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/parallel_work_join_contract.py              <span class="dim">(5 enums + 8 models)</span><br>
+    <span class="hl">CREATED</span>  tests/test_parallel_work_join_contract.py           <span class="dim">(69 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/parallel_work_join_examples.json            <span class="dim">(5 examples)</span><br>
+    <span class="hl">CREATED</span>  parallel/PARALLEL.md &bull; templates/                  <span class="dim">(protocol doc + templates)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 2746/2746 tests pass &mdash; P54: 285 lines, 69 tests
+  </div>
+
+  <div class="section-label">Enums</div>
+
+  <div class="grid-5">
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-b">&#9881;</div>
+        <div>
+          <div class="card-title">ParallelizationMode</div>
+          <div class="card-subtitle">5 modes</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        fan_out_all<br>fan_out_selected<br>conditional_parallel<br>verification_parallel<br>speculative_parallel
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-p">&#9881;</div>
+        <div>
+          <div class="card-title">BranchStatus</div>
+          <div class="card-subtitle">8 statuses</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        planned &bull; ready<br>running &bull; waiting<br>completed &bull; failed<br>cancelled &bull; blocked
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-y">&#9881;</div>
+        <div>
+          <div class="card-title">JoinPolicy</div>
+          <div class="card-subtitle">5 policies</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        wait_for_all<br>wait_for_quorum<br>wait_for_first_success<br>wait_for_required_set<br>manual_join
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-g">&#9881;</div>
+        <div>
+          <div class="card-title">JoinStatus</div>
+          <div class="card-subtitle">7 statuses</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        pending &bull; waiting<br>ready_to_merge &bull; merged<br>partial_merge &bull; failed<br>cancelled
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-r">&#9881;</div>
+        <div>
+          <div class="card-title">MergeOutcome</div>
+          <div class="card-subtitle">5 outcomes</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        success &bull; partial<br>conflict &bull; rejected<br>needs_review
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Models</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">ParallelWorkRequest</div>
+          <div class="card-subtitle">parent fan-out request</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        parallel_request_id &bull; parent_run_id?<br>parent_step_id?<br>parent_graph_node_id?<br>parallelization_mode &bull; objective<br>branching_reason?<br>requested_branch_count?<br>join_policy &bull; created_at
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9632;</div>
+        <div>
+          <div class="card-title">BranchAssignmentRecord</div>
+          <div class="card-subtitle">one parallel branch</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        branch_id &bull; parallel_request_id<br>assigned_agent_id?<br>assigned_role_id?<br>scope_summary &bull; input_refs[]<br>expected_output_types[]<br>dependency_refs[]<br>conflict_risk? &bull; status<br>started_at? &bull; deadline_at?
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9632;</div>
+        <div>
+          <div class="card-title">BranchOutputRecord</div>
+          <div class="card-subtitle">branch return</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        branch_output_id &bull; branch_id<br>status &bull; result_summary?<br>output_refs[]<br>evidence_refs[]<br>changed_artifact_refs[]<br>confidence? &bull; submitted_at?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9632;</div>
+        <div>
+          <div class="card-title">BranchConflictRecord</div>
+          <div class="card-subtitle">merge conflict</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        conflict_id &bull; branch_ids[2+]<br>conflict_type?<br>conflict_summary<br>artifact_refs[]<br>proposed_resolution?<br>requires_review
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">JoinRequirementRecord</div>
+          <div class="card-subtitle">join conditions</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        join_requirement_id<br>parallel_request_id<br>required_branch_ids[]<br>optional_branch_ids[]<br>required_completion_count?<br>accept_partial_failures<br>deadline_policy?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">JoinExecutionRecord</div>
+          <div class="card-subtitle">join event</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        join_id &bull; parallel_request_id<br>join_policy &bull; join_status<br>completed_branch_ids[]<br>failed_branch_ids[]<br>late_branch_ids[]<br>selected_output_refs[]<br>join_notes? &bull; executed_at?
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-s">&#9632;</div>
+        <div>
+          <div class="card-title">MergeResultRecord</div>
+          <div class="card-subtitle">merge outcome</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        merge_id &bull; join_id<br>merge_outcome<br>merged_output_refs[]<br>rejected_output_refs[]<br>conflict_refs[]<br>review_required<br>final_summary? &bull; next_action?<br>merged_at?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9632;</div>
+        <div>
+          <div class="card-title">ParallelJoinEnvelope</div>
+          <div class="card-subtitle">top-level wrapper</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        envelope_id &bull; parallel_request<br>branch_assignments[]<br>branch_outputs[]?<br>conflicts[]?<br>join_requirements<br>join_execution?<br>merge_result?
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Parallel Workflow</div>
+
+  <div class="diagram">
+    <span class="hl">PARALLEL REQUEST</span><br>
+    <span class="dim">&#9492; Branch 1 (</span><span class="hl3">completed</span><span class="dim">) &#8594; </span><span class="hl">JOIN</span><span class="dim"> &#8594; </span><span class="hl3">MERGE (success)</span><br>
+    <span class="dim">&#9492; Branch 2 (</span><span class="hl3">completed</span><span class="dim">) &#8594; </span><span class="hl">JOIN</span><span class="dim"> &#8594; </span><span class="hl3">MERGE (success)</span><br>
+    <span class="dim">&#9492; Branch 3 (</span><span style="color:#f87171;">failed</span><span class="dim">) &#8594; </span><span class="hl">JOIN</span><span class="dim"> &#8594; </span><span style="color:#fbbf24;">MERGE (partial)</span><br>
+    <span class="dim">&#9492; Branch 4 (</span><span style="color:#f87171;">blocked</span><span class="dim">) &#8594; </span><span class="hl">JOIN</span><span class="dim"> &#8594; </span><span style="color:#f87171;">MERGE (needs_review)</span>
+  </div>
+
+  <div class="section-label">Validation Rules</div>
+
+  <div class="diagram">
+    <span class="hl">NON-BLANK</span>  envelope_id, parallel_request_id, objective, branch_id, scope_summary, branch_output_id, conflict_id, conflict_summary, join_requirement_id, join_id, merge_id<br>
+    <span class="hl">BRANCHES</span>  at least one branch, branch IDs unique per request<br>
+    <span class="hl">COMPLETION</span>  required_completion_count cannot exceed total required branches<br>
+    <span class="hl">FIRST_SUCCESS</span>  wait_for_first_success must not require all branches<br>
+    <span class="hl">MERGE</span>  merge results require completed or partial join state<br>
+    <span class="hl">CONFLICT</span>  conflict and output records must reference valid branch IDs<br>
+    <span class="hl">CONFIDENCE</span>  confidence bounded 0.0 &le; v &le; 1.0
+  </div>
+
+  <div class="section-label">Test Coverage</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">69 tests</div>
+          <div class="card-subtitle">All passing</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">8 models</div>
+          <div class="card-subtitle">5 enums + validators</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#10003;</div>
+        <div>
+          <div class="card-title">Fan-out integrity</div>
+          <div class="card-subtitle">branch assignment, join policies, merge outcomes, conflict tracking, cross-model validation</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">All 54 Primitives</div>
+  <div class="diagram">
+    <span style="color:#818cf8;">P1&nbsp;&nbsp;INSTRUCTION LAYERING</span><br>
+    <span style="color:#34d399;">P2&nbsp;&nbsp;TASK CONTRACT SCHEMA</span><br>
+    <span style="color:#38bdf8;">P3&nbsp;&nbsp;CONTEXT DELIVERY SCHEMA</span><br>
+    <span style="color:#fbbf24;">P4&nbsp;&nbsp;CONTEXT SELECTION POLICY</span><br>
+    <span style="color:#f87171;">P5&nbsp;&nbsp;TOOL INTERFACE SCHEMA</span><br>
+    <span style="color:#a78bfa;">P6&nbsp;&nbsp;EXECUTION ENVIRONMENT</span><br>
+    <span style="color:#fbbf24;">P7&nbsp;&nbsp;DURABLE STATE SCHEMA</span><br>
+    <span style="color:#34d399;">P8&nbsp;&nbsp;VERIFICATION SCHEMA</span><br>
+    <span style="color:#38bdf8;">P9&nbsp;&nbsp;PROMPT ASSEMBLY SCHEMA</span><br>
+    <span style="color:#818cf8;">P10 RUN ORCHESTRATION STATE MACHINE</span><br>
+    <span style="color:#fbbf24;">P11 RETRY AND RECOVERY POLICY</span><br>
+    <span style="color:#ef4444;">P12 APPROVAL AND SAFETY POLICY</span><br>
+    <span style="color:#34d399;">P13 EVALUATION AND BENCHMARK SCHEMA</span><br>
+    <span style="color:#a855f7;">P14 OBSERVABILITY AND TRACE SCHEMA</span><br>
+    <span style="color:#fbbf24;">P15 STATE MACHINE DRIVER</span><br>
+    <span style="color:#34d399;">P16 PIPELINE EXECUTOR</span><br>
+    <span style="color:#fbbf24;">P17 PRODUCTION CONFIG &amp; SECRETS</span><br>
+    <span style="color:#a855f7;">P18 BUDGET &amp; RATE LIMIT POLICY</span><br>
+    <span style="color:#ef4444;">P19 FAILURE TAXONOMY &amp; ERROR ENVELOPE</span><br>
+    <span style="color:#38bdf8;">P20 INPUT &amp; OUTPUT GUARDRAILS</span><br>
+    <span style="color:#34d399;">P21 APPROVAL &amp; ESCALATION</span><br>
+    <span style="color:#a855f7;">P22 CAPABILITY MATRIX</span><br>
+    <span style="color:#818cf8;">P23 SESSION STATE &amp; CHECKPOINT</span><br>
+    <span style="color:#34d399;">P24 EVALUATION &amp; QUALITY GATE</span><br>
+    <span style="color:#38bdf8;">P25 TRACE, AUDIT &amp; PROVENANCE</span><br>
+    <span style="color:#a855f7;">P26 AGENT IDENTITY &amp; OWNERSHIP</span><br>
+    <span style="color:#a855f7;">P27 MEMORY BOUNDARY</span><br>
+    <span style="color:#ef4444;">P28 TOOL CAPABILITY &amp; PERMISSION</span><br>
+    <span style="color:#ef4444;">P29 POLICY EVALUATION &amp; GUARDRAIL</span><br>
+    <span style="color:#ef4444;">P30 HUMAN APPROVAL &amp; ESCALATION</span><br>
+    <span style="color:#38bdf8;">P31 TASK CONTRACT &amp; UNIT-OF-WORK</span><br>
+    <span style="color:#a855f7;">P32 TOOL INVOCATION RECEIPT</span><br>
+    <span style="color:#fbbf24;">P33 MODEL CALL &amp; PROMPT PROVENANCE</span><br>
+    <span style="color:#34d399;">P34 CHECKPOINT &amp; SESSION RECOVERY</span><br>
+    <span style="color:#ef4444;">P35 POLICY DECISION &amp; APPROVAL GATE</span><br>
+    <span style="color:#38bdf8;">P36 AUDIT TRAIL &amp; EVENT LOG CONTRACT</span><br>
+    <span style="color:#a855f7;">P37 MEMORY, CONTEXT &amp; RETRIEVAL SNAPSHOT</span><br>
+    <span style="color:#fbbf24;">P38 ARTIFACT, FILE &amp; GENERATED OUTPUT CONTRACT</span><br>
+    <span style="color:#34d399;">P39 FEEDBACK, EVALUATION &amp; QUALITY SIGNAL CONTRACT</span><br>
+    <span style="color:#f87171;">P40 RUN ORCHESTRATION &amp; EXECUTION STATE CONTRACT</span><br>
+    <span style="color:#f87171;">P41 FAILURE, EXCEPTION &amp; RECOVERY DECISION CONTRACT</span><br>
+    <span style="color:#fbbf24;">P42 CONFIGURATION, SECRETS &amp; ENVIRONMENT CONTRACT</span><br>
+    <span style="color:#38bdf8;">P43 LOGGING, TRACE &amp; OBSERVABILITY EVENT CONTRACT</span><br>
+    <span style="color:#34d399;">P44 RUNNING LOOP CONTRACT</span><br>
+    <span style="color:#a855f7;">P45 STEP / TURN LIFECYCLE CONTRACT</span><br>
+    <span style="color:#818cf8;">P46 SUPERVISION &amp; DELEGATION CONTRACT</span><br>
+    <span style="color:#38bdf8;">P47 ROUTING &amp; DISPATCH CONTRACT</span><br>
+    <span style="color:#34d399;">P48 INPUT VALIDATION CONTRACT</span><br>
+    <span style="color:#fbbf24;">P49 HOOK LIFECYCLE CONTRACT</span><br>
+    <span style="color:#a855f7;">P50 AGENT ROLE &amp; SPECIALIZATION CONTRACT</span><br>
+    <span style="color:#38bdf8;">P51 HANDOFF &amp; RETURN ENVELOPE CONTRACT</span><br>
+    <span style="color:#34d399;">P52 MULTI-AGENT SESSION GRAPH CONTRACT</span><br>
+    <span style="color:#a855f7;">P53 CROSS-AGENT MESSAGING CONTRACT</span><br>
+    <span class="hl" style="color:#a855f7;">P54 PARALLEL WORK &amp; JOIN CONTRACT</span>  <span class="dim">— <span style="color:#a855f7;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P54 &bull; Parallel Work &amp; Join Contract &bull; 2746/2746 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

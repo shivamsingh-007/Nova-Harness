@@ -1,0 +1,183 @@
+[
+  {
+    "title": "Resumable checkpoint after completed task unit",
+    "description": "Checkpoint taken after 3 of 5 task units completed, resumable from unit-004 with CONSISTENT state and hash-verified snapshot",
+    "envelope": {
+      "envelope_id": "env-resume",
+      "checkpoint": {
+        "checkpoint_id": "cp-resume",
+        "session_id": "sess-001",
+        "run_id": "run-001",
+        "task_id": "t-001",
+        "trace_id": "trace-resume",
+        "agent_id": "agent-code",
+        "status": "resumable",
+        "boundary_type": "task_unit_completed",
+        "consistency_level": "consistent",
+        "progress": {
+          "completed_units": 3,
+          "remaining_units": 2,
+          "last_completed_unit_ref": "unit-003",
+          "next_unit_ref": "unit-004",
+          "progress_note": "Implementation units 1-3 complete, all tests pass"
+        },
+        "snapshot": {
+          "snapshot_ref_id": "ss-resume",
+          "snapshot_uri": "s3://checkpoints/run-001/cp-resume.json",
+          "snapshot_hash": "sha256-abc123def456",
+          "serialization_format": "json",
+          "size_bytes": 8192
+        },
+        "recovery_policy": {
+          "disposition": "resume",
+          "resume_from_unit_ref": "unit-004",
+          "max_restore_attempts": 3,
+          "requires_validation_before_resume": true
+        },
+        "restore_attempts": []
+      }
+    }
+  },
+  {
+    "title": "Manual pause checkpoint",
+    "description": "Operator paused the session mid-execution after 2 units; reads CREATED and will RESUME from unit-003",
+    "envelope": {
+      "envelope_id": "env-pause",
+      "checkpoint": {
+        "checkpoint_id": "cp-pause",
+        "session_id": "sess-002",
+        "run_id": "run-002",
+        "agent_id": "agent-code",
+        "status": "created",
+        "boundary_type": "manual_pause",
+        "consistency_level": "consistent",
+        "progress": {
+          "completed_units": 2,
+          "remaining_units": null,
+          "last_completed_unit_ref": null,
+          "next_unit_ref": "unit-003",
+          "progress_note": "Paused by operator request"
+        },
+        "snapshot": {
+          "snapshot_ref_id": "ss-pause",
+          "snapshot_uri": "s3://checkpoints/run-002/cp-pause.json",
+          "serialization_format": "json"
+        },
+        "recovery_policy": {
+          "disposition": "resume",
+          "resume_from_unit_ref": "unit-003",
+          "max_restore_attempts": 3,
+          "requires_validation_before_resume": true
+        }
+      }
+    }
+  },
+  {
+    "title": "Approval-wait checkpoint",
+    "description": "Checkpoint taken at an approval gate boundary; state is PARTIAL because execution paused mid-workflow pending human decision",
+    "envelope": {
+      "envelope_id": "env-approval",
+      "checkpoint": {
+        "checkpoint_id": "cp-approval",
+        "session_id": "sess-003",
+        "run_id": "run-003",
+        "task_id": "t-002",
+        "agent_id": "agent-code",
+        "status": "resumable",
+        "boundary_type": "approval_wait",
+        "consistency_level": "partial",
+        "progress": {
+          "completed_units": 1,
+          "next_unit_ref": "unit-002",
+          "progress_note": "Awaiting human approval for delete operation"
+        },
+        "snapshot": {
+          "snapshot_ref_id": "ss-approval",
+          "snapshot_uri": "s3://checkpoints/run-003/cp-approval.json",
+          "serialization_format": "json"
+        },
+        "recovery_policy": {
+          "disposition": "resume",
+          "resume_from_unit_ref": "unit-002",
+          "max_restore_attempts": 3,
+          "requires_validation_before_resume": true
+        }
+      }
+    }
+  },
+  {
+    "title": "Invalid checkpoint after failed restore",
+    "description": "Checkpoint was found INVALID after a failed restore attempt (hash mismatch); recovery ABORTs and the failed attempt is recorded",
+    "envelope": {
+      "envelope_id": "env-invalid",
+      "checkpoint": {
+        "checkpoint_id": "cp-invalid",
+        "session_id": "sess-004",
+        "run_id": "run-004",
+        "agent_id": "agent-code",
+        "status": "invalid",
+        "boundary_type": "task_unit_completed",
+        "consistency_level": "consistent",
+        "progress": {
+          "completed_units": 3,
+          "progress_note": "Invalidated after failed restore attempt"
+        },
+        "snapshot": {
+          "snapshot_ref_id": "ss-invalid",
+          "snapshot_uri": "s3://checkpoints/run-004/cp-invalid.json",
+          "snapshot_hash": "sha256-corrupted",
+          "serialization_format": "json",
+          "size_bytes": 4096
+        },
+        "recovery_policy": {
+          "disposition": "abort",
+          "max_restore_attempts": 3,
+          "requires_validation_before_resume": true
+        },
+        "restore_attempts": [
+          {
+            "attempt_id": "att-fail-001",
+            "attempted_at": "2026-07-04T10:05:00Z",
+            "outcome": "failed",
+            "note": "Snapshot hash mismatch: expected sha256-abc, got sha256-corrupted"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "title": "Superseded checkpoint replaced by newer one",
+    "description": "Old checkpoint marked SUPERSEDED after a newer checkpoint was created; recovery policy ESCALATEs to operator for review",
+    "envelope": {
+      "envelope_id": "env-super",
+      "checkpoint": {
+        "checkpoint_id": "cp-super",
+        "session_id": "sess-005",
+        "run_id": "run-005",
+        "task_id": "t-003",
+        "agent_id": "agent-code",
+        "status": "superseded",
+        "boundary_type": "task_unit_completed",
+        "consistency_level": "consistent",
+        "progress": {
+          "completed_units": 2,
+          "last_completed_unit_ref": "unit-002",
+          "next_unit_ref": "unit-003",
+          "progress_note": "Superseded by checkpoint cp-super-v2"
+        },
+        "snapshot": {
+          "snapshot_ref_id": "ss-super",
+          "snapshot_uri": "s3://checkpoints/run-005/cp-super.json",
+          "snapshot_hash": "sha256-old-hash",
+          "serialization_format": "json",
+          "size_bytes": 6144
+        },
+        "recovery_policy": {
+          "disposition": "escalate",
+          "max_restore_attempts": 3,
+          "requires_validation_before_resume": true
+        }
+      }
+    }
+  }
+]

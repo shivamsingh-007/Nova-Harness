@@ -1,0 +1,9 @@
+{
+  "approval_id": "string (required, non-blank)",
+  "approval_requirement_id": "string (required, non-blank)",
+  "approver_ref": "string | null (required for approved/rejected)",
+  "approval_status": "not_required | pending | approved | rejected | timed_out | withdrawn",
+  "decision_notes": "string | null (required for approved/rejected)",
+  "imposed_constraints": ["string ..."],
+  "decided_at": "ISO 8601 timestamp"
+}

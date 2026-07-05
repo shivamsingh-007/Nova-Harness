@@ -1,0 +1,267 @@
+{
+  "description": "P60 Risk, Escalation & Human-Approval Contract examples — multi-dimensional risk assessment, threshold-driven escalation, approval routing, timeout fallback, and final disposition.",
+  "examples": [
+    {
+      "name": "low_risk_action_proceeds_automatically",
+      "description": "A low-risk code formatting change is assessed and auto-proceeds because no thresholds are crossed.",
+      "envelope": {
+        "envelope_id": "env-low-risk",
+        "risk_assessment": {
+          "risk_assessment_id": "ra-low",
+          "scope_ref": "task-low-risk",
+          "risk_category": "quality",
+          "risk_level": "low",
+          "risk_score": 5.0,
+          "uncertainty_score": 5.0,
+          "trigger_reasons": ["Minor code formatting change"],
+          "evidence_refs": ["code-review-001"],
+          "assessed_by": "system"
+        },
+        "threshold_policy": {
+          "threshold_policy_id": "tp-auto",
+          "minimum_risk_level": "medium",
+          "minimum_risk_score": 30.0,
+          "uncertainty_threshold": 50.0,
+          "trigger_type": "risk_threshold",
+          "requires_human_approval": false,
+          "default_disposition": "proceed"
+        }
+      }
+    },
+    {
+      "name": "high_risk_action_pauses_for_human_approval",
+      "description": "A high-risk security action (database access with PII) is assessed, triggers the threshold policy, and creates an escalation request pending human approval.",
+      "envelope": {
+        "envelope_id": "env-high-risk",
+        "risk_assessment": {
+          "risk_assessment_id": "ra-high",
+          "scope_ref": "task-high-risk",
+          "risk_category": "security",
+          "risk_level": "high",
+          "risk_score": 75.0,
+          "uncertainty_score": 20.0,
+          "trigger_reasons": ["Database access with sensitive PII"],
+          "evidence_refs": ["data-flow-003"],
+          "assessed_by": "system"
+        },
+        "threshold_policy": {
+          "threshold_policy_id": "tp-approval",
+          "minimum_risk_level": "high",
+          "minimum_risk_score": 50.0,
+          "uncertainty_threshold": 50.0,
+          "trigger_type": "risk_threshold",
+          "requires_human_approval": true,
+          "default_disposition": "pause_for_review",
+          "timeout_sla_seconds": 3600
+        },
+        "escalation_request": {
+          "escalation_request_id": "er-high",
+          "scope_ref": "task-high-risk",
+          "trigger_type": "risk_threshold",
+          "risk_assessment_ref": "ra-high",
+          "summary": "High-risk security action requires approval",
+          "requester_ref": "system"
+        },
+        "approval_requirement": {
+          "approval_requirement_id": "ar-high",
+          "escalation_request_id": "er-high",
+          "required_role_ids": ["security_lead"],
+          "required_approver_count": 1
+        }
+      }
+    },
+    {
+      "name": "budget_overrun_escalation_approved_increase",
+      "description": "A token budget overrun of 40% triggers an escalation. The manager approves with additional allocation and a monitoring constraint.",
+      "envelope": {
+        "envelope_id": "env-budget-overrun",
+        "risk_assessment": {
+          "risk_assessment_id": "ra-budget",
+          "scope_ref": "task-overrun",
+          "risk_category": "financial",
+          "risk_level": "medium",
+          "risk_score": 45.0,
+          "uncertainty_score": 15.0,
+          "trigger_reasons": ["Token budget exceeded by 40%"],
+          "evidence_refs": ["budget-alert-003"],
+          "assessed_by": "system"
+        },
+        "threshold_policy": {
+          "threshold_policy_id": "tp-budget",
+          "minimum_risk_level": "medium",
+          "minimum_risk_score": 30.0,
+          "uncertainty_threshold": 50.0,
+          "trigger_type": "budget_overrun",
+          "requires_human_approval": true,
+          "default_disposition": "pause_for_review"
+        },
+        "escalation_request": {
+          "escalation_request_id": "er-budget",
+          "scope_ref": "task-overrun",
+          "trigger_type": "budget_overrun",
+          "trigger_ref": "budget-alert-003",
+          "risk_assessment_ref": "ra-budget",
+          "summary": "Budget overrun on task-overrun, 40% above allocation",
+          "requester_ref": "budget_enforcer"
+        },
+        "approval_requirement": {
+          "approval_requirement_id": "ar-budget",
+          "escalation_request_id": "er-budget",
+          "required_role_ids": ["manager"],
+          "required_approver_count": 1,
+          "approval_instructions": "Review budget overrun and approve increase or reject"
+        },
+        "approval_records": [
+          {
+            "approval_id": "ha-budget",
+            "approval_requirement_id": "ar-budget",
+            "approver_ref": "manager-alpha",
+            "approval_status": "approved",
+            "decision_notes": "Approved additional 20K token allocation",
+            "imposed_constraints": ["Add monitoring on token usage"]
+          }
+        ],
+        "decision": {
+          "decision_id": "dec-budget",
+          "escalation_request_id": "er-budget",
+          "approval_status": "approved",
+          "escalation_disposition": "proceed_with_constraints",
+          "final_decider_ref": "manager-alpha",
+          "decision_reason": "Budget increase approved with monitoring constraint",
+          "resume_constraints": ["Add monitoring on token usage"],
+          "followup_actions": ["Log budget increase decision"]
+        }
+      }
+    },
+    {
+      "name": "stalled_approval_timeout_escalation_to_fallback",
+      "description": "A stalled execution timer triggers an escalation. The primary approver does not respond, causing a timeout and automatic escalation to the fallback approver via an escalation path.",
+      "envelope": {
+        "envelope_id": "env-timeout",
+        "risk_assessment": {
+          "risk_assessment_id": "ra-timeout",
+          "scope_ref": "task-timeout",
+          "risk_category": "operational",
+          "risk_level": "medium",
+          "risk_score": 35.0,
+          "uncertainty_score": 60.0,
+          "trigger_reasons": ["Stalled execution pending approval"],
+          "evidence_refs": ["timer-002"],
+          "assessed_by": "system"
+        },
+        "threshold_policy": {
+          "threshold_policy_id": "tp-timeout",
+          "minimum_risk_level": "medium",
+          "minimum_risk_score": 20.0,
+          "uncertainty_threshold": 50.0,
+          "trigger_type": "stalled_execution",
+          "requires_human_approval": true,
+          "default_disposition": "pause_for_review",
+          "timeout_sla_seconds": 1800
+        },
+        "escalation_request": {
+          "escalation_request_id": "er-timeout",
+          "scope_ref": "task-timeout",
+          "trigger_type": "stalled_execution",
+          "risk_assessment_ref": "ra-timeout",
+          "summary": "Approval stalled for 30 minutes, escalating",
+          "requester_ref": "scheduler"
+        },
+        "approval_requirement": {
+          "approval_requirement_id": "ar-timeout",
+          "escalation_request_id": "er-timeout",
+          "required_role_ids": ["lead"],
+          "required_approver_count": 1
+        },
+        "approval_records": [
+          {
+            "approval_id": "ha-timeout",
+            "approval_requirement_id": "ar-timeout",
+            "approval_status": "timed_out"
+          }
+        ],
+        "escalation_path": {
+          "path_id": "path-timeout",
+          "escalation_request_id": "er-timeout",
+          "primary_approver_refs": ["lead-alpha"],
+          "fallback_approver_refs": ["manager-beta"],
+          "escalation_order": 1,
+          "auto_escalate_on_timeout": true,
+          "next_timeout_sla_seconds": 900,
+          "path_notes": "Escalate to manager if lead does not respond in 30 min"
+        },
+        "decision": {
+          "decision_id": "dec-timeout",
+          "escalation_request_id": "er-timeout",
+          "approval_status": "timed_out",
+          "escalation_disposition": "escalate_further",
+          "final_decider_ref": "system",
+          "decision_reason": "Primary approver timed out, escalating to fallback",
+          "followup_actions": ["Notify manager-beta of escalation"]
+        }
+      }
+    },
+    {
+      "name": "rejected_risky_action_returned_for_rework",
+      "description": "A critical safety risk is assessed and escalated. The safety officer rejects it and returns it for rework with specific constraints.",
+      "envelope": {
+        "envelope_id": "env-reject",
+        "risk_assessment": {
+          "risk_assessment_id": "ra-reject",
+          "scope_ref": "task-risky",
+          "risk_category": "safety",
+          "risk_level": "critical",
+          "risk_score": 92.0,
+          "uncertainty_score": 10.0,
+          "trigger_reasons": ["Unsafe file system operation in production"],
+          "evidence_refs": ["fs-audit-007"],
+          "assessed_by": "system"
+        },
+        "threshold_policy": {
+          "threshold_policy_id": "tp-reject",
+          "minimum_risk_level": "high",
+          "minimum_risk_score": 70.0,
+          "uncertainty_threshold": 30.0,
+          "trigger_type": "risk_threshold",
+          "requires_human_approval": true,
+          "default_disposition": "pause_for_review"
+        },
+        "escalation_request": {
+          "escalation_request_id": "er-reject",
+          "scope_ref": "task-risky",
+          "trigger_type": "risk_threshold",
+          "risk_assessment_ref": "ra-reject",
+          "summary": "Critical safety risk in production FS operation",
+          "requester_ref": "system"
+        },
+        "approval_requirement": {
+          "approval_requirement_id": "ar-reject",
+          "escalation_request_id": "er-reject",
+          "required_role_ids": ["safety_officer", "senior_engineer"],
+          "required_approver_count": 2,
+          "allow_parallel_approval": true
+        },
+        "approval_records": [
+          {
+            "approval_id": "ha-reject-1",
+            "approval_requirement_id": "ar-reject",
+            "approver_ref": "safety-officer-alpha",
+            "approval_status": "rejected",
+            "decision_notes": "Operation is unsafe — must use sandboxed alternative",
+            "imposed_constraints": ["Must use read-only mode first"]
+          }
+        ],
+        "decision": {
+          "decision_id": "dec-reject",
+          "escalation_request_id": "er-reject",
+          "approval_status": "rejected",
+          "escalation_disposition": "return_for_rework",
+          "final_decider_ref": "safety-officer-alpha",
+          "decision_reason": "Safety officer rejected the action — unsafe production FS operation",
+          "resume_constraints": ["Must use read-only mode first"],
+          "followup_actions": ["Redesign to use sandboxed FS", "Re-assess after changes"]
+        }
+      }
+    }
+  ]
+}

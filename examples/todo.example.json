@@ -1,0 +1,64 @@
+{
+  "tasks": [
+    {
+      "task_id": "task-auth-001",
+      "title": "Create user authentication model",
+      "description": "Implement User model with password hashing and email uniqueness",
+      "status": "done",
+      "priority": "high",
+      "category": "feature",
+      "depends_on": [],
+      "acceptance_criteria": [
+        "User model has email, password_hash fields",
+        "Passwords hashed with bcrypt",
+        "Email uniqueness enforced at DB level"
+      ],
+      "verification_type": "test",
+      "owner_role": "agent",
+      "last_updated": "2026-07-04T10:30:00Z",
+      "linked_feature_ids": ["feature-auth"],
+      "blocked_by": [],
+      "notes": "Uses bcrypt with cost factor 12"
+    },
+    {
+      "task_id": "task-auth-002",
+      "title": "Implement JWT token generation",
+      "description": "Create JWT encode/decode utilities with configurable expiry",
+      "status": "done",
+      "priority": "high",
+      "category": "feature",
+      "depends_on": ["task-auth-001"],
+      "acceptance_criteria": [
+        "JWT tokens generated with user ID claim",
+        "Token expiry configurable",
+        "Token verification endpoint works"
+      ],
+      "verification_type": "test",
+      "owner_role": "agent",
+      "last_updated": "2026-07-04T11:00:00Z",
+      "linked_feature_ids": ["feature-auth"],
+      "blocked_by": [],
+      "notes": "Default expiry: 1 hour"
+    },
+    {
+      "task_id": "task-db-001",
+      "title": "Create initial database migration",
+      "description": "Create Alembic migration for user and session tables",
+      "status": "in_progress",
+      "priority": "high",
+      "category": "chore",
+      "depends_on": [],
+      "acceptance_criteria": [
+        "Migration creates users table",
+        "Migration creates sessions table",
+        "Rollback works cleanly"
+      ],
+      "verification_type": "manual",
+      "owner_role": "agent",
+      "last_updated": "2026-07-04T09:30:00Z",
+      "linked_feature_ids": ["feature-auth"],
+      "blocked_by": ["Pending review of migration script"],
+      "notes": "Half-completed before session crash"
+    }
+  ]
+}

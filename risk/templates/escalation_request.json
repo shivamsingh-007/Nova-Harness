@@ -1,0 +1,11 @@
+{
+  "escalation_request_id": "string (required, non-blank)",
+  "scope_ref": "string (required, non-blank)",
+  "trigger_type": "risk_threshold | budget_overrun | policy_exception | uncertainty_exceeded | approval_required_action | stalled_execution | manual_request",
+  "trigger_ref": "string | null (optional ref to triggering event)",
+  "risk_assessment_ref": "string | null (optional ref to risk assessment)",
+  "summary": "string (required, non-blank)",
+  "requested_disposition": "proceed | proceed_with_constraints | pause_for_review | return_for_rework | reject | escalate_further | null",
+  "requested_at": "ISO 8601 timestamp",
+  "requester_ref": "string | null"
+}

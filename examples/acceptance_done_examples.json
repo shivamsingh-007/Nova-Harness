@@ -1,0 +1,363 @@
+{
+  "description": "P58 Acceptance Criteria & Definition-of-Done Contract examples — task-specific criteria, reusable DoD profiles, evidence, assessment, and completion decisions.",
+  "examples": [
+    {
+      "name": "task_with_explicit_output_and_evidence_criteria",
+      "description": "A task defines three explicit acceptance criteria (functional, output, evidence) each with test methods and expected results.",
+      "acceptance_criteria_set": {
+        "criteria_set_id": "cs-001",
+        "task_id": "task-001",
+        "title": "Login endpoint acceptance criteria",
+        "criteria": [
+          {
+            "criterion_id": "crit-001",
+            "task_id": "task-001",
+            "criterion_type": "functional",
+            "description": "Login endpoint accepts valid credentials and returns JWT",
+            "priority": 1,
+            "required": true,
+            "test_method": "integration_test",
+            "expected_result": "200 OK with JWT token",
+            "status": "met",
+            "owner": "engineer-alpha"
+          },
+          {
+            "criterion_id": "crit-002",
+            "task_id": "task-001",
+            "criterion_type": "output",
+            "description": "OpenAPI spec updated with new endpoint",
+            "priority": 2,
+            "required": true,
+            "test_method": "spec_review",
+            "expected_result": "openapi.yaml includes /auth/login",
+            "status": "met",
+            "owner": "engineer-alpha"
+          },
+          {
+            "criterion_id": "crit-003",
+            "task_id": "task-001",
+            "criterion_type": "evidence",
+            "description": "Security review passed",
+            "priority": 1,
+            "required": true,
+            "test_method": "review_ticket",
+            "expected_result": "Review ticket marked approved",
+            "status": "met",
+            "owner": "sec-engineer"
+          }
+        ],
+        "created_by": "planner-alpha",
+        "created_at": "2026-07-05T09:00:00Z",
+        "version": "1.0"
+      }
+    },
+    {
+      "name": "reusable_dod_profile_for_code_tasks",
+      "description": "A reusable definition-of-done profile defining quality, verification, documentation, and release gates for all code changes.",
+      "definition_of_done_profile": {
+        "dod_profile_id": "dod-code",
+        "name": "Standard Code DoD",
+        "description": "Baseline quality gates for all code changes",
+        "checks": [
+          {
+            "done_check_id": "dod-lint",
+            "done_check_type": "quality_gate",
+            "description": "All linters pass",
+            "required": true,
+            "validation_method": "ruff check",
+            "status": "passed",
+            "applies_to_task_types": ["implementation", "refactor"]
+          },
+          {
+            "done_check_id": "dod-tests",
+            "done_check_type": "verification_gate",
+            "description": "All tests pass",
+            "required": true,
+            "validation_method": "pytest",
+            "status": "passed",
+            "applies_to_task_types": ["implementation", "refactor", "bugfix"]
+          },
+          {
+            "done_check_id": "dod-docs",
+            "done_check_type": "documentation_gate",
+            "description": "Documentation updated",
+            "required": false,
+            "validation_method": "doc review",
+            "status": "passed",
+            "applies_to_task_types": ["implementation", "feature"]
+          },
+          {
+            "done_check_id": "dod-release",
+            "done_check_type": "release_gate",
+            "description": "Release checklist complete",
+            "required": true,
+            "validation_method": "release_ticket",
+            "status": "passed",
+            "applies_to_task_types": []
+          }
+        ],
+        "version": "2.0",
+        "owner": "eng-team",
+        "active": true
+      }
+    },
+    {
+      "name": "accepted_task_all_criteria_met",
+      "description": "A completed task where all acceptance criteria and DoD checks passed, with evidence, resulting in full acceptance.",
+      "envelope": {
+        "envelope_id": "env-completion-001",
+        "acceptance_criteria_set": {
+          "criteria_set_id": "cs-001",
+          "task_id": "task-001",
+          "title": "Login endpoint criteria",
+          "criteria": [
+            {
+              "criterion_id": "crit-001",
+              "task_id": "task-001",
+              "criterion_type": "functional",
+              "description": "Login endpoint accepts valid credentials and returns JWT",
+              "required": true,
+              "test_method": "integration_test",
+              "expected_result": "200 OK with JWT",
+              "status": "met",
+              "owner": "engineer-alpha"
+            },
+            {
+              "criterion_id": "crit-002",
+              "task_id": "task-001",
+              "criterion_type": "output",
+              "description": "OpenAPI spec updated",
+              "required": true,
+              "test_method": "spec_review",
+              "expected_result": "openapi.yaml updated",
+              "status": "met",
+              "owner": "engineer-alpha"
+            }
+          ]
+        },
+        "definition_of_done_profile": {
+          "dod_profile_id": "dod-code",
+          "name": "Standard Code DoD",
+          "checks": [
+            {
+              "done_check_id": "dod-tests",
+              "done_check_type": "verification_gate",
+              "description": "All tests pass",
+              "required": true,
+              "validation_method": "pytest",
+              "status": "passed"
+            },
+            {
+              "done_check_id": "dod-lint",
+              "done_check_type": "quality_gate",
+              "description": "All linters pass",
+              "required": true,
+              "validation_method": "ruff",
+              "status": "passed"
+            }
+          ]
+        },
+        "evidence_records": [
+          {
+            "evidence_id": "ev-001",
+            "task_id": "task-001",
+            "criterion_or_check_ref": "crit-001",
+            "evidence_type": "test_result",
+            "artifact_refs": ["test_reports/login_test.log"],
+            "summary": "Integration test: POST /auth/login returns 200 with JWT",
+            "collected_at": "2026-07-05T10:00:00Z"
+          },
+          {
+            "evidence_id": "ev-002",
+            "task_id": "task-001",
+            "criterion_or_check_ref": "crit-002",
+            "evidence_type": "artifact",
+            "artifact_refs": ["docs/openapi.yaml"],
+            "summary": "OpenAPI spec includes /auth/login endpoint",
+            "collected_at": "2026-07-05T10:00:00Z"
+          },
+          {
+            "evidence_id": "ev-003",
+            "task_id": "task-001",
+            "criterion_or_check_ref": "dod-tests",
+            "evidence_type": "test_suite",
+            "artifact_refs": ["test_reports/pytest_results.xml"],
+            "validation_refs": ["val-pytest-pass-001"],
+            "summary": "Full test suite: 142 passed, 0 failed",
+            "collected_at": "2026-07-05T10:00:00Z"
+          }
+        ],
+        "assessment": {
+          "assessment_id": "asm-001",
+          "task_id": "task-001",
+          "criteria_met_count": 2,
+          "criteria_failed_count": 0,
+          "dod_passed_count": 2,
+          "dod_failed_count": 0,
+          "waived_items": [],
+          "open_items": [],
+          "assessment_summary": "All criteria met, all DoD checks passed",
+          "assessed_at": "2026-07-05T10:00:05Z"
+        },
+        "decision": {
+          "decision_id": "dec-001",
+          "task_id": "task-001",
+          "completion_disposition": "accepted",
+          "approved_by": "verifier-alpha",
+          "decision_reason": "All acceptance criteria met and DoD checks passed",
+          "release_ready": true,
+          "followup_actions": [],
+          "decided_at": "2026-07-05T10:00:10Z"
+        }
+      }
+    },
+    {
+      "name": "accepted_with_caveats_decision",
+      "description": "A task is accepted but with minor documentation gaps recorded as follow-up actions.",
+      "envelope": {
+        "envelope_id": "env-completion-002",
+        "acceptance_criteria_set": {
+          "criteria_set_id": "cs-002",
+          "task_id": "task-002",
+          "title": "Refactor auth module criteria",
+          "criteria": [
+            {
+              "criterion_id": "crit-001",
+              "task_id": "task-002",
+              "criterion_type": "functional",
+              "description": "All existing auth flows continue to work",
+              "required": true,
+              "test_method": "regression_tests",
+              "expected_result": "All regression tests pass",
+              "status": "met"
+            },
+            {
+              "criterion_id": "crit-002",
+              "task_id": "task-002",
+              "criterion_type": "constraint",
+              "description": "No new dependencies introduced",
+              "required": false,
+              "test_method": "dependency_diff",
+              "expected_result": "Zero new dependencies",
+              "status": "met"
+            }
+          ]
+        },
+        "definition_of_done_profile": {
+          "dod_profile_id": "dod-code",
+          "name": "Standard Code DoD",
+          "checks": [
+            {
+              "done_check_id": "dod-tests",
+              "done_check_type": "verification_gate",
+              "description": "All tests pass",
+              "required": true,
+              "validation_method": "pytest",
+              "status": "passed"
+            },
+            {
+              "done_check_id": "dod-docs",
+              "done_check_type": "documentation_gate",
+              "description": "Documentation updated",
+              "required": false,
+              "validation_method": "doc review",
+              "status": "failed",
+              "notes": "README not fully updated for new module structure"
+            }
+          ]
+        },
+        "assessment": {
+          "assessment_id": "asm-002",
+          "task_id": "task-002",
+          "criteria_met_count": 2,
+          "criteria_failed_count": 0,
+          "dod_passed_count": 1,
+          "dod_failed_count": 1,
+          "waived_items": [],
+          "open_items": ["dod-docs"],
+          "assessment_summary": "Functional criteria met, optional doc check failed",
+          "assessed_at": "2026-07-05T11:00:00Z"
+        },
+        "decision": {
+          "decision_id": "dec-002",
+          "task_id": "task-002",
+          "completion_disposition": "accepted_with_caveats",
+          "approved_by": "verifier-alpha",
+          "decision_reason": "Functional criteria met; doc gap tracked as follow-up",
+          "release_ready": false,
+          "followup_actions": ["Update README with new module structure"],
+          "decided_at": "2026-07-05T11:00:05Z"
+        }
+      }
+    },
+    {
+      "name": "failed_release_gate_needs_rework",
+      "description": "A task where all acceptance criteria pass but a required release-gate DoD check fails, requiring rework.",
+      "envelope": {
+        "envelope_id": "env-completion-003",
+        "acceptance_criteria_set": {
+          "criteria_set_id": "cs-003",
+          "task_id": "task-003",
+          "title": "Add rate limiting middleware criteria",
+          "criteria": [
+            {
+              "criterion_id": "crit-001",
+              "task_id": "task-003",
+              "criterion_type": "functional",
+              "description": "Rate limiter blocks requests exceeding threshold",
+              "required": true,
+              "test_method": "load_test",
+              "expected_result": "429 returned after 100 requests/min",
+              "status": "met"
+            }
+          ]
+        },
+        "definition_of_done_profile": {
+          "dod_profile_id": "dod-code",
+          "name": "Standard Code DoD",
+          "checks": [
+            {
+              "done_check_id": "dod-tests",
+              "done_check_type": "verification_gate",
+              "description": "All tests pass",
+              "required": true,
+              "validation_method": "pytest",
+              "status": "passed"
+            },
+            {
+              "done_check_id": "dod-security",
+              "done_check_type": "release_gate",
+              "description": "Security scan passed",
+              "required": true,
+              "validation_method": "snyk scan",
+              "status": "failed",
+              "notes": "Critical vulnerability found in rate-limit dependency (CVE-2026-1234)"
+            }
+          ]
+        },
+        "assessment": {
+          "assessment_id": "asm-003",
+          "task_id": "task-003",
+          "criteria_met_count": 1,
+          "criteria_failed_count": 0,
+          "dod_passed_count": 1,
+          "dod_failed_count": 1,
+          "waived_items": [],
+          "open_items": ["dod-security"],
+          "assessment_summary": "Functional criteria met but security release gate failed",
+          "assessed_at": "2026-07-05T12:00:00Z"
+        },
+        "decision": {
+          "decision_id": "dec-003",
+          "task_id": "task-003",
+          "completion_disposition": "needs_rework",
+          "approved_by": "verifier-alpha",
+          "decision_reason": "Release gate failed — security scan found critical vulnerability",
+          "release_ready": false,
+          "followup_actions": ["Update vulnerable dependency", "Re-run security scan"],
+          "decided_at": "2026-07-05T12:00:05Z"
+        }
+      }
+    }
+  ]
+}

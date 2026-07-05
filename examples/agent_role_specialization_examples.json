@@ -1,0 +1,302 @@
+{
+  "description": "P50 Agent Role & Specialization Contract examples — role definitions, capability boundaries, assignment records, and validation rejections.",
+  "examples": [
+    {
+      "name": "manager_role_with_supervisory_autonomy",
+      "description": "Manager role with supervisory autonomy, delegation capabilities, and coordination specialization.",
+      "envelope": {
+        "envelope_id": "env-mgr-001",
+        "role_definition": {
+          "role_id": "role-mgr-001",
+          "role_type": "manager",
+          "name": "Team Manager",
+          "description": "Coordinates multi-agent workflows, delegates tasks, and reviews outcomes",
+          "status": "active",
+          "specialization_type": "coordination_specific",
+          "autonomy_level": "supervisory",
+          "expected_output_types": ["plan", "review"],
+          "owner": "platform-team",
+          "version": "2.0.0"
+        },
+        "specialization_profile": {
+          "profile_id": "spec-mgr-001",
+          "role_id": "role-mgr-001",
+          "domain_tags": ["multi-agent", "orchestration"],
+          "task_types": ["task decomposition", "delegation", "progress tracking"],
+          "strengths": ["breaking down complex tasks", "parallel coordination"],
+          "weaknesses": ["not optimized for detailed execution"],
+          "preferred_problem_shapes": ["multi-step workflows", "parallel subtasks"],
+          "avoid_problem_shapes": ["single-step code generation"],
+          "quality_focus": "completeness and coherence",
+          "risk_notes": "May over-delegate without sufficient context sharing"
+        },
+        "capability_profile": {
+          "capability_profile_id": "cap-mgr-001",
+          "role_id": "role-mgr-001",
+          "allowed_tools": ["read", "write", "delegate", "review"],
+          "allowed_skill_ids": ["skill-delegation", "skill-review"],
+          "allowed_model_classes": ["gpt-4", "claude-3"],
+          "allowed_context_types": ["task_plan", "delegation_record"],
+          "can_delegate": true,
+          "can_verify": true,
+          "can_modify_artifacts": true,
+          "can_request_approval": true,
+          "max_budget_scope": "session",
+          "delegation_boundaries": "may delegate to specialist, reviewer, and verifier roles only; must not delegate to unverified roles"
+        },
+        "constraint_profile": {
+          "constraint_profile_id": "con-mgr-001",
+          "role_id": "role-mgr-001",
+          "forbidden_tools": ["execute_remote", "delete_production"],
+          "forbidden_actions": ["direct_code_write"],
+          "approval_required_actions": ["deploy", "modify_production_config"],
+          "must_not_write_without_verification": true,
+          "must_not_delegate_further": false,
+          "sensitive_data_restrictions": "must not expose credentials in delegation context"
+        },
+        "prompt_profile": {
+          "prompt_profile_id": "prompt-mgr-001",
+          "role_id": "role-mgr-001",
+          "system_prompt_ref": "prompts/manager_system_v2.md",
+          "prompt_fragments": ["fragments/delegation_guidelines", "fragments/review_criteria"],
+          "instruction_pack_refs": ["packs/coordination_protocol"],
+          "style_notes": "Direct, action-oriented, focused on task structure",
+          "handoff_template_ref": "templates/manager_handoff.md"
+        },
+        "evaluation_profile": {
+          "evaluation_profile_id": "eval-mgr-001",
+          "role_id": "role-mgr-001",
+          "success_criteria": ["all subtasks completed", "delegation decisions are correct", "no resource conflicts"],
+          "failure_modes": ["over-delegation", "lost context between delegates", "unbalanced work distribution"],
+          "required_evidence_types": ["delegation_log", "task_completion_report"],
+          "quality_metrics": ["completion_rate", "delegation_accuracy", "cycle_time"],
+          "review_policy": "post_run_review"
+        }
+      }
+    },
+    {
+      "name": "coding_specialist_with_bounded_permissions",
+      "description": "Coding specialist with focused tool permissions, no deployment rights, and verification requirements.",
+      "envelope": {
+        "envelope_id": "env-coder-001",
+        "role_definition": {
+          "role_id": "role-coder-001",
+          "role_type": "coder",
+          "name": "Python Coding Specialist",
+          "description": "Generates and refactors Python code with type safety",
+          "status": "active",
+          "specialization_type": "coding_specific",
+          "autonomy_level": "bounded_execution",
+          "expected_output_types": ["implementation"],
+          "owner": "eng-team",
+          "version": "1.2.0"
+        },
+        "specialization_profile": {
+          "profile_id": "spec-coder-001",
+          "role_id": "role-coder-001",
+          "domain_tags": ["python", "backend", "api"],
+          "task_types": ["code generation", "refactoring", "test writing"],
+          "strengths": ["fast code generation", "type-safe implementations", "test coverage"],
+          "weaknesses": ["limited frontend knowledge", "no infrastructure expertise"],
+          "preferred_problem_shapes": ["well-specified functions", "CRUD endpoints"],
+          "avoid_problem_shapes": ["multi-service orchestration", "infrastructure-as-code"],
+          "quality_focus": "correctness and type safety",
+          "risk_notes": "May generate overly complex solutions for simple problems"
+        },
+        "capability_profile": {
+          "capability_profile_id": "cap-coder-001",
+          "role_id": "role-coder-001",
+          "allowed_tools": ["read", "write", "execute", "test"],
+          "allowed_skill_ids": ["skill-py-codegen", "skill-test-gen"],
+          "allowed_model_classes": ["claude-3-sonnet", "gpt-4"],
+          "allowed_context_types": ["codebase", "specification"],
+          "can_delegate": false,
+          "can_verify": true,
+          "can_modify_artifacts": true,
+          "can_request_approval": false,
+          "max_budget_scope": "task"
+        },
+        "constraint_profile": {
+          "constraint_profile_id": "con-coder-001",
+          "role_id": "role-coder-001",
+          "forbidden_tools": ["deploy", "delete", "modify_secrets"],
+          "forbidden_actions": ["production_deploy", "infrastructure_change"],
+          "approval_required_actions": ["modify_shared_library"],
+          "must_not_write_without_verification": true,
+          "must_not_delegate_further": true,
+          "sensitive_data_restrictions": "must not log credentials or tokens",
+          "environment_restrictions": "restricted to sandbox execution"
+        },
+        "prompt_profile": {
+          "prompt_profile_id": "prompt-coder-001",
+          "role_id": "role-coder-001",
+          "system_prompt_ref": "prompts/coder_system_v1.md",
+          "prompt_fragments": ["fragments/python_style", "fragments/test_patterns"],
+          "instruction_pack_refs": ["packs/coding_standards_v2", "packs/type_safety_guide"],
+          "style_notes": "Write clean, typed, documented Python",
+          "reasoning_constraints": "Prefer simple solutions; explain trade-offs when choosing complexity"
+        },
+        "evaluation_profile": {
+          "evaluation_profile_id": "eval-coder-001",
+          "role_id": "role-coder-001",
+          "success_criteria": ["code compiles", "all tests pass", "type checks pass"],
+          "failure_modes": ["syntax errors", "type violations", "security vulnerabilities"],
+          "required_evidence_types": ["test_output", "type_check_report", "lint_report"],
+          "quality_metrics": ["correctness", "maintainability", "test_coverage"],
+          "review_policy": "peer_review_required"
+        }
+      }
+    },
+    {
+      "name": "verifier_role_with_strict_evidence",
+      "description": "Verifier role focused on evidence collection and strict quality gates.",
+      "envelope": {
+        "envelope_id": "env-verifier-001",
+        "role_definition": {
+          "role_id": "role-ver-001",
+          "role_type": "verifier",
+          "name": "Quality Verifier",
+          "description": "Validates outputs against acceptance criteria with strict evidence requirements",
+          "status": "active",
+          "specialization_type": "verification_specific",
+          "autonomy_level": "bounded_execution",
+          "expected_output_types": ["verification_report", "review"],
+          "owner": "qa-team",
+          "version": "1.0.0"
+        },
+        "specialization_profile": {
+          "profile_id": "spec-ver-001",
+          "role_id": "role-ver-001",
+          "domain_tags": ["quality", "verification"],
+          "task_types": ["output verification", "compliance checking", "evidence audit"],
+          "strengths": ["thorough validation", "edge case detection"],
+          "weaknesses": ["slow on large outputs", "no code generation"],
+          "preferred_problem_shapes": ["well-defined acceptance criteria", "structured outputs"],
+          "avoid_problem_shapes": ["ambiguous requirements"],
+          "quality_focus": "completeness and precision",
+          "risk_notes": "May reject borderline-valid outputs without clear override path"
+        },
+        "capability_profile": {
+          "capability_profile_id": "cap-ver-001",
+          "role_id": "role-ver-001",
+          "allowed_tools": ["read", "compare", "validate", "inspect"],
+          "allowed_skill_ids": ["skill-validation", "skill-evidence-check"],
+          "allowed_model_classes": ["claude-3-haiku", "gpt-4-mini"],
+          "allowed_context_types": ["verification_criteria", "output"],
+          "can_delegate": false,
+          "can_verify": true,
+          "can_modify_artifacts": false,
+          "can_request_approval": true,
+          "max_budget_scope": "task"
+        },
+        "constraint_profile": {
+          "constraint_profile_id": "con-ver-001",
+          "role_id": "role-ver-001",
+          "forbidden_tools": ["write", "execute", "deploy"],
+          "forbidden_actions": ["code_generation", "production_change"],
+          "must_not_write_without_verification": true,
+          "must_not_delegate_further": true,
+          "sensitive_data_restrictions": "must not leak verification evidence outside audit trail"
+        },
+        "prompt_profile": {
+          "prompt_profile_id": "prompt-ver-001",
+          "role_id": "role-ver-001",
+          "system_prompt_ref": "prompts/verifier_system_v1.md",
+          "instruction_pack_refs": ["packs/verification_protocol"],
+          "style_notes": "Precise, evidence-based, reference acceptance criteria explicitly",
+          "reasoning_constraints": "Must cite specific evidence for each pass/fail decision"
+        },
+        "evaluation_profile": {
+          "evaluation_profile_id": "eval-ver-001",
+          "role_id": "role-ver-001",
+          "success_criteria": ["all verifications cite evidence", "no false negatives", "turnaround within budget"],
+          "failure_modes": ["missed defect", "false positive", "evidence not cited"],
+          "required_evidence_types": ["checklist", "trace_log", "diff_output"],
+          "quality_metrics": ["precision", "recall", "evidence_quality"],
+          "review_policy": "sampling_review"
+        }
+      }
+    },
+    {
+      "name": "disabled_role_rejected_for_assignment",
+      "description": "A DISABLED role that cannot receive a runtime assignment.",
+      "envelope": {
+        "envelope_id": "env-disabled-001",
+        "role_definition": {
+          "role_id": "role-deprecated-001",
+          "role_type": "summarizer",
+          "name": "Legacy Summarizer (Deprecated)",
+          "description": "Old summarizer replaced by extractor role",
+          "status": "disabled",
+          "specialization_type": "generalist",
+          "autonomy_level": "advisory_only",
+          "expected_output_types": ["summary"],
+          "owner": "platform-team",
+          "version": "0.9.0"
+        },
+        "specialization_profile": {
+          "profile_id": "spec-dep-001",
+          "role_id": "role-deprecated-001",
+          "domain_tags": ["summarization"],
+          "task_types": ["text summarization"],
+          "strengths": ["concise summaries"],
+          "weaknesses": ["no structured output support"]
+        },
+        "assignment_record": {
+          "assignment_id": "assign-dep-001",
+          "role_id": "role-deprecated-001",
+          "agent_id": "agent-009",
+          "assigned_by": "orchestrator",
+          "assignment_reason": "Fallback assignment"
+        },
+        "_should_validate": false,
+        "_validation_error": "assignment records must reference an active role, got status RoleStatus.DISABLED"
+      }
+    },
+    {
+      "name": "runtime_assignment_of_role_to_agent",
+      "description": "A concrete assignment record linking a manager role to a specific agent instance for a run.",
+      "envelope": {
+        "envelope_id": "env-assign-001",
+        "role_definition": {
+          "role_id": "role-mgr-001",
+          "role_type": "manager",
+          "name": "Team Manager",
+          "description": "Coordinates multi-agent workflows",
+          "status": "active",
+          "specialization_type": "coordination_specific",
+          "autonomy_level": "supervisory",
+          "expected_output_types": ["plan", "review"],
+          "version": "2.0.0"
+        },
+        "capability_profile": {
+          "capability_profile_id": "cap-mgr-assign",
+          "role_id": "role-mgr-001",
+          "allowed_tools": ["read", "write", "delegate", "review"],
+          "can_delegate": true,
+          "can_verify": true,
+          "can_modify_artifacts": true,
+          "delegation_boundaries": "specialist and reviewer roles only"
+        },
+        "constraint_profile": {
+          "constraint_profile_id": "con-mgr-assign",
+          "role_id": "role-mgr-001",
+          "forbidden_tools": ["execute_remote"],
+          "must_not_write_without_verification": true
+        },
+        "assignment_record": {
+          "assignment_id": "assign-mgr-run-042",
+          "role_id": "role-mgr-001",
+          "agent_id": "agent-alpha-01",
+          "run_id": "run-20260705-042",
+          "session_id": "session-alpha-01",
+          "assigned_by": "orchestrator",
+          "assignment_reason": "Coordinate code generation subtask",
+          "active_from": "2026-07-05T10:00:00Z",
+          "active_until": "2026-07-05T12:00:00Z",
+          "override_refs": []
+        }
+      }
+    }
+  ]
+}

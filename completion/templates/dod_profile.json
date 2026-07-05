@@ -1,0 +1,20 @@
+{
+  "dod_profile_id": "string (required, non-blank)",
+  "name": "string (required, non-blank)",
+  "description": "string | null",
+  "checks": [
+    {
+      "done_check_id": "string (required, non-blank)",
+      "done_check_type": "quality_gate | verification_gate | documentation_gate | policy_gate | release_gate",
+      "description": "string (required, non-blank)",
+      "required": "boolean (default: true)",
+      "validation_method": "string | null",
+      "status": "not_checked | passed | failed | waived",
+      "applies_to_task_types": ["string ..."],
+      "notes": "string | null (required if required=true and status=waived)"
+    }
+  ],
+  "version": "string (default: '1.0')",
+  "owner": "string | null",
+  "active": "boolean (default: true)"
+}

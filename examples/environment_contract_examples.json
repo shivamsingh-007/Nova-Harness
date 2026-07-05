@@ -1,0 +1,228 @@
+[
+  {
+    "title": "Local development profile",
+    "description": "A local development profile with default values, optional log level, and env-var-based secrets",
+    "envelope": {
+      "envelope_id": "env-local-dev",
+      "bundle": {
+        "bundle_id": "bundle-local",
+        "profile": {
+          "environment": "local",
+          "profile_id": "prof-local",
+          "name": "Local Development",
+          "description": "Local development environment with relaxed defaults",
+          "config_keys": [
+            { "key": "db_host", "scope": "global", "source": "env_var", "required": true, "description": "Database hostname" },
+            { "key": "db_port", "scope": "global", "source": "default", "required": false, "description": "Database port" },
+            { "key": "log_level", "scope": "global", "source": "default", "required": false, "description": "Logging verbosity" }
+          ],
+          "secrets": [
+            { "secret_id": "sec-001", "name": "db_password", "storage_type": "env_var", "required": true, "source_hint": "LOCAL_DB_PASSWORD" }
+          ],
+          "runtime_settings": [
+            { "setting_id": "s-001", "key_ref": { "key": "db_host", "scope": "global", "source": "env_var" }, "value_type": "string", "sensitive": false },
+            { "setting_id": "s-002", "key_ref": { "key": "db_port", "scope": "global", "source": "default" }, "value_type": "integer", "default_value": "5432", "sensitive": false },
+            { "setting_id": "s-003", "key_ref": { "key": "log_level", "scope": "global", "source": "default" }, "value_type": "string", "default_value": "debug", "sensitive": false }
+          ]
+        },
+        "values": { "db_host": "localhost", "db_port": "5432", "log_level": "debug" }
+      },
+      "secrets_manifest": {
+        "manifest_id": "manifest-local",
+        "profile_id": "prof-local",
+        "secrets": [
+          { "secret_id": "sec-001", "name": "db_password", "storage_type": "env_var", "required": true, "source_hint": "LOCAL_DB_PASSWORD" }
+        ]
+      }
+    }
+  },
+  {
+    "title": "Test environment profile",
+    "description": "A test profile with in-memory database settings and CI-specific values",
+    "envelope": {
+      "envelope_id": "env-test",
+      "bundle": {
+        "bundle_id": "bundle-test",
+        "profile": {
+          "environment": "test",
+          "profile_id": "prof-test",
+          "name": "Test Environment",
+          "description": "CI and local test environment settings",
+          "config_keys": [
+            { "key": "db_host", "scope": "global", "source": "env_var", "required": true, "description": "Database hostname" },
+            { "key": "db_engine", "scope": "global", "source": "default", "required": false, "description": "Database engine type" },
+            { "key": "log_level", "scope": "global", "source": "default", "required": false, "description": "Logging level for tests" }
+          ],
+          "secrets": [
+            { "secret_id": "sec-001", "name": "test_db_password", "storage_type": "env_var", "required": true, "source_hint": "TEST_DB_PASSWORD" }
+          ],
+          "runtime_settings": [
+            { "setting_id": "s-001", "key_ref": { "key": "db_host", "scope": "global", "source": "env_var" }, "value_type": "string", "sensitive": false },
+            { "setting_id": "s-002", "key_ref": { "key": "db_engine", "scope": "global", "source": "default" }, "value_type": "string", "default_value": "sqlite", "sensitive": false },
+            { "setting_id": "s-003", "key_ref": { "key": "log_level", "scope": "global", "source": "default" }, "value_type": "string", "default_value": "info", "sensitive": false }
+          ]
+        },
+        "values": { "db_host": "localhost", "db_engine": "sqlite", "log_level": "info" }
+      },
+      "secrets_manifest": {
+        "manifest_id": "manifest-test",
+        "profile_id": "prof-test",
+        "secrets": [
+          { "secret_id": "sec-001", "name": "test_db_password", "storage_type": "env_var", "required": true, "source_hint": "TEST_DB_PASSWORD" }
+        ]
+      }
+    }
+  },
+  {
+    "title": "Staging profile with secret references",
+    "description": "A staging profile connecting to a remote staging database with vault-backed secrets",
+    "envelope": {
+      "envelope_id": "env-staging",
+      "bundle": {
+        "bundle_id": "bundle-staging",
+        "profile": {
+          "environment": "staging",
+          "profile_id": "prof-staging",
+          "name": "Staging Environment",
+          "description": "Staging environment mirroring production with relaxed limits",
+          "config_keys": [
+            { "key": "api_endpoint", "scope": "global", "source": "env_var", "required": true, "description": "Staging API base URL" },
+            { "key": "db_host", "scope": "global", "source": "env_var", "required": true, "description": "Staging database host" },
+            { "key": "db_port", "scope": "global", "source": "default", "required": false, "description": "Staging database port" },
+            { "key": "log_level", "scope": "global", "source": "default", "required": false, "description": "Logging verbosity" }
+          ],
+          "secrets": [
+            { "secret_id": "sec-001", "name": "staging_db_password", "storage_type": "vault", "required": true, "source_hint": "vault://staging/db_password" },
+            { "secret_id": "sec-002", "name": "staging_api_key", "storage_type": "vault", "required": true, "source_hint": "vault://staging/api_key" }
+          ],
+          "runtime_settings": [
+            { "setting_id": "s-001", "key_ref": { "key": "api_endpoint", "scope": "global", "source": "env_var" }, "value_type": "string", "sensitive": false },
+            { "setting_id": "s-002", "key_ref": { "key": "db_host", "scope": "global", "source": "env_var" }, "value_type": "string", "sensitive": false },
+            { "setting_id": "s-003", "key_ref": { "key": "db_port", "scope": "global", "source": "default" }, "value_type": "integer", "default_value": "5432", "sensitive": false },
+            { "setting_id": "s-004", "key_ref": { "key": "log_level", "scope": "global", "source": "default" }, "value_type": "string", "default_value": "info", "sensitive": false }
+          ]
+        },
+        "values": { "api_endpoint": "https://staging-api.example.com", "db_host": "staging-db.example.com", "db_port": "5432", "log_level": "info" }
+      },
+      "secrets_manifest": {
+        "manifest_id": "manifest-staging",
+        "profile_id": "prof-staging",
+        "secrets": [
+          { "secret_id": "sec-001", "name": "staging_db_password", "storage_type": "vault", "required": true, "source_hint": "vault://staging/db_password" },
+          { "secret_id": "sec-002", "name": "staging_api_key", "storage_type": "vault", "required": true, "source_hint": "vault://staging/api_key" }
+        ]
+      }
+    }
+  },
+  {
+    "title": "Production profile with strict required settings",
+    "description": "A production profile enforcing all required keys and secret-manager-backed secrets",
+    "envelope": {
+      "envelope_id": "env-production",
+      "bundle": {
+        "bundle_id": "bundle-prod",
+        "profile": {
+          "environment": "production",
+          "profile_id": "prof-prod",
+          "name": "Production Environment",
+          "description": "Production environment with strict validation and cloud secrets",
+          "config_keys": [
+            { "key": "api_endpoint", "scope": "global", "source": "env_var", "required": true, "description": "Production API base URL" },
+            { "key": "db_host", "scope": "global", "source": "env_var", "required": true, "description": "Production database host" },
+            { "key": "db_port", "scope": "global", "source": "env_var", "required": true, "description": "Production database port" },
+            { "key": "log_level", "scope": "global", "source": "default", "required": false, "description": "Logging verbosity" }
+          ],
+          "secrets": [
+            { "secret_id": "sec-001", "name": "prod_db_password", "storage_type": "secret_manager", "required": true, "source_hint": "arn:aws:secretsmanager:us-east-1:123456789012:secret:prod/db-password" },
+            { "secret_id": "sec-002", "name": "prod_api_key", "storage_type": "kms", "required": true, "source_hint": "kms://key/prod/api-key" },
+            { "secret_id": "sec-003", "name": "prod_oauth_token", "storage_type": "secret_manager", "required": true, "source_hint": "arn:aws:secretsmanager:us-east-1:123456789012:secret:prod/oauth-token" }
+          ],
+          "runtime_settings": [
+            { "setting_id": "s-001", "key_ref": { "key": "api_endpoint", "scope": "global", "source": "env_var" }, "value_type": "string", "sensitive": false },
+            { "setting_id": "s-002", "key_ref": { "key": "db_host", "scope": "global", "source": "env_var" }, "value_type": "string", "sensitive": false },
+            { "setting_id": "s-003", "key_ref": { "key": "db_port", "scope": "global", "source": "env_var" }, "value_type": "integer", "sensitive": false },
+            { "setting_id": "s-004", "key_ref": { "key": "log_level", "scope": "global", "source": "default" }, "value_type": "string", "default_value": "warn", "sensitive": false }
+          ]
+        },
+        "values": { "api_endpoint": "https://api.example.com", "db_host": "prod-db.example.com", "db_port": "5432", "log_level": "warn" }
+      },
+      "secrets_manifest": {
+        "manifest_id": "manifest-prod",
+        "profile_id": "prof-prod",
+        "secrets": [
+          { "secret_id": "sec-001", "name": "prod_db_password", "storage_type": "secret_manager", "required": true, "source_hint": "arn:aws:secretsmanager:us-east-1:123456789012:secret:prod/db-password" },
+          { "secret_id": "sec-002", "name": "prod_api_key", "storage_type": "kms", "required": true, "source_hint": "kms://key/prod/api-key" },
+          { "secret_id": "sec-003", "name": "prod_oauth_token", "storage_type": "secret_manager", "required": true, "source_hint": "arn:aws:secretsmanager:us-east-1:123456789012:secret:prod/oauth-token" }
+        ]
+      }
+    }
+  },
+  {
+    "title": "Config bundle plus secrets manifest envelope (multi-env)",
+    "description": "Two complete envelopes for local and production side by side, demonstrating parity",
+    "envelopes": [
+      {
+        "envelope_id": "env-local-complete",
+        "bundle": {
+          "bundle_id": "bundle-local",
+          "profile": {
+            "environment": "local",
+            "profile_id": "prof-local",
+            "name": "Local Development",
+            "config_keys": [
+              { "key": "db_host", "scope": "global", "source": "env_var", "required": true },
+              { "key": "log_level", "scope": "global", "source": "default", "required": false }
+            ],
+            "secrets": [
+              { "secret_id": "sec-001", "name": "local_db_password", "storage_type": "env_var", "required": true }
+            ],
+            "runtime_settings": [
+              { "setting_id": "s-001", "key_ref": { "key": "db_host", "scope": "global", "source": "env_var" }, "value_type": "string", "sensitive": false },
+              { "setting_id": "s-002", "key_ref": { "key": "log_level", "scope": "global", "source": "default" }, "value_type": "string", "default_value": "debug", "sensitive": false }
+            ]
+          },
+          "values": { "db_host": "localhost", "log_level": "debug" }
+        },
+        "secrets_manifest": {
+          "manifest_id": "manifest-local",
+          "profile_id": "prof-local",
+          "secrets": [
+            { "secret_id": "sec-001", "name": "local_db_password", "storage_type": "env_var", "required": true }
+          ]
+        }
+      },
+      {
+        "envelope_id": "env-prod-complete",
+        "bundle": {
+          "bundle_id": "bundle-prod",
+          "profile": {
+            "environment": "production",
+            "profile_id": "prof-prod",
+            "name": "Production",
+            "config_keys": [
+              { "key": "db_host", "scope": "global", "source": "env_var", "required": true },
+              { "key": "db_port", "scope": "global", "source": "default", "required": false },
+              { "key": "log_level", "scope": "global", "source": "default", "required": false }
+            ],
+            "secrets": [
+              { "secret_id": "sec-001", "name": "prod_db_password", "storage_type": "vault", "required": true }
+            ],
+            "runtime_settings": [
+              { "setting_id": "s-001", "key_ref": { "key": "db_host", "scope": "global", "source": "env_var" }, "value_type": "string", "sensitive": false },
+              { "setting_id": "s-002", "key_ref": { "key": "db_port", "scope": "global", "source": "default" }, "value_type": "integer", "default_value": "5432", "sensitive": false },
+              { "setting_id": "s-003", "key_ref": { "key": "log_level", "scope": "global", "source": "default" }, "value_type": "string", "default_value": "warn", "sensitive": false }
+            ]
+          },
+          "values": { "db_host": "prod-db.example.com", "db_port": "5432", "log_level": "warn" }
+        },
+        "secrets_manifest": {
+          "manifest_id": "manifest-prod",
+          "profile_id": "prof-prod",
+          "secrets": [
+            { "secret_id": "sec-001", "name": "prod_db_password", "storage_type": "vault", "required": true }
+          ]
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "decision_id": "string (required, non-blank)",
+  "escalation_request_id": "string (required, non-blank)",
+  "approval_status": "not_required | pending | approved | rejected | timed_out | withdrawn",
+  "escalation_disposition": "proceed | proceed_with_constraints | pause_for_review | return_for_rework | reject | escalate_further",
+  "final_decider_ref": "string | null (required for approved/rejected)",
+  "decision_reason": "string | null (required for approved/rejected)",
+  "resume_constraints": ["string ... (required for proceed_with_constraints)"],
+  "followup_actions": ["string ..."],
+  "decided_at": "ISO 8601 timestamp"
+}

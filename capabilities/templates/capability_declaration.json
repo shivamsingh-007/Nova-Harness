@@ -1,0 +1,9 @@
+{
+  "declaration_id": "string (required, non-blank)",
+  "party_ref": "string (required, non-blank)",
+  "party_type": "string | null (e.g. task, agent, role, skill, tool, model)",
+  "capability_category": "tooling | model_behavior | skill_support | output_format | context_window | safety_control | integration | interaction_mode",
+  "schema_version": "string (default: 1.0)",
+  "declared_at": "ISO 8601 timestamp",
+  "notes": "string | null"
+}

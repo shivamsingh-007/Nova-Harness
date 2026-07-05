@@ -1,0 +1,11 @@
+{
+  "recovery_plan_id": "string (required, non-blank)",
+  "failure_id": "string (required, non-blank)",
+  "recovery_mode": "resume_from_checkpoint | replay_last_step | replay_from_intent | handoff_recovery | manual_recovery | no_recovery",
+  "checkpoint_ref": "string | null (required if mode=resume_from_checkpoint)",
+  "intent_state_ref": "string | null (required if mode=replay_from_intent)",
+  "prerequisites": ["string ..."],
+  "requires_approval": "boolean (default: false)",
+  "recovery_goal": "string | null",
+  "created_at": "ISO 8601 timestamp"
+}

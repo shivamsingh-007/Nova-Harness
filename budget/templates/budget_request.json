@@ -1,0 +1,18 @@
+{
+  "budget_id": "string (required, non-blank)",
+  "scope_type": "session | run | task | agent | role | branch | tool_call | model_call",
+  "scope_ref": "string (required, non-blank)",
+  "parent_budget_id": "string | null (optional)",
+  "planning_budget_ref": "string | null (optional)",
+  "execution_budget_ref": "string | null (optional)",
+  "initial_lines": [
+    {
+      "resource_type": "tokens | currency_cost | compute_time_ms | api_calls | storage_bytes | custom",
+      "allocated_amount": "float >= 0",
+      "unit": "string (required, non-blank)"
+    }
+  ],
+  "request_reason": "string (required, non-blank)",
+  "requested_by": "string (required, non-blank)",
+  "requested_at": "ISO 8601 timestamp"
+}

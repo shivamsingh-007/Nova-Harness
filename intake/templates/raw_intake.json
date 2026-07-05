@@ -1,0 +1,12 @@
+{
+  "intake_id": "intake-<seq>",
+  "source_type": "<user_message|form_submission|api_payload|artifact_upload|mixed_input>",
+  "session_id": "session-<seq>",
+  "user_id": "user-<name>",
+  "received_at": "<iso_timestamp>",
+  "raw_text": "<original user request exactly as received>",
+  "raw_artifact_refs": ["<path_to_attached_file>"],
+  "language": "en",
+  "channel": "<cli|api|webhook>",
+  "source_metadata": {}
+}

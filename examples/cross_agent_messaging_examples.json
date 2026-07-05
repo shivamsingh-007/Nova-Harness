@@ -1,0 +1,229 @@
+{
+  "description": "P53 Cross-Agent Messaging Contract examples — typed, versioned messages with explicit intent, audience, payload, delivery policy, acknowledgement, and failure handling.",
+  "examples": [
+    {
+      "name": "request_action_from_manager_to_specialist",
+      "description": "Manager sends a typed action request to a coding specialist with structured payload and delivery policy.",
+      "envelope": {
+        "envelope_id": "env-msg-req-001",
+        "message": {
+          "header": {
+            "message_id": "msg-req-001",
+            "schema_version": "1.0",
+            "intent_type": "request_action",
+            "transport_mode": "asynchronous",
+            "priority": "high",
+            "sender_agent_id": "agent-mgr-01",
+            "sender_role_id": "manager",
+            "trace_id": "trace-req-042",
+            "run_id": "run-042",
+            "step_id": "step-03",
+            "graph_id": "graph-001",
+            "created_at": "2026-07-05T10:00:00Z",
+            "expires_at": "2026-07-06T10:00:00Z"
+          },
+          "audience": {
+            "audience_id": "aud-req-001",
+            "audience_type": "single_agent",
+            "target_agent_ids": ["agent-coder-01"],
+            "explicit_audience_note": "Direct task assignment to primary coder"
+          },
+          "payload": {
+            "payload_id": "pl-req-001",
+            "summary": "Implement user authentication module with JWT",
+            "data_refs": ["specs/auth_spec.md", "docs/api_patterns.md"],
+            "artifact_refs": ["src/auth/template.py"],
+            "instruction_refs": ["packs/coding_standards_v2"],
+            "requested_actions": ["implement login endpoint", "implement register endpoint", "implement token refresh", "write unit tests", "run security scan"],
+            "constraints": ["must_not_delegate_further", "must_pass_type_checks"],
+            "expected_response_type": "implementation"
+          },
+          "delivery_policy": {
+            "delivery_policy_id": "dp-req-001",
+            "requires_ack": true,
+            "timeout_ms": 300000,
+            "max_retries": 3,
+            "retry_backoff_policy": "exponential",
+            "idempotency_key": "idem-req-001"
+          }
+        }
+      }
+    },
+    {
+      "name": "handoff_message_with_structured_payload_refs",
+      "description": "Handoff message carrying artifact refs, instruction refs, and constraints for a rate limiter task.",
+      "envelope": {
+        "envelope_id": "env-msg-hf-001",
+        "message": {
+          "header": {
+            "message_id": "msg-hf-001",
+            "schema_version": "1.0",
+            "intent_type": "handoff",
+            "transport_mode": "synchronous",
+            "priority": "normal",
+            "sender_agent_id": "agent-mgr-01",
+            "handoff_id": "hf-001",
+            "delegation_id": "del-001",
+            "created_at": "2026-07-05T11:00:00Z"
+          },
+          "audience": {
+            "audience_id": "aud-hf-001",
+            "audience_type": "single_agent",
+            "target_agent_ids": ["agent-coder-01"]
+          },
+          "payload": {
+            "payload_id": "pl-hf-001",
+            "summary": "Implement token bucket rate limiter",
+            "artifact_refs": ["specs/rate_limiter.md", "docs/middleware_patterns.md"],
+            "instruction_refs": ["packs/coding_standards_v2", "packs/performance_guide"],
+            "constraints": ["sandbox_execution_only", "must_not_delegate_further"],
+            "expected_response_type": "implementation_and_tests"
+          },
+          "delivery_policy": {
+            "delivery_policy_id": "dp-hf-001",
+            "requires_ack": true,
+            "timeout_ms": 60000,
+            "max_retries": 2
+          }
+        }
+      }
+    },
+    {
+      "name": "async_blocker_signal_requiring_acknowledgement",
+      "description": "Coder signals a blocker to the supervisor asynchronously and receives acknowledgement.",
+      "envelope": {
+        "envelope_id": "env-msg-block-001",
+        "message": {
+          "header": {
+            "message_id": "msg-block-001",
+            "schema_version": "1.0",
+            "intent_type": "signal_blocker",
+            "transport_mode": "asynchronous",
+            "priority": "critical",
+            "sender_agent_id": "agent-coder-01",
+            "sender_role_id": "coder",
+            "trace_id": "trace-block-001",
+            "run_id": "run-042",
+            "graph_id": "graph-001",
+            "created_at": "2026-07-05T11:30:00Z"
+          },
+          "audience": {
+            "audience_id": "aud-block-001",
+            "audience_type": "supervisor_only",
+            "target_agent_ids": ["agent-mgr-01"],
+            "explicit_audience_note": "Blocker requires manager decision"
+          },
+          "payload": {
+            "payload_id": "pl-block-001",
+            "summary": "Blocked on Stripe sandbox API key provisioning",
+            "data_refs": ["docs/stripe_integration.md"],
+            "question_list": ["Please provision Stripe sandbox API key in vault", "Should we use test mode keys for now?"],
+            "constraints": ["blocker:stripe_key_missing", "blocker:finance_approval_pending"]
+          },
+          "delivery_policy": {
+            "delivery_policy_id": "dp-block-001",
+            "requires_ack": true,
+            "timeout_ms": 120000,
+            "max_retries": 3,
+            "retry_backoff_policy": "linear",
+            "idempotency_key": "idem-block-001"
+          },
+          "acknowledgement": {
+            "ack_id": "ack-block-001",
+            "message_id": "msg-block-001",
+            "receiver_agent_id": "agent-mgr-01",
+            "delivery_status": "acknowledged",
+            "received_at": "2026-07-05T11:30:05Z",
+            "processing_note": "Blocker received, will provision key within 30 minutes"
+          }
+        }
+      }
+    },
+    {
+      "name": "failed_message_due_to_audience_validation",
+      "description": "A message targeting an unknown agent is rejected with a failure record.",
+      "envelope": {
+        "envelope_id": "env-msg-fail-001",
+        "message": {
+          "header": {
+            "message_id": "msg-fail-001",
+            "schema_version": "1.0",
+            "intent_type": "request_action",
+            "transport_mode": "asynchronous",
+            "sender_agent_id": "agent-mgr-01",
+            "trace_id": "trace-fail-001",
+            "created_at": "2026-07-05T12:00:00Z"
+          },
+          "audience": {
+            "audience_id": "aud-fail-001",
+            "audience_type": "single_agent",
+            "target_agent_ids": ["agent-unknown-99"],
+            "explicit_audience_note": "Attempted to contact unknown agent"
+          },
+          "payload": {
+            "payload_id": "pl-fail-001",
+            "summary": "Attempted task assignment to unknown agent"
+          },
+          "delivery_policy": {
+            "delivery_policy_id": "dp-fail-001",
+            "requires_ack": false,
+            "timeout_ms": 5000,
+            "max_retries": 0
+          },
+          "failure_record": {
+            "failure_id": "fail-msg-001",
+            "message_id": "msg-fail-001",
+            "failure_stage": "validation",
+            "failure_reason": "target_agent_not_found: agent-unknown-99 not registered in any active role",
+            "retryable": false,
+            "rejected_by": "messaging_router",
+            "diagnostic_refs": ["logs/router-audit-fail-001.json"]
+          }
+        }
+      }
+    },
+    {
+      "name": "cancel_message_for_expired_delegated_task",
+      "description": "Manager cancels a delegated task that has exceeded its time budget.",
+      "envelope": {
+        "envelope_id": "env-msg-cancel-001",
+        "message": {
+          "header": {
+            "message_id": "msg-cancel-001",
+            "schema_version": "1.0",
+            "intent_type": "cancel",
+            "transport_mode": "asynchronous",
+            "priority": "high",
+            "sender_agent_id": "agent-mgr-01",
+            "sender_role_id": "manager",
+            "trace_id": "trace-cancel-001",
+            "run_id": "run-042",
+            "delegation_id": "del-001",
+            "created_at": "2026-07-05T14:00:00Z",
+            "expires_at": "2026-07-05T14:05:00Z"
+          },
+          "audience": {
+            "audience_id": "aud-cancel-001",
+            "audience_type": "single_agent",
+            "target_agent_ids": ["agent-coder-01"],
+            "explicit_audience_note": "Cancel del-001 which exceeded 4-hour budget"
+          },
+          "payload": {
+            "payload_id": "pl-cancel-001",
+            "summary": "Cancel delegated task del-001 - rate limiter implementation",
+            "data_refs": ["delegations/del-001.md"],
+            "requested_actions": ["stop work on del-001", "return partial results"],
+            "constraints": ["cancellation_reason:time_budget_exceeded"]
+          },
+          "delivery_policy": {
+            "delivery_policy_id": "dp-cancel-001",
+            "requires_ack": true,
+            "timeout_ms": 10000,
+            "max_retries": 1,
+            "idempotency_key": "idem-cancel-001"
+          }
+        }
+      }
+    }
+  ]
+}

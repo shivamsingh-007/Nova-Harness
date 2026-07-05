@@ -1,0 +1,172 @@
+{
+  "description": "P61 Retry, Recovery & Compensation Contract examples — failure classification, retry policies, recovery modes, and compensation plans for side-effecting work.",
+  "examples": [
+    {
+      "name": "transient_dependency_failure_retried_successfully",
+      "description": "A transient HTTP 503 from an upstream dependency is retried with exponential backoff. The second attempt succeeds.",
+      "envelope": {
+        "envelope_id": "env-transient",
+        "failure": {
+          "failure_id": "fail-transient",
+          "scope_ref": "task-dep-call",
+          "failure_category": "transient_error",
+          "failure_summary": "Dependency service returned 503",
+          "retryable": true,
+          "evidence_refs": ["http-503-001"]
+        },
+        "retry_policy": {
+          "retry_policy_id": "rp-transient",
+          "failure_category": "transient_error",
+          "retry_strategy": "exponential_backoff",
+          "max_attempts": 3,
+          "base_delay_ms": 500,
+          "backoff_scale_factor": 2.0,
+          "max_delay_ms": 10000,
+          "jitter_enabled": true
+        },
+        "retry_attempts": [
+          {
+            "retry_attempt_id": "ra-trans-1",
+            "failure_id": "fail-transient",
+            "attempt_number": 1,
+            "scheduled_delay_ms": 500,
+            "result_status": "success",
+            "result_summary": "Retry succeeded"
+          }
+        ],
+        "failure_disposition": "recovered"
+      }
+    },
+    {
+      "name": "timeout_recovered_from_checkpoint",
+      "description": "A long-running task times out. No retry is attempted; instead, recovery resumes from the last checkpoint.",
+      "envelope": {
+        "envelope_id": "env-timeout",
+        "failure": {
+          "failure_id": "fail-timeout",
+          "scope_ref": "task-long-run",
+          "failure_category": "timeout",
+          "failure_summary": "Execution timed out after 30s",
+          "retryable": false,
+          "side_effects_present": true
+        },
+        "retry_policy": {
+          "retry_policy_id": "rp-timeout",
+          "failure_category": "timeout",
+          "retry_strategy": "none",
+          "max_attempts": 0
+        },
+        "recovery_plan": {
+          "recovery_plan_id": "rec-plan-timeout",
+          "failure_id": "fail-timeout",
+          "recovery_mode": "resume_from_checkpoint",
+          "checkpoint_ref": "ckpt-step-004",
+          "recovery_goal": "Resume from last known checkpoint"
+        },
+        "recovery_execution": {
+          "recovery_execution_id": "rec-exec-timeout",
+          "recovery_plan_id": "rec-plan-timeout",
+          "executor_ref": "agent-alpha",
+          "recovery_status": "completed",
+          "residual_risks": ["Possible duplicate writes"]
+        },
+        "failure_disposition": "recovered"
+      }
+    },
+    {
+      "name": "partial_side_effect_requiring_compensation",
+      "description": "A DB write succeeded but the subsequent step failed. A compensating rollback action is executed.",
+      "envelope": {
+        "envelope_id": "env-sidefx",
+        "failure": {
+          "failure_id": "fail-sidefx",
+          "scope_ref": "task-db-write",
+          "failure_category": "partial_side_effect",
+          "failure_summary": "DB write succeeded but subsequent step failed",
+          "retryable": false,
+          "side_effects_present": true
+        },
+        "compensation_plan": {
+          "compensation_plan_id": "cp-sidefx",
+          "failure_id": "fail-sidefx",
+          "actions": [
+            {
+              "compensation_action_id": "ca-rollback",
+              "failure_id": "fail-sidefx",
+              "action_ref": "rollback_db_write",
+              "target_side_effect_ref": "db-write-003",
+              "execution_order": 0,
+              "retry_policy_ref": "rp-comp-retry",
+              "status": "completed",
+              "action_notes": "Rolled back write #003"
+            }
+          ],
+          "plan_status": "completed"
+        },
+        "failure_disposition": "compensated"
+      }
+    },
+    {
+      "name": "compensation_action_failure_escalated",
+      "description": "Multiple side effects occurred. The compensation action itself fails, so the entire failure is escalated.",
+      "envelope": {
+        "envelope_id": "env-comp-fail",
+        "failure": {
+          "failure_id": "fail-comp-fail",
+          "scope_ref": "task-multi-write",
+          "failure_category": "partial_side_effect",
+          "failure_summary": "Multiple side effects, compensation failed",
+          "retryable": false,
+          "side_effects_present": true
+        },
+        "compensation_plan": {
+          "compensation_plan_id": "cp-comp-fail",
+          "failure_id": "fail-comp-fail",
+          "actions": [
+            {
+              "compensation_action_id": "ca-comp-1",
+              "failure_id": "fail-comp-fail",
+              "action_ref": "rollback_api_call",
+              "target_side_effect_ref": "api-call-002",
+              "execution_order": 0,
+              "status": "failed",
+              "action_notes": "Compensation call failed with 500"
+            }
+          ],
+          "plan_status": "failed",
+          "escalation_on_failure": true
+        },
+        "failure_disposition": "escalated"
+      }
+    },
+    {
+      "name": "unknown_state_failure_requiring_manual_recovery",
+      "description": "Agent state is corrupted and the last action is unknown. Side effects may exist. Manual recovery is requested.",
+      "envelope": {
+        "envelope_id": "env-unknown",
+        "failure": {
+          "failure_id": "fail-unknown",
+          "scope_ref": "task-state-loss",
+          "failure_category": "unknown_state",
+          "failure_summary": "Agent state corrupted, cannot determine last action",
+          "retryable": false,
+          "side_effects_present": true,
+          "unknown_state": true
+        },
+        "retry_policy": {
+          "retry_policy_id": "rp-unknown",
+          "retry_strategy": "manual_retry",
+          "max_attempts": 1
+        },
+        "recovery_plan": {
+          "recovery_plan_id": "rec-plan-unknown",
+          "failure_id": "fail-unknown",
+          "recovery_mode": "manual_recovery",
+          "requires_approval": true,
+          "recovery_goal": "Manual inspection and recovery"
+        },
+        "failure_disposition": "escalated"
+      }
+    }
+  ]
+}

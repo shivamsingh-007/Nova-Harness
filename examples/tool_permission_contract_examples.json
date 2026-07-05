@@ -1,0 +1,236 @@
+{
+  "examples": [
+    {
+      "label": "read_only_search_tool_grant",
+      "description": "Read-only search tool with restricted network, no filesystem access",
+      "tool_descriptor": {
+        "tool_id": "td-search",
+        "tool_name": "search_index",
+        "version": "2.1.0",
+        "description": "Read-only full-text search index",
+        "supported_actions": ["read"],
+        "risk_level": "low"
+      },
+      "execution_constraint": {
+        "timeout_seconds": 30,
+        "max_calls_per_run": 200,
+        "network_access": "restricted",
+        "filesystem_access": "none",
+        "allowed_paths": []
+      },
+      "capability_grant": {
+        "grant_id": "g-search-reader",
+        "agent_id": "agent-reader",
+        "tool_id": "td-search",
+        "allowed_actions": ["read"],
+        "approval_requirement": "none",
+        "credential_mode": "scoped_ephemeral",
+        "resource_scopes": ["index:docs", "index:knowledge_base"],
+        "execution_constraint": {
+          "timeout_seconds": 30,
+          "max_calls_per_run": 200,
+          "network_access": "restricted",
+          "filesystem_access": "none",
+          "allowed_paths": []
+        }
+      },
+      "invocation_request": {
+        "request_id": "req-search-001",
+        "run_id": "run-a1b2c3",
+        "agent_id": "agent-reader",
+        "tool_id": "td-search",
+        "action": "read",
+        "resource_target": "index://docs/architecture",
+        "tenant_id": "tenant-acme",
+        "justification": "Retrieve architecture documentation for context assembly"
+      },
+      "permission_decision": {
+        "decision_id": "dec-search-001",
+        "request_id": "req-search-001",
+        "allowed": true,
+        "reason": "READ on search_index granted by g-search-reader with matching scope",
+        "matched_grant_id": "g-search-reader",
+        "approval_required": false
+      }
+    },
+    {
+      "label": "code_execution_sandbox_filesystem",
+      "description": "Code execution tool with sandbox-only filesystem, no network, call limit",
+      "tool_descriptor": {
+        "tool_id": "td-codex",
+        "tool_name": "code_runner",
+        "version": "3.0.0",
+        "description": "Isolated Python code execution environment",
+        "supported_actions": ["read", "execute"],
+        "risk_level": "high"
+      },
+      "execution_constraint": {
+        "timeout_seconds": 120,
+        "max_calls_per_run": 5,
+        "network_access": "none",
+        "filesystem_access": "sandbox_only",
+        "allowed_paths": []
+      },
+      "capability_grant": {
+        "grant_id": "g-codex-coder",
+        "agent_id": "agent-coder",
+        "tool_id": "td-codex",
+        "allowed_actions": ["read", "execute"],
+        "approval_requirement": "optional",
+        "credential_mode": "scoped_ephemeral",
+        "resource_scopes": ["sandbox:default"],
+        "execution_constraint": {
+          "timeout_seconds": 120,
+          "max_calls_per_run": 5,
+          "network_access": "none",
+          "filesystem_access": "sandbox_only",
+          "allowed_paths": []
+        }
+      },
+      "invocation_request": {
+        "request_id": "req-codex-001",
+        "run_id": "run-d4e5f6",
+        "agent_id": "agent-coder",
+        "tool_id": "td-codex",
+        "action": "execute",
+        "resource_target": "sandbox://scripts/transform.py",
+        "justification": "Transform CSV data: sanitize PII fields before persistence"
+      },
+      "permission_decision": {
+        "decision_id": "dec-codex-001",
+        "request_id": "req-codex-001",
+        "allowed": true,
+        "reason": "EXECUTE on code_runner granted by g-codex-coder; approval optional",
+        "matched_grant_id": "g-codex-coder",
+        "approval_required": false
+      }
+    },
+    {
+      "label": "high_risk_delete_action_requiring_approval",
+      "description": "Critical-risk delete action that requires explicit approval before execution",
+      "tool_descriptor": {
+        "tool_id": "td-storage",
+        "tool_name": "object_store",
+        "version": "1.5.0",
+        "description": "Cloud object storage management",
+        "supported_actions": ["read", "write", "delete"],
+        "risk_level": "critical"
+      },
+      "execution_constraint": {
+        "timeout_seconds": 60,
+        "network_access": "full",
+        "filesystem_access": "none",
+        "allowed_paths": []
+      },
+      "capability_grant": {
+        "grant_id": "g-storage-admin",
+        "agent_id": "agent-admin",
+        "tool_id": "td-storage",
+        "allowed_actions": ["read", "write", "delete"],
+        "approval_requirement": "required",
+        "credential_mode": "prebound_reference",
+        "resource_scopes": ["storage:production", "storage:backup"],
+        "execution_constraint": {
+          "timeout_seconds": 60,
+          "network_access": "full",
+          "filesystem_access": "none",
+          "allowed_paths": []
+        }
+      },
+      "invocation_request": {
+        "request_id": "req-delete-001",
+        "run_id": "run-g7h8i9",
+        "agent_id": "agent-admin",
+        "tool_id": "td-storage",
+        "action": "delete",
+        "resource_target": "blob://containers/backup-2025-01",
+        "tenant_id": "tenant-acme",
+        "justification": "Remove expired backup per 90-day retention policy (ticket INFRA-442)"
+      },
+      "permission_decision": {
+        "decision_id": "dec-delete-001",
+        "request_id": "req-delete-001",
+        "allowed": true,
+        "reason": "DELETE on object_store granted by g-storage-admin but approval is required",
+        "matched_grant_id": "g-storage-admin",
+        "approval_required": true
+      }
+    },
+    {
+      "label": "unknown_tool_denied",
+      "description": "Unregistered tool is denied by default with no matching grant",
+      "tool_descriptor": null,
+      "execution_constraint": null,
+      "capability_grant": null,
+      "invocation_request": {
+        "request_id": "req-unknown-001",
+        "run_id": "run-xyz",
+        "agent_id": "agent-x",
+        "tool_id": "td-nonexistent",
+        "action": "execute",
+        "justification": "Attempt to invoke unregistered tool"
+      },
+      "permission_decision": {
+        "decision_id": "dec-unknown-001",
+        "request_id": "req-unknown-001",
+        "allowed": false,
+        "reason": "Default deny: no matching grant or tool registration for td-nonexistent",
+        "matched_grant_id": null,
+        "approval_required": false
+      }
+    },
+    {
+      "label": "network_restricted_api_tool",
+      "description": "API client tool with restricted network, prebound credentials, call limit",
+      "tool_descriptor": {
+        "tool_id": "td-api",
+        "tool_name": "external_api_client",
+        "version": "1.2.0",
+        "description": "HTTP client for external API integrations",
+        "supported_actions": ["read", "send"],
+        "risk_level": "moderate"
+      },
+      "execution_constraint": {
+        "timeout_seconds": 60,
+        "max_calls_per_run": 100,
+        "network_access": "restricted",
+        "filesystem_access": "none",
+        "allowed_paths": []
+      },
+      "capability_grant": {
+        "grant_id": "g-api-fetcher",
+        "agent_id": "agent-fetcher",
+        "tool_id": "td-api",
+        "allowed_actions": ["read", "send"],
+        "approval_requirement": "none",
+        "credential_mode": "prebound_reference",
+        "resource_scopes": ["api:weather", "api:maps", "api:exchange_rates"],
+        "execution_constraint": {
+          "timeout_seconds": 60,
+          "max_calls_per_run": 100,
+          "network_access": "restricted",
+          "filesystem_access": "none",
+          "allowed_paths": []
+        }
+      },
+      "invocation_request": {
+        "request_id": "req-api-001",
+        "run_id": "run-j1k2l3",
+        "agent_id": "agent-fetcher",
+        "tool_id": "td-api",
+        "action": "read",
+        "resource_target": "https://api.weather.example/v2/forecast?city=London",
+        "tenant_id": "tenant-weather",
+        "justification": "Fetch weather forecast for user notification pipeline"
+      },
+      "permission_decision": {
+        "decision_id": "dec-api-001",
+        "request_id": "req-api-001",
+        "allowed": true,
+        "reason": "READ on external_api_client granted by g-api-fetcher with matching scope",
+        "matched_grant_id": "g-api-fetcher",
+        "approval_required": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavish Axi — P56: Hybrid Task Intake Contract</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #e2e2e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container { max-width: 1000px; width: 100%; }
+
+.hero { margin-bottom: 2.5rem; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #a855f7; margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  background: linear-gradient(135deg, #f0f0ff 0%, #a855f7 50%, #7c3aed 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.75rem;
+}
+
+.hero p {
+  font-size: 1.05rem; color: #9494a8; max-width: 640px;
+}
+
+.card {
+  background: #12121a; border: 1px solid #1e1e2a;
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+}
+.card:hover { border-color: #2a2a3a; }
+
+.card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.icon-r { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+.icon-b { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.icon-p { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+.icon-g { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-y { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.icon-s { background: rgba(148, 148, 168, 0.15); color: #9494a8; }
+
+.card-title { font-weight: 700; font-size: 1.05rem; color: #f0f0ff; }
+.card-subtitle { font-size: 0.85rem; color: #6b6b80; margin-top: 0.1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+.grid-5 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 0.75rem; }
+
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #6b6b80; margin-bottom: 1rem; margin-top: 2rem;
+}
+
+.diagram {
+  background: #0d0d15; border: 1px solid #1a1a28; border-radius: 10px;
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.8; overflow-x: auto;
+}
+
+.diagram .hl { color: #a855f7; }
+.diagram .hl2 { color: #818cf8; }
+.diagram .hl3 { color: #34d399; }
+.diagram .dim { color: #52525b; }
+
+.footer {
+  text-align: center; font-size: 0.8rem; color: #52525b;
+  padding: 2rem 0 1rem; border-top: 1px solid #1e1e2a; margin-top: 2rem;
+}
+
+.success-banner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: 0.9rem; color: #34d399;
+  margin-bottom: 1.25rem;
+}
+
+.flow { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; line-height: 2.2; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">Primitive 56 &mdash; Hybrid Task Intake</div>
+    <h1>Hybrid Task Intake Contract</h1>
+    <p>
+      Typed contract for accepting free-form user or system requests, extracting
+      them into a structured task schema, validating the extraction, handling
+      ambiguity, and deciding the intake disposition.
+    </p>
+  </div>
+
+  <div class="section-label">Files</div>
+  <div class="diagram">
+    <span class="hl">CREATED</span>  models/hybrid_task_intake_contract.py              <span class="dim">(5 enums + 8 models)</span><br>
+    <span class="hl">CREATED</span>  tests/test_hybrid_task_intake_contract.py           <span class="dim">(49 tests, all PASS)</span><br>
+    <span class="hl">CREATED</span>  examples/hybrid_task_intake_examples.json            <span class="dim">(5 examples)</span><br>
+    <span class="hl">CREATED</span>  intake/INTAKE.md &bull; templates/                      <span class="dim">(protocol doc + 3 templates)</span>
+  </div>
+
+  <div class="success-banner">
+    &#10003; 2862/2862 tests pass &mdash; P56: 285 lines, 49 tests
+  </div>
+
+  <div class="section-label">Enums</div>
+
+  <div class="grid-5">
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-b">&#9881;</div>
+        <div>
+          <div class="card-title">IntakeSourceType</div>
+          <div class="card-subtitle">5 sources</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        user_message<br>form_submission<br>api_payload<br>artifact_upload<br>mixed_input
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-p">&#9881;</div>
+        <div>
+          <div class="card-title">ExtractionStatus</div>
+          <div class="card-subtitle">6 statuses</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        not_started &bull; in_progress<br>extracted<br>partially_extracted<br>failed &bull; needs_review
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-y">&#9881;</div>
+        <div>
+          <div class="card-title">FieldResolutionStatus</div>
+          <div class="card-subtitle">5 statuses</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        explicit &bull; inferred<br>missing &bull; ambiguous<br>invalid
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-g">&#9881;</div>
+        <div>
+          <div class="card-title">ClarificationMode</div>
+          <div class="card-subtitle">4 modes</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        ask_user<br>auto_repair<br>route_to_review<br>defer_until_context
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-icon icon-r">&#9881;</div>
+        <div>
+          <div class="card-title">IntakeDisposition</div>
+          <div class="card-subtitle">5 dispositions</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        accepted<br>accepted_with_gaps<br>clarification_required<br>rejected &bull; escalated
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Models</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">RawTaskIntake</div>
+          <div class="card-subtitle">original request</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        intake_id &bull; source_type<br>session_id? &bull; user_id?<br>received_at<br>raw_text? &bull; raw_artifact_refs[]<br>language? &bull; channel?<br>source_metadata{}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9632;</div>
+        <div>
+          <div class="card-title">StructuredTaskExtraction</div>
+          <div class="card-subtitle">normalized task view</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        extraction_id &bull; intake_id<br>target_schema_id<br>extraction_status<br>task_type? &bull; title?<br>objective? &bull; constraints[]<br>deadline? &bull; priority?<br>requested_outputs[]
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-y">&#9632;</div>
+        <div>
+          <div class="card-title">ExtractedFieldRecord</div>
+          <div class="card-subtitle">field-level extraction</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        field_record_id &bull; field_name<br>field_value_ref?<br>resolution_status<br>confidence? &bull; source_span?<br>extraction_reason?<br>validation_notes?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-r">&#9632;</div>
+        <div>
+          <div class="card-title">AmbiguityRecord</div>
+          <div class="card-subtitle">uncertainty</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        ambiguity_id &bull; field_name<br>ambiguity_summary<br>candidate_values[]<br>impact_level?<br>clarification_needed
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#9632;</div>
+        <div>
+          <div class="card-title">ClarificationRequestRecord</div>
+          <div class="card-subtitle">follow-up</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        clarification_id &bull; intake_id<br>clarification_mode<br>questions[]<br>blocking_fields[]<br>recommended_defaults{}<br>requested_at?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-s">&#9632;</div>
+        <div>
+          <div class="card-title">IntakeValidationRecord</div>
+          <div class="card-subtitle">validation outcome</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        validation_id &bull; intake_id<br>required_fields_checked[]<br>missing_required_fields[]<br>invalid_fields[]<br>average_confidence?<br>schema_valid &bull; review_required<br>validation_summary?
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-b">&#9632;</div>
+        <div>
+          <div class="card-title">TaskIntakeDecisionRecord</div>
+          <div class="card-subtitle">intake verdict</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        decision_id &bull; intake_id<br>intake_disposition<br>decision_reason?<br>accepted_task_ref?<br>clarification_ref?<br>escalation_ref?<br>decided_at?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#9632;</div>
+        <div>
+          <div class="card-title">HybridTaskIntakeEnvelope</div>
+          <div class="card-subtitle">top-level wrapper</div>
+        </div>
+      </div>
+      <div class="diagram" style="border:none; padding:0.5rem 0;">
+        envelope_id &bull; raw_intake<br>structured_extraction<br>fields[]<br>ambiguities[]?<br>clarification_request?<br>validation &bull; decision
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Intake Pipeline</div>
+
+  <div class="diagram">
+    <span class="hl">CAPTURE</span> &rarr; <span class="hl">EXTRACT</span> &rarr; <span class="hl">RESOLVE</span> &rarr; <span class="hl">VALIDATE</span> &rarr; <span class="hl">DECIDE</span><br>
+    <span class="dim">raw text</span> &nbsp;&nbsp; <span class="dim">schema map</span> &nbsp;&nbsp; <span class="dim"><span style="color:#34d399;">explicit</span>/<span style="color:#fbbf24;">inferred</span>/<span style="color:#f87171;">missing</span></span> &nbsp;&nbsp; <span class="dim">confidence + schema</span> &nbsp;&nbsp; <span class="dim"><span style="color:#34d399;">accept</span>/<span style="color:#fbbf24;">clarify</span>/<span style="color:#f87171;">reject</span></span>
+  </div>
+
+  <div class="section-label">Validation Rules</div>
+
+  <div class="diagram">
+    <span class="hl">NON-BLANK</span>  envelope_id, intake_id, extraction_id, target_schema_id, decision_id, validation_id, field_record_id, field_name, ambiguity_id, ambiguity_summary, clarification_id<br>
+    <span class="hl">CONTENT</span>  raw_text or raw_artifact_refs must be present<br>
+    <span class="hl">RESOLUTION</span>  missing fields must not have a field_value_ref<br>
+    <span class="hl">ACCEPT</span>  accepted disposition requires schema_valid=True and decision_reason<br>
+    <span class="hl">CLARIFY</span>  clarification_required requires a clarification_request<br>
+    <span class="hl">GAPS</span>  missing required fields block unconditional acceptance<br>
+    <span class="hl">AMBIGUITY</span>  ambiguity records must reference valid field names<br>
+    <span class="hl">CONFIDENCE</span>  confidence and average_confidence bounded 0.0 &le; v &le; 1.0
+  </div>
+
+  <div class="section-label">Test Coverage</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">49 tests</div>
+          <div class="card-subtitle">All passing</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-g">&#10003;</div>
+        <div>
+          <div class="card-title">8 models</div>
+          <div class="card-subtitle">5 enums + validators</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-p">&#10003;</div>
+        <div>
+          <div class="card-title">Intake integrity</div>
+          <div class="card-subtitle">source capture, field extraction, ambiguity tracking, clarification, validation gates, disposition rules</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">All 56 Primitives</div>
+  <div class="diagram">
+    <span style="color:#818cf8;">P1&nbsp;&nbsp;INSTRUCTION LAYERING</span><br>
+    <span style="color:#34d399;">P2&nbsp;&nbsp;TASK CONTRACT SCHEMA</span><br>
+    <span style="color:#38bdf8;">P3&nbsp;&nbsp;CONTEXT DELIVERY SCHEMA</span><br>
+    <span style="color:#fbbf24;">P4&nbsp;&nbsp;CONTEXT SELECTION POLICY</span><br>
+    <span style="color:#f87171;">P5&nbsp;&nbsp;TOOL INTERFACE SCHEMA</span><br>
+    <span style="color:#a78bfa;">P6&nbsp;&nbsp;EXECUTION ENVIRONMENT</span><br>
+    <span style="color:#fbbf24;">P7&nbsp;&nbsp;DURABLE STATE SCHEMA</span><br>
+    <span style="color:#34d399;">P8&nbsp;&nbsp;VERIFICATION SCHEMA</span><br>
+    <span style="color:#38bdf8;">P9&nbsp;&nbsp;PROMPT ASSEMBLY SCHEMA</span><br>
+    <span style="color:#818cf8;">P10 RUN ORCHESTRATION STATE MACHINE</span><br>
+    <span style="color:#fbbf24;">P11 RETRY AND RECOVERY POLICY</span><br>
+    <span style="color:#ef4444;">P12 APPROVAL AND SAFETY POLICY</span><br>
+    <span style="color:#34d399;">P13 EVALUATION AND BENCHMARK SCHEMA</span><br>
+    <span style="color:#a855f7;">P14 OBSERVABILITY AND TRACE SCHEMA</span><br>
+    <span style="color:#fbbf24;">P15 STATE MACHINE DRIVER</span><br>
+    <span style="color:#34d399;">P16 PIPELINE EXECUTOR</span><br>
+    <span style="color:#fbbf24;">P17 PRODUCTION CONFIG &amp; SECRETS</span><br>
+    <span style="color:#a855f7;">P18 BUDGET &amp; RATE LIMIT POLICY</span><br>
+    <span style="color:#ef4444;">P19 FAILURE TAXONOMY &amp; ERROR ENVELOPE</span><br>
+    <span style="color:#38bdf8;">P20 INPUT &amp; OUTPUT GUARDRAILS</span><br>
+    <span style="color:#34d399;">P21 APPROVAL &amp; ESCALATION</span><br>
+    <span style="color:#a855f7;">P22 CAPABILITY MATRIX</span><br>
+    <span style="color:#818cf8;">P23 SESSION STATE &amp; CHECKPOINT</span><br>
+    <span style="color:#34d399;">P24 EVALUATION &amp; QUALITY GATE</span><br>
+    <span style="color:#38bdf8;">P25 TRACE, AUDIT &amp; PROVENANCE</span><br>
+    <span style="color:#a855f7;">P26 AGENT IDENTITY &amp; OWNERSHIP</span><br>
+    <span style="color:#a855f7;">P27 MEMORY BOUNDARY</span><br>
+    <span style="color:#ef4444;">P28 TOOL CAPABILITY &amp; PERMISSION</span><br>
+    <span style="color:#ef4444;">P29 POLICY EVALUATION &amp; GUARDRAIL</span><br>
+    <span style="color:#ef4444;">P30 HUMAN APPROVAL &amp; ESCALATION</span><br>
+    <span style="color:#38bdf8;">P31 TASK CONTRACT &amp; UNIT-OF-WORK</span><br>
+    <span style="color:#a855f7;">P32 TOOL INVOCATION RECEIPT</span><br>
+    <span style="color:#fbbf24;">P33 MODEL CALL &amp; PROMPT PROVENANCE</span><br>
+    <span style="color:#34d399;">P34 CHECKPOINT &amp; SESSION RECOVERY</span><br>
+    <span style="color:#ef4444;">P35 POLICY DECISION &amp; APPROVAL GATE</span><br>
+    <span style="color:#38bdf8;">P36 AUDIT TRAIL &amp; EVENT LOG CONTRACT</span><br>
+    <span style="color:#a855f7;">P37 MEMORY, CONTEXT &amp; RETRIEVAL SNAPSHOT</span><br>
+    <span style="color:#fbbf24;">P38 ARTIFACT, FILE &amp; GENERATED OUTPUT CONTRACT</span><br>
+    <span style="color:#34d399;">P39 FEEDBACK, EVALUATION &amp; QUALITY SIGNAL CONTRACT</span><br>
+    <span style="color:#f87171;">P40 RUN ORCHESTRATION &amp; EXECUTION STATE CONTRACT</span><br>
+    <span style="color:#f87171;">P41 FAILURE, EXCEPTION &amp; RECOVERY DECISION CONTRACT</span><br>
+    <span style="color:#fbbf24;">P42 CONFIGURATION, SECRETS &amp; ENVIRONMENT CONTRACT</span><br>
+    <span style="color:#38bdf8;">P43 LOGGING, TRACE &amp; OBSERVABILITY EVENT CONTRACT</span><br>
+    <span style="color:#34d399;">P44 RUNNING LOOP CONTRACT</span><br>
+    <span style="color:#a855f7;">P45 STEP / TURN LIFECYCLE CONTRACT</span><br>
+    <span style="color:#818cf8;">P46 SUPERVISION &amp; DELEGATION CONTRACT</span><br>
+    <span style="color:#38bdf8;">P47 ROUTING &amp; DISPATCH CONTRACT</span><br>
+    <span style="color:#34d399;">P48 INPUT VALIDATION CONTRACT</span><br>
+    <span style="color:#fbbf24;">P49 HOOK LIFECYCLE CONTRACT</span><br>
+    <span style="color:#a855f7;">P50 AGENT ROLE &amp; SPECIALIZATION CONTRACT</span><br>
+    <span style="color:#38bdf8;">P51 HANDOFF &amp; RETURN ENVELOPE CONTRACT</span><br>
+    <span style="color:#34d399;">P52 MULTI-AGENT SESSION GRAPH CONTRACT</span><br>
+    <span style="color:#a855f7;">P53 CROSS-AGENT MESSAGING CONTRACT</span><br>
+    <span style="color:#38bdf8;">P54 PARALLEL WORK &amp; JOIN CONTRACT</span><br>
+    <span style="color:#34d399;">P55 SYNTHESIS &amp; FINALIZATION CONTRACT</span><br>
+    <span class="hl" style="color:#a855f7;">P56 HYBRID TASK INTAKE CONTRACT</span>  <span class="dim">— <span style="color:#a855f7;">YOU ARE HERE</span></span>
+  </div>
+
+  <div class="footer">
+    Harness Project &mdash; Lavish Axi P56 &bull; Hybrid Task Intake Contract &bull; 2862/2862 tests PASS
+  </div>
+
+</div>
+</body>
+</html>

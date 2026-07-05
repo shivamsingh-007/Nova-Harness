@@ -1,0 +1,11 @@
+{
+  "retry_policy_id": "string (required, non-blank)",
+  "failure_category": "transient_error | timeout | dependency_failure | ... | null",
+  "retry_strategy": "none | fixed | linear_backoff | exponential_backoff | manual_retry",
+  "max_attempts": "int >= 0 (default: 3, must be 0 if strategy=none)",
+  "base_delay_ms": "int >= 0 (default: 1000)",
+  "backoff_scale_factor": "float >= 1.0 (default: 2.0)",
+  "max_delay_ms": "int >= 0 | null",
+  "jitter_enabled": "boolean (default: false)",
+  "stop_conditions": ["string ..."]
+}

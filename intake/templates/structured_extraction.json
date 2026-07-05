@@ -1,0 +1,13 @@
+{
+  "extraction_id": "ext-<seq>",
+  "intake_id": "intake-<seq>",
+  "target_schema_id": "<schema_identifier>",
+  "extraction_status": "<extracted|partially_extracted|failed>",
+  "task_type": "<task_type>",
+  "title": "<task title>",
+  "objective": "<task objective>",
+  "constraints": ["<constraint_1>"],
+  "deadline": "<deadline>",
+  "priority": "<high|medium|low>",
+  "requested_outputs": ["<output_type_1>"]
+}

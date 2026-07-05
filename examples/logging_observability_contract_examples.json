@@ -1,0 +1,151 @@
+[
+  {
+    "title": "INFO-level state_change event for run_start",
+    "description": "A standard run_start event with INFO level and success outcome, correlated to trace and run",
+    "envelope": {
+      "envelope_id": "env-run-start",
+      "event": {
+        "event_id": "evt-run-start",
+        "signal_type": "log",
+        "event_kind": "run_start",
+        "event_name": "run.start",
+        "timestamp": "2026-07-04T12:00:00Z",
+        "level": "INFO",
+        "outcome": "success",
+        "message": "Run r-001 started successfully",
+        "service_name": "harness",
+        "correlation": {
+          "trace_id": "trace-001",
+          "run_id": "r-001",
+          "agent_id": "agent-alpha"
+        },
+        "attributes": [
+          { "key": "run_mode", "value": "sequential" },
+          { "key": "task_count", "value": "5" }
+        ],
+        "sensitive": false
+      }
+    }
+  },
+  {
+    "title": "WARN-level tool_call event with partial outcome",
+    "description": "A tool call returned partial results, logged at WARN with partial outcome",
+    "envelope": {
+      "envelope_id": "env-tool-partial",
+      "event": {
+        "event_id": "evt-tool-partial",
+        "signal_type": "log",
+        "event_kind": "tool_call",
+        "event_name": "tool.call.partial",
+        "timestamp": "2026-07-04T12:01:30Z",
+        "level": "WARN",
+        "outcome": "partial",
+        "message": "Tool read_file returned partial results (512 of 2048 bytes)",
+        "service_name": "harness",
+        "correlation": {
+          "trace_id": "trace-001",
+          "span_id": "span-003",
+          "run_id": "r-001",
+          "task_id": "t-001",
+          "tool_call_id": "tc-001"
+        },
+        "attributes": [
+          { "key": "bytes_read", "value": "512" },
+          { "key": "expected_bytes", "value": "2048" }
+        ],
+        "sensitive": false
+      }
+    }
+  },
+  {
+    "title": "ERROR-level failure event linked to a FailureRecord",
+    "description": "A tool timed out with ERROR level, failure outcome, and correlation to a FailureRecord via failure_id",
+    "envelope": {
+      "envelope_id": "env-error-failure",
+      "event": {
+        "event_id": "evt-error-failure",
+        "signal_type": "log",
+        "event_kind": "error",
+        "event_name": "tool.failure.timeout",
+        "timestamp": "2026-07-04T12:02:15Z",
+        "level": "ERROR",
+        "outcome": "failure",
+        "message": "Tool read_file timed out after 30s",
+        "service_name": "harness",
+        "correlation": {
+          "trace_id": "trace-001",
+          "span_id": "span-005",
+          "run_id": "r-001",
+          "task_id": "t-001",
+          "tool_call_id": "tc-001",
+          "failure_id": "fail-001"
+        },
+        "attributes": [
+          { "key": "timeout_seconds", "value": "30" },
+          { "key": "attempt", "value": "2" }
+        ],
+        "sensitive": false
+      }
+    }
+  },
+  {
+    "title": "Checkpoint event tied to a checkpoint_id",
+    "description": "A trace event recording a checkpoint taken mid-execution, linked to checkpoint_id",
+    "envelope": {
+      "envelope_id": "env-checkpoint",
+      "event": {
+        "event_id": "evt-checkpoint",
+        "signal_type": "trace_event",
+        "event_kind": "checkpoint",
+        "event_name": "checkpoint.taken",
+        "timestamp": "2026-07-04T12:03:00Z",
+        "outcome": "success",
+        "message": "Checkpoint chk-001 taken after step 4 of 10",
+        "service_name": "harness",
+        "correlation": {
+          "trace_id": "trace-001",
+          "span_id": "span-006",
+          "run_id": "r-001",
+          "task_id": "t-001",
+          "checkpoint_id": "chk-001"
+        },
+        "attributes": [
+          { "key": "step_index", "value": "4" },
+          { "key": "total_steps", "value": "10" },
+          { "key": "checkpoint_type", "value": "full" }
+        ],
+        "sensitive": false
+      }
+    }
+  },
+  {
+    "title": "Recovery decision event tied to a recovery_decision_id",
+    "description": "A trace event recording a recovery decision after a failure, linked to recovery_decision_id and failure_id",
+    "envelope": {
+      "envelope_id": "env-recovery",
+      "event": {
+        "event_id": "evt-recovery",
+        "signal_type": "trace_event",
+        "event_kind": "recovery",
+        "event_name": "recovery.decided",
+        "timestamp": "2026-07-04T12:04:00Z",
+        "outcome": "success",
+        "message": "Recovery decided: retry from checkpoint chk-001 after fail-001",
+        "service_name": "harness",
+        "correlation": {
+          "trace_id": "trace-001",
+          "span_id": "span-007",
+          "run_id": "r-001",
+          "task_id": "t-001",
+          "failure_id": "fail-001",
+          "recovery_decision_id": "dec-001"
+        },
+        "attributes": [
+          { "key": "recovery_action", "value": "retry" },
+          { "key": "next_checkpoint_id", "value": "chk-001" }
+        ],
+        "sensitive": false
+      }
+    }
+  }
+]

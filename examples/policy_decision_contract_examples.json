@@ -1,0 +1,179 @@
+[
+  {
+    "title": "Allow decision with rule refs",
+    "description": "A read_file tool call was allowed by policy with a referenced rule",
+    "envelope": {
+      "envelope_id": "env-allow",
+      "run_id": "run-001",
+      "task_id": "t-001",
+      "agent_id": "agent-code",
+      "decision": {
+        "decision_id": "pd-allow",
+        "scope": "tool_call",
+        "status": "allow",
+        "reason": "File read is permitted for all agents",
+        "rule_refs": [
+          {
+            "rule_id": "rule-007",
+            "rule_name": "allow_read_access",
+            "version": "1.2"
+          }
+        ],
+        "conditions": [],
+        "approval_requirement": "none",
+        "escalation_level": "none",
+        "next_action": null
+      },
+      "approval_gate": null
+    }
+  },
+  {
+    "title": "Block decision with reason and rule refs",
+    "description": "A delete_file tool call was blocked because the target path is protected",
+    "envelope": {
+      "envelope_id": "env-block",
+      "run_id": "run-001",
+      "task_id": "t-001",
+      "agent_id": "agent-code",
+      "decision": {
+        "decision_id": "pd-block",
+        "scope": "tool_call",
+        "status": "block",
+        "reason": "File path src/secrets/prod.env is in protected paths list",
+        "rule_refs": [
+          {
+            "rule_id": "rule-003",
+            "rule_name": "block_protected_paths",
+            "version": "2.0"
+          }
+        ],
+        "conditions": [
+          {
+            "condition_id": "cond-001",
+            "description": "Target path matches protected pattern",
+            "satisfied": true
+          }
+        ],
+        "approval_requirement": "none",
+        "escalation_level": "none",
+        "next_action": null
+      }
+    }
+  },
+  {
+    "title": "Require approval decision with next action",
+    "description": "Deleting an API endpoint requires owner approval; execution paused until gate is resolved",
+    "envelope": {
+      "envelope_id": "env-req",
+      "run_id": "run-002",
+      "task_id": "t-002",
+      "agent_id": "agent-code",
+      "decision": {
+        "decision_id": "pd-req",
+        "scope": "tool_call",
+        "status": "require_approval",
+        "reason": "Deleting API endpoint requires human approval",
+        "rule_refs": [
+          {
+            "rule_id": "rule-012",
+            "rule_name": "delete_endpoint_requires_approval"
+          }
+        ],
+        "conditions": [
+          {
+            "condition_id": "cond-001",
+            "description": "Endpoint has active traffic in last 30 days",
+            "satisfied": true
+          }
+        ],
+        "approval_requirement": "owner_approval",
+        "escalation_level": "none",
+        "next_action": "notify_api_team_lead"
+      },
+      "approval_gate": {
+        "gate_id": "gate-req-001",
+        "decision_id": "pd-req",
+        "approved": false,
+        "approval_actor": null,
+        "approval_note": null,
+        "approved_at": null
+      }
+    }
+  },
+  {
+    "title": "Escalated decision with approval gate",
+    "description": "Budget threshold exceeded; decision escalated to security with resolved approval gate",
+    "envelope": {
+      "envelope_id": "env-esc",
+      "run_id": "run-003",
+      "task_id": "t-003",
+      "trace_id": "trace-esc",
+      "agent_id": "agent-code",
+      "decision": {
+        "decision_id": "pd-esc",
+        "scope": "session",
+        "status": "escalate",
+        "reason": "Session exceeded budget threshold, requires security review",
+        "rule_refs": [
+          {
+            "rule_id": "rule-020",
+            "rule_name": "budget_exceeded_escalation"
+          }
+        ],
+        "conditions": [],
+        "approval_requirement": "none",
+        "escalation_level": "security",
+        "next_action": null
+      },
+      "approval_gate": {
+        "gate_id": "gate-esc-001",
+        "decision_id": "pd-esc",
+        "approved": true,
+        "approval_actor": {
+          "actor_id": "sec-user-01",
+          "actor_type": "human",
+          "display_name": "Security Lead"
+        },
+        "approval_note": "Reviewed and approved session continuation within revised budget",
+        "approved_at": "2026-07-04T11:00:00Z"
+      }
+    }
+  },
+  {
+    "title": "Deferred decision waiting on conditions",
+    "description": "Task execution deferred until all conditions are satisfied, with a recheck action",
+    "envelope": {
+      "envelope_id": "env-def",
+      "run_id": "run-004",
+      "task_id": "t-004",
+      "agent_id": "agent-code",
+      "decision": {
+        "decision_id": "pd-def",
+        "scope": "task",
+        "status": "defer",
+        "reason": "Waiting for resource quota to become available",
+        "rule_refs": [
+          {
+            "rule_id": "rule-005",
+            "rule_name": "resource_quota_policy"
+          }
+        ],
+        "conditions": [
+          {
+            "condition_id": "cond-001",
+            "description": "Enough disk space available",
+            "satisfied": false
+          },
+          {
+            "condition_id": "cond-002",
+            "description": "API rate limit reset",
+            "satisfied": true
+          }
+        ],
+        "approval_requirement": "none",
+        "escalation_level": "none",
+        "next_action": "recheck_in_60s"
+      }
+    }
+  }
+]

@@ -1,0 +1,46 @@
+{
+  "registry_version": "1.0.0",
+  "updated_at": "2026-07-05T12:47:00Z",
+  "roles": [
+    {
+      "role_id": "role-manager-001",
+      "role_type": "manager",
+      "name": "Team Manager",
+      "status": "active",
+      "specialization_type": "coordination_specific",
+      "autonomy_level": "supervisory",
+      "manifest_path": "roles/manager_role/ROLE.md",
+      "version": "2.0.0"
+    },
+    {
+      "role_id": "role-coder-001",
+      "role_type": "coder",
+      "name": "Coding Specialist",
+      "status": "active",
+      "specialization_type": "coding_specific",
+      "autonomy_level": "bounded_execution",
+      "manifest_path": "roles/example_role/ROLE.md",
+      "version": "1.2.0"
+    },
+    {
+      "role_id": "role-verifier-001",
+      "role_type": "verifier",
+      "name": "Quality Verifier",
+      "status": "active",
+      "specialization_type": "verification_specific",
+      "autonomy_level": "bounded_execution",
+      "manifest_path": "roles/verifier_role/ROLE.md",
+      "version": "1.0.0"
+    },
+    {
+      "role_id": "role-planner-001",
+      "role_type": "planner",
+      "name": "Task Planner",
+      "status": "draft",
+      "specialization_type": "generalist",
+      "autonomy_level": "advisory_only",
+      "manifest_path": "roles/planner_role/ROLE.md",
+      "version": "0.5.0"
+    }
+  ]
+}
